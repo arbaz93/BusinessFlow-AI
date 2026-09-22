@@ -1,12 +1,14 @@
+import Link from "next/link";
+
 export default function Home() {
   return (
     <main className="min-h-screen bg-[var(--surface)]">
       <header className="border-b border-[var(--line)] bg-white/80">
         <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-6 py-5 lg:px-10">
-          <a href="/" className="flex items-center gap-3" aria-label="BusinessFlow AI home">
+          <Link href="/" className="flex items-center gap-3" aria-label="BusinessFlow AI home">
             <span className="grid size-9 place-items-center rounded-lg bg-[var(--ink)] text-sm font-bold text-white">B</span>
             <span className="text-base font-semibold tracking-tight text-[var(--ink)]">BusinessFlow <span className="text-[var(--accent)]">AI</span></span>
-          </a>
+          </Link>
           <nav className="hidden items-center gap-7 text-sm text-[var(--muted)] sm:flex" aria-label="Main navigation">
             <a href="#approach" className="transition-colors hover:text-[var(--ink)]">Approach</a>
             <a href="#foundation" className="transition-colors hover:text-[var(--ink)]">Foundation</a>
@@ -53,6 +55,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-    </div>
+    </main>
   );
 }
