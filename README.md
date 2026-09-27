@@ -2,7 +2,7 @@
 
 BusinessFlow AI is an AI-powered project and client operations platform for digital and creative agencies.
 
-This repository currently contains **Phase 0: project foundation only**. Authentication, business records, AI workflows, and multi-tenant behavior are intentionally not implemented yet.
+This repository contains the BusinessFlow AI foundation, Supabase email/password authentication, first-workspace onboarding, and protected application routes. Business modules remain later vertical slices.
 
 ## Tech Stack
 
@@ -11,8 +11,8 @@ This repository currently contains **Phase 0: project foundation only**. Authent
 - Tailwind CSS 4
 - shadcn/ui conventions
 - PostgreSQL and Prisma ORM 7
-- Supabase configuration prepared for later Auth and Storage phases
-- Zod for environment and future input validation
+- Supabase Auth with cookie-based App Router sessions
+- Zod for form and environment validation
 - npm, Git, and Vercel-compatible project structure
 
 ## Prerequisites
@@ -32,18 +32,17 @@ npm install
 Create a local environment file from the template:
 
 ```bash
-cp .env.example .env.local
+cp .env.local.example .env.local
 ```
 
-Fill in credentials only when the related integration is being developed:
+Configure these values before using authentication or database-backed routes:
 
-- `DATABASE_URL`: PostgreSQL connection string for Prisma
+- `DATABASE_URL`: PostgreSQL connection string used by the application runtime
+- `DIRECT_URL`: PostgreSQL connection used by Prisma CLI migrations
 - `NEXT_PUBLIC_SUPABASE_URL`: Supabase project URL
 - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`: Supabase publishable key
-- `GEMINI_API_KEY`: reserved for the later AI integration phase
-- `AI_PROVIDER`: currently defaults to `gemini`
 
-Do not commit `.env.local` or any credentials. Blank values are accepted by the foundation shell.
+Do not commit `.env.local` or any credentials. In Supabase Auth settings, enable email/password sign-in and add `http://localhost:3000/auth/callback` to the allowed redirect URLs. Set the production callback URL there before deployment. No service-role key is required.
 
 ## Development
 
@@ -55,16 +54,16 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ## Database
 
-Prisma is configured for PostgreSQL in `prisma/schema.prisma`, with connection settings in `prisma.config.ts`. No application tables are defined in Phase 0.
+Prisma is configured for PostgreSQL in `prisma/schema.prisma`. It defines application profiles, organizations, and organization memberships; Supabase Auth remains the identity source.
 
-After setting `DATABASE_URL`, use the following commands as the schema evolves:
+After setting both database URLs, apply the initial schema and generate the client:
 
 ```bash
 npx prisma generate
-npx prisma migrate dev --name initial
+npx prisma migrate deploy
 ```
 
-The database connection has not been claimed as tested until a real PostgreSQL URL is supplied.
+For local schema changes, use `npx prisma migrate dev --name <migration-name>`.
 
 ## Build
 
@@ -81,8 +80,8 @@ npm run build
 - `prisma/`: PostgreSQL schema and migrations
 - `public/`: static assets
 
-Future architecture areas such as `app/(auth)`, `app/(dashboard)`, `lib/actions`, `lib/services`, `lib/auth`, `lib/ai`, and `lib/storage` are intentionally not populated until their respective phases begin.
+Auth helpers live in `lib/auth/`, Supabase clients in `lib/supabase/`, and protected application routes under `app/(application)/`.
 
-## Phase 0 Boundary
+## Current Boundary
 
-This phase stops at the technical foundation. It does not include Supabase authentication, signup, login, organizations, memberships, leads, clients, projects, tasks, documents, AI processing, Gemini integration, or dashboard business metrics.
+The Leads, Clients, Projects, Assistant, and Settings routes are protected placeholders. Their business operations, tasks, documents, AI processing, storage, and billing are not implemented yet.

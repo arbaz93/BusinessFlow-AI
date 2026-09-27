@@ -13,7 +13,10 @@ export default function Home() {
             <a href="#approach" className="transition-colors hover:text-[var(--ink)]">Approach</a>
             <a href="#foundation" className="transition-colors hover:text-[var(--ink)]">Foundation</a>
           </nav>
-          <span className="rounded-full border border-[var(--line)] bg-white px-3 py-1.5 text-xs font-medium text-[var(--muted)]">Phase 0</span>
+          <div className="flex items-center gap-4 text-sm font-medium">
+            <Link href="/login" className="text-[var(--muted)] transition-colors hover:text-[var(--ink)]">Log in</Link>
+            <Link href="/signup" className="rounded-lg bg-[var(--accent)] px-4 py-2 text-white transition-transform hover:-translate-y-0.5">Get started</Link>
+          </div>
         </div>
       </header>
 
@@ -23,8 +26,8 @@ export default function Home() {
           <h1 className="max-w-xl text-5xl font-semibold leading-[1.05] tracking-[-0.04em] text-[var(--ink)] sm:text-6xl">Make agency work easier to move forward.</h1>
           <p className="mt-7 max-w-lg text-lg leading-8 text-[var(--muted)]">AI-powered project and client operations for digital agencies. A focused foundation for the work that comes next.</p>
           <div className="mt-9 flex flex-wrap items-center gap-4">
-            <a href="#foundation" className="rounded-lg bg-[var(--ink)] px-5 py-3 text-sm font-semibold text-white transition-transform hover:-translate-y-0.5">Explore the foundation</a>
-            <span className="text-sm text-[var(--muted)]">Built for thoughtful teams</span>
+            <Link href="/signup" className="rounded-lg bg-[var(--ink)] px-5 py-3 text-sm font-semibold text-white transition-transform hover:-translate-y-0.5">Create your workspace</Link>
+            <Link href="/login" className="text-sm font-medium text-[var(--muted)] underline underline-offset-4 hover:text-[var(--ink)]">Sign in</Link>
           </div>
         </div>
 
@@ -51,7 +54,7 @@ export default function Home() {
           <div id="approach" className="grid gap-8 sm:grid-cols-3">
             <div><p className="text-sm font-semibold text-[var(--ink)]">Clear by default</p><p className="mt-2 text-sm leading-6 text-[var(--muted)]">A server-first Next.js foundation keeps the product direct and maintainable.</p></div>
             <div><p className="text-sm font-semibold text-[var(--ink)]">Ready for depth</p><p className="mt-2 text-sm leading-6 text-[var(--muted)]">Prisma, PostgreSQL, and Supabase are prepared for later phases.</p></div>
-            <div><p className="text-sm font-semibold text-[var(--ink)]">Deliberately early</p><p className="mt-2 text-sm leading-6 text-[var(--muted)]">No auth, records, or AI workflows are included in this foundation.</p></div>
+            <div><p className="text-sm font-semibold text-[var(--ink)]">Private by design</p><p className="mt-2 text-sm leading-6 text-[var(--muted)]">Authenticated workspace routes are verified on the server.</p></div>
           </div>
         </div>
       </section>
