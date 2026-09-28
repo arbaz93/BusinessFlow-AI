@@ -9,7 +9,10 @@ import { prisma } from "@/lib/db/prisma";
 import { redirect } from "next/navigation";
 
 export async function createWorkspace(_previousState: FormState, formData: FormData): Promise<FormState> {
-  const parsed = workspaceSchema.safeParse({ name: formData.get("name") });
+  const parsed = workspaceSchema.safeParse({
+    name: formData.get("name"),
+    businessType: formData.get("businessType"),
+  });
   if (!parsed.success) return { error: parsed.error.issues[0]?.message ?? "Enter a valid workspace name." };
 
   const authUser = await requireUser();
@@ -35,6 +38,7 @@ export async function createWorkspace(_previousState: FormState, formData: FormD
       transaction.organization.create({
         data: {
           name: parsed.data.name,
+          businessType: parsed.data.businessType,
           slug: `${baseSlug}-${randomUUID().slice(0, 8)}`,
           memberships: {
             create: { userId: context.profile.id, role: OrganizationRole.OWNER },

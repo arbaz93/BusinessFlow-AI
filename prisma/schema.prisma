@@ -13,6 +13,21 @@ enum OrganizationRole {
   MEMBER
 }
 
+enum LeadStatus {
+  NEW
+  CONTACTED
+  QUALIFIED
+  LOST
+  WON
+}
+
+enum ActivityType {
+  LEAD_CREATED
+  LEAD_UPDATED
+  LEAD_STATUS_CHANGED
+  LEAD_CONVERTED
+}
+
 model User {
   id          String               @id @default(cuid())
   authUserId  String               @unique
@@ -22,15 +37,20 @@ model User {
   createdAt   DateTime             @default(now())
   updatedAt   DateTime             @updatedAt
   memberships OrganizationMember[]
+  activities  Activity[]
 }
 
 model Organization {
-  id          String               @id @default(cuid())
-  name        String
-  slug        String               @unique
-  createdAt   DateTime             @default(now())
-  updatedAt   DateTime             @updatedAt
-  memberships OrganizationMember[]
+  id           String               @id @default(cuid())
+  name         String
+  businessType String               @default("OTHER")
+  slug         String               @unique
+  createdAt    DateTime             @default(now())
+  updatedAt    DateTime             @updatedAt
+  memberships  OrganizationMember[]
+  leads        Lead[]
+  clients      Client[]
+  activities   Activity[]
 }
 
 model OrganizationMember {
@@ -45,4 +65,60 @@ model OrganizationMember {
   @@unique([organizationId, userId])
   @@index([userId])
   @@index([organizationId])
+}
+
+model Lead {
+  id             String       @id @default(cuid())
+  organizationId String
+  name           String
+  email          String?
+  phone          String?
+  company        String?
+  source         String?
+  notes          String?
+  status         LeadStatus   @default(NEW)
+  convertedAt    DateTime?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  client         Client?
+  activities     Activity[]
+
+  @@unique([organizationId, id])
+  @@index([organizationId, status])
+  @@index([organizationId, createdAt])
+}
+
+model Client {
+  id             String       @id @default(cuid())
+  organizationId String
+  leadId         String       @unique
+  name           String
+  email          String?
+  phone          String?
+  company        String?
+  createdAt      DateTime     @default(now())
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  lead           Lead         @relation(fields: [organizationId, leadId], references: [organizationId, id], onDelete: Cascade)
+  activities     Activity[]
+
+  @@unique([organizationId, leadId])
+  @@index([organizationId, createdAt])
+}
+
+model Activity {
+  id             String       @id @default(cuid())
+  organizationId String
+  actorId        String
+  leadId         String?
+  clientId       String?
+  type           ActivityType
+  description    String
+  createdAt      DateTime     @default(now())
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  actor          User         @relation(fields: [actorId], references: [id], onDelete: Cascade)
+  lead           Lead?        @relation(fields: [leadId], references: [id], onDelete: SetNull)
+  client         Client?      @relation(fields: [clientId], references: [id], onDelete: SetNull)
+
+  @@index([organizationId, createdAt])
 }
