@@ -15,12 +15,13 @@ import {
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { requireOrganization } from "@/lib/auth/dal";
+import { prisma } from "@/lib/db/prisma";
 
-const metrics = [
+const metrics = (leadCount: number, clientCount: number) => [
   {
     href: "/leads",
     label: "Total Leads",
-    value: "24",
+    value: leadCount.toLocaleString(),
     note: "Across all lead stages",
     icon: Users,
     tone: "border-white/10 bg-[#18181b]",
@@ -29,8 +30,8 @@ const metrics = [
   {
     href: "/clients",
     label: "Active Clients",
-    value: "12",
-    note: "Clients currently working with you",
+    value: clientCount.toLocaleString(),
+    note: "Active client relationships",
     icon: BriefcaseBusiness,
     tone: "border-white/10 bg-[#18181b]",
     accent: "bg-[#3b82f6]/10 text-[#93c5fd]",
@@ -109,6 +110,10 @@ function getGreeting() {
 
 export default async function DashboardPage() {
   const { profile, organization } = await requireOrganization();
+  const [leadCount, clientCount] = await Promise.all([
+    prisma.lead.count({ where: { organizationId: organization.id } }),
+    prisma.client.count({ where: { organizationId: organization.id, status: "ACTIVE" } }),
+  ]);
   const firstName = profile.name.trim().split(/\s+/)[0] || null;
   const greeting = getGreeting();
   const workspaceName = organization?.name?.trim() || "your workspace";
@@ -152,7 +157,7 @@ export default async function DashboardPage() {
       </section>
 
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4" aria-label="Workspace metrics">
-        {metrics.map(({ href, label, value, note, icon: Icon, tone, accent }) => (
+        {metrics(leadCount, clientCount).map(({ href, label, value, note, icon: Icon, tone, accent }) => (
           <Link
             key={label}
             href={href}
