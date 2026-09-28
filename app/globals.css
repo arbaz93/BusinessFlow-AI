@@ -19,5 +19,16 @@
 body {
   background: var(--surface);
   color: var(--ink);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), sans-serif;
+}
+
+.auth-page {
+  --surface: #f5f5f5;
+  --ink: #111318;
+  --muted: #65686d;
+  --accent: #2563eb;
+  --line: #dedfe1;
+  --line-strong: #c9cbd0;
+  background-color: var(--surface);
+  font-family: var(--font-geist-sans), sans-serif;
 }

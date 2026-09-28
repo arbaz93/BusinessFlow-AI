@@ -19,4 +19,5 @@ export const signupSchema = z
 
 export const workspaceSchema = z.object({
   name: z.string().trim().min(2, "Workspace name must be at least 2 characters.").max(80, "Workspace name must be 80 characters or fewer."),
+  businessType: z.enum(["CREATIVE_AGENCY", "MARKETING_AGENCY", "DESIGN_STUDIO", "SOFTWARE_DEVELOPMENT", "CONSULTING", "OTHER"], "Select a business type."),
 });
