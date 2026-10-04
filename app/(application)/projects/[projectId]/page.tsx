@@ -94,6 +94,32 @@ export default async function ProjectOverviewPage({ params }: PageProps<"/projec
 
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1.5fr)_minmax(290px,0.8fr)]">
         <div className="space-y-6">
+
+          <section className="rounded-[10px] border border-white/10 bg-[#18181b] p-4 sm:p-5" aria-labelledby="project-progress">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <h2 id="project-progress" className="text-[16px] font-semibold text-[#f4f4f5]">Task progress</h2>
+                <p className="mt-1 text-xs text-white/45">
+                  {eligibleTaskCount ? `${completedTaskCount} of ${eligibleTaskCount} tasks completed` : "No tasks yet"}
+                </p>
+              </div>
+              <span className="text-lg font-semibold text-white/85">              {progress.percentage !== null ? `${progress.percentage}%` : "—"}</span>
+            </div>
+            <div
+              className="mt-4 h-2 overflow-hidden rounded-full bg-white/10"
+              role="progressbar"
+              aria-label="Project task completion"
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-valuenow={progress.percentage ?? 0}
+            >
+              {progress.percentage !== null && <div className="h-full rounded-full bg-[#8b83f5] transition-[width]" style={{ width: `${progress.percentage}%` }} />}
+            </div>
+            {!eligibleTaskCount && (
+              <p className="mt-4 text-sm text-white/50">Add tasks to organize this project&apos;s work and track progress.</p>
+            )}
+          </section>
+
           <section className="rounded-[10px] border border-white/10 bg-[#18181b] p-4 sm:p-5" aria-labelledby="project-summary">
             <div className="flex flex-wrap items-start justify-between gap-4">
               <div>
@@ -122,34 +148,15 @@ export default async function ProjectOverviewPage({ params }: PageProps<"/projec
             )}
           </section>
 
-          <section className="rounded-[10px] border border-white/10 bg-[#18181b] p-4 sm:p-5" aria-labelledby="project-progress">
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <h2 id="project-progress" className="text-[16px] font-semibold text-[#f4f4f5]">Task progress</h2>
-                <p className="mt-1 text-xs text-white/45">
-                  {eligibleTaskCount ? `${completedTaskCount} of ${eligibleTaskCount} tasks completed` : "No tasks yet"}
-                </p>
-              </div>
-              <span className="text-lg font-semibold text-white/85">              {progress.percentage !== null ? `${progress.percentage}%` : "—"}</span>
-            </div>
-            <div
-              className="mt-4 h-2 overflow-hidden rounded-full bg-white/10"
-              role="progressbar"
-              aria-label="Project task completion"
-              aria-valuemin={0}
-              aria-valuemax={100}
-              aria-valuenow={progress.percentage ?? 0}
-            >
-              {progress.percentage !== null && <div className="h-full rounded-full bg-[#8b83f5] transition-[width]" style={{ width: `${progress.percentage}%` }} />}
-            </div>
-            {!eligibleTaskCount && (
-              <p className="mt-4 text-sm text-white/50">Add tasks to organize this project&apos;s work and track progress.</p>
-            )}
+
+
+          <section>
+            <ProjectAIOverviewSummary projectId={project.id} initialState={aiState} />
           </section>
         </div>
 
         <aside className="space-y-6">
-          <ProjectAIOverviewSummary projectId={project.id} initialState={aiState} />
+          {/* <ProjectAIOverviewSummary projectId={project.id} initialState={aiState} /> */}
 
           <section className="rounded-[10px] border border-white/10 bg-[#18181b] p-4 sm:p-5" aria-labelledby="project-recent-tasks">
             <div className="flex items-start justify-between gap-3">

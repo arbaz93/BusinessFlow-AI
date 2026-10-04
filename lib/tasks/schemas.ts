@@ -38,6 +38,23 @@ export const taskInputSchema = z.object({
 
 export const taskIdSchema = z.string().trim().min(1).max(64);
 
+export const taskProposalEditSchema = z.object({
+  title: z.string().trim().min(1, "Task title is required.").max(160, "Task title must be 160 characters or fewer."),
+  description: optionalText(2000),
+  priority: z.preprocess(
+    (value) => (value === null || value === undefined || value === "" ? "MEDIUM" : value),
+    taskPrioritySchema,
+  ),
+  dueDate: z.preprocess(
+    (value) => (typeof value === "string" && value.trim() === "" ? undefined : value),
+    z.coerce.date().optional(),
+  ),
+  assigneeId: z.preprocess(
+    (value) => (typeof value === "string" && value.trim() === "" ? undefined : value),
+    z.string().trim().max(64).optional(),
+  ),
+}).strict();
+
 export type TaskInput = z.infer<typeof taskInputSchema>;
 export type TaskFormState = {
   error?: string;
