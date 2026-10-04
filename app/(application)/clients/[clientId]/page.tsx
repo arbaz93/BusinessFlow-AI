@@ -1,10 +1,14 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, BriefcaseBusiness, CalendarDays, FileText, FolderKanban, Mail, Phone, Plus, UserRound } from "lucide-react";
+import { ArrowLeft, BriefcaseBusiness, CalendarDays, FileText, FolderKanban, Mail, Phone, UserRound } from "lucide-react";
 import { ClientActionsMenu } from "@/components/clients/client-actions-menu";
 import { ClientFormDialog } from "@/components/clients/client-form-dialog";
+import { ProjectFormDialog } from "@/components/projects/project-form-dialog";
 import { requireOrganization } from "@/lib/auth/dal";
 import { prisma } from "@/lib/db/prisma";
+import { projectPriorityLabels, projectStatusLabels, projectStatusTone } from "@/lib/projects/options";
+import { isActiveProjectStatus } from "@/lib/projects/timeline";
+import { activeTaskStatuses } from "@/lib/tasks/options";
 
 export default async function ClientDetailPage({ params }: PageProps<"/clients/[clientId]">) {
   const { clientId } = await params;
@@ -19,12 +23,37 @@ export default async function ClientDetailPage({ params }: PageProps<"/clients/[
         take: 20,
         include: { actor: { select: { name: true } } },
       },
+      projects: {
+        orderBy: { updatedAt: "desc" },
+        select: {
+          id: true,
+          name: true,
+          status: true,
+          priority: true,
+          dueDate: true,
+          updatedAt: true,
+          _count: {
+            select: {
+              tasks: {
+                where: { organizationId: organization.id, status: { in: activeTaskStatuses } },
+              },
+            },
+          },
+        },
+      },
       _count: { select: { activities: { where: { organizationId: organization.id } } } },
     },
   });
 
   if (!client) notFound();
   const latestActivity = client.activities[0];
+  const activeProjects = client.projects.filter((project) => isActiveProjectStatus(project.status)).length;
+  const completedProjects = client.projects.filter((project) => project.status === "COMPLETED").length;
+  const clients = await prisma.client.findMany({
+    where: { organizationId: organization.id },
+    orderBy: { name: "asc" },
+    select: { id: true, name: true, company: true },
+  });
   const draft = {
     id: client.id,
     name: client.name,
@@ -58,7 +87,7 @@ export default async function ClientDetailPage({ params }: PageProps<"/clients/[
           </div>
           <div className="flex flex-wrap items-center gap-2">
             <ClientFormDialog client={draft} />
-            <button type="button" disabled title="Project tracking is not available yet" className="inline-flex h-10 cursor-not-allowed items-center gap-2 rounded-lg border border-white/10 bg-[#18181b] px-3 text-sm font-medium text-white/35 disabled:opacity-60"><Plus size={15} />Create Project</button>
+            <ProjectFormDialog clients={clients} defaultClientId={client.id} triggerLabel="Create Project" />
             <ClientActionsMenu
               clientId={client.id}
               name={client.name}
@@ -71,9 +100,9 @@ export default async function ClientDetailPage({ params }: PageProps<"/clients/[
       </div>
 
       <section aria-label="Client overview" className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        <SummaryMetric icon={FolderKanban} label="Active Projects" value="—" note="Project tracking unavailable" />
-        <SummaryMetric icon={BriefcaseBusiness} label="Total Projects" value="—" note="Project tracking unavailable" />
-        <SummaryMetric icon={CalendarDays} label="Open Tasks" value="—" note="Task tracking unavailable" />
+        <SummaryMetric icon={FolderKanban} label="Active Projects" value={String(activeProjects)} note="Planning, in progress, or on hold" />
+        <SummaryMetric icon={BriefcaseBusiness} label="Total Projects" value={String(client.projects.length)} note="Across this client" />
+        <SummaryMetric icon={CalendarDays} label="Completed" value={String(completedProjects)} note="Delivered work" />
         <SummaryMetric icon={CalendarDays} label="Last Activity" value={latestActivity ? latestActivity.createdAt.toLocaleDateString("en-US", { month: "short", day: "numeric" }) : "None"} note={latestActivity ? latestActivity.description : "No recorded activity"} />
       </section>
 
@@ -82,13 +111,37 @@ export default async function ClientDetailPage({ params }: PageProps<"/clients/[
           <section className="rounded-[10px] border border-white/10 bg-[#18181b] p-4 sm:p-5" aria-labelledby="projects-heading">
             <div className="flex items-center justify-between gap-4">
               <div><h2 id="projects-heading" className="text-[16px] font-semibold text-[#f4f4f5]">Projects</h2><p className="mt-1 text-xs text-white/45">Delivery work associated with this client.</p></div>
-              <button type="button" disabled title="Project tracking is not available yet" className="inline-flex h-9 cursor-not-allowed items-center gap-1.5 rounded-lg border border-white/10 bg-[#111113] px-3 text-xs font-medium text-white/35"><Plus size={14} />New Project</button>
+              <ProjectFormDialog clients={clients} defaultClientId={client.id} triggerLabel="New Project" />
             </div>
-            <div className="mt-4 rounded-lg border border-dashed border-white/12 bg-[#111113]/60 px-4 py-8 text-center">
-              <span className="mx-auto grid size-9 place-items-center rounded-lg border border-white/10 bg-white/[0.03] text-white/45"><FolderKanban size={16} /></span>
-              <h3 className="mt-3 text-sm font-medium text-white/75">Project tracking unavailable</h3>
-              <p className="mx-auto mt-1 max-w-sm text-xs leading-5 text-white/45">Project tracking and creation are not available yet.</p>
-            </div>
+            {client.projects.length ? (
+              <div className="mt-4 space-y-3">
+                {client.projects.map((project) => (
+                  <Link key={project.id} href={`/projects/${project.id}`} className="block rounded-lg border border-white/10 bg-[#111113]/80 p-3 transition-colors hover:border-[#8b5cf6]/30 hover:bg-[#14131a]">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-semibold text-[#f4f4f5]">{project.name}</p>
+                        <p className="mt-1 text-[11px] text-white/45">Priority: {projectPriorityLabels[project.priority]}</p>
+                      </div>
+                      <span className={`inline-flex h-6 shrink-0 items-center rounded-full border px-2 text-[10px] font-medium ${projectStatusTone[project.status]}`}>{projectStatusLabels[project.status]}</span>
+                    </div>
+                    <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-white/45">
+                      <span>Due {project.dueDate ? new Date(project.dueDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "No date"}</span>
+                      <span>Updated {new Date(project.updatedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</span>
+                      <span>{project._count.tasks} open {project._count.tasks === 1 ? "task" : "tasks"}</span>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            ) : (
+              <div className="mt-4 rounded-lg border border-dashed border-white/12 bg-[#111113]/60 px-4 py-8 text-center">
+                <span className="mx-auto grid size-9 place-items-center rounded-lg border border-white/10 bg-white/[0.03] text-white/45"><FolderKanban size={16} /></span>
+                <h3 className="mt-3 text-sm font-medium text-white/75">No projects yet</h3>
+                <p className="mx-auto mt-1 max-w-sm text-xs leading-5 text-white/45">Create a project to start organizing work for this client.</p>
+                <div className="mt-4 flex justify-center">
+                  <ProjectFormDialog clients={clients} defaultClientId={client.id} triggerLabel="Create Project" />
+                </div>
+              </div>
+            )}
           </section>
 
           <section className="rounded-[10px] border border-white/10 bg-[#18181b] p-4 sm:p-5" aria-labelledby="client-info-heading">

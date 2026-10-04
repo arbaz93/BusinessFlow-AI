@@ -13,11 +13,31 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "BusinessFlow AI",
-  description: "AI-powered project and client operations for digital agencies.",
+  title: {
+    default: "BusinessFlow AI — Connected Operations for Agencies",
+    template: "%s | BusinessFlow AI",
+  },
+  description:
+    "Organize leads, manage client relationships, and connect projects in one workspace built for agencies and small service businesses.",
+  openGraph: {
+    title: "BusinessFlow AI — Connected Operations for Agencies",
+    description:
+      "Organize leads, manage client relationships, and connect projects in one workspace built for agencies and small service businesses.",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "BusinessFlow AI — Connected Operations for Agencies",
+    description:
+      "Organize leads, manage client relationships, and connect projects in one workspace built for agencies and small service businesses.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html
       lang="en"

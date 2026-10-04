@@ -1,0 +1,27 @@
+import { existsSync, statSync } from "node:fs";
+import path from "node:path";
+import { fileURLToPath, pathToFileURL } from "node:url";
+
+const projectRoot = path.resolve(fileURLToPath(new URL("../..", import.meta.url)));
+
+function resolveFile(target) {
+  if (existsSync(target) && statSync(target).isFile()) return target;
+  for (const extension of [".ts", ".tsx", ".mjs", ".js"]) {
+    const candidate = `${target}${extension}`;
+    if (existsSync(candidate)) return candidate;
+  }
+  for (const extension of [".ts", ".tsx", ".mjs", ".js"]) {
+    const candidate = path.join(target, `index${extension}`);
+    if (existsSync(candidate)) return candidate;
+  }
+  return null;
+}
+
+/** Maps the `@/...` path alias used throughout the app onto the repository root. */
+export function resolve(specifier, context, nextResolve) {
+  if (specifier.startsWith("@/")) {
+    const resolved = resolveFile(path.join(projectRoot, specifier.slice(2)));
+    if (resolved) return nextResolve(pathToFileURL(resolved).href, context);
+  }
+  return nextResolve(specifier, context);
+}
