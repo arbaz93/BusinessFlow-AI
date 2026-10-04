@@ -5,15 +5,23 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Dialog } from "radix-ui";
 import { ArrowUpRight, Check, Copy, LoaderCircle, MessageSquareText, Plus, Send, Sparkles, Trash2, X } from "lucide-react";
-import { createAssistantConversation, deleteAssistantConversation, submitAssistantMessage } from "@/app/actions/ai-assistant";
-import { AssistantMessageContent } from "@/components/assistant/assistant-message-content";
+import {
+  cancelAssistantTaskProposal,
+  createAssistantConversation,
+  deleteAssistantConversation,
+  submitAssistantMessage,
+} from "@/app/actions/ai-assistant";import { AssistantMessageContent } from "@/components/assistant/assistant-message-content";
+import { TaskProposalCard } from "@/components/assistant/task-proposal-card";
 import { Textarea } from "@/components/ui/textarea";
-import type { AssistantConversationDetail, AssistantConversationListItem, AssistantConversationMessage } from "@/lib/assistant/types";
+import type { AssistantConversationDetail, AssistantConversationListItem, AssistantConversationMessage, TaskProposal } from "@/lib/assistant/types";
+import type { AssistantTeamMember } from "@/lib/assistant/team";
 import { ASSISTANT_MESSAGE_MAX_LENGTH } from "@/lib/assistant/schemas";
 
 type AssistantWorkspaceProps = {
   conversations: AssistantConversationListItem[];
   initialConversation: AssistantConversationDetail | null;
+  pendingProposals: TaskProposal[];
+  teamMembers: AssistantTeamMember[];
 };
 
 type RetryRequest = { requestId: string; content: string };
@@ -111,10 +119,17 @@ const SUGGESTED_STARTERS = [
 
 function ConversationPanel({
   conversation,
+  pendingProposals,
+  teamMembers,
 }: {
   conversation: AssistantConversationDetail;
+  pendingProposals: TaskProposal[];
+  teamMembers: AssistantTeamMember[];
 }) {
   const [messages, setMessages] = useState(conversation.messages);
+  const [proposalsByMessage, setProposalsByMessage] = useState<Record<string, TaskProposal>>(
+    () => Object.fromEntries(pendingProposals.map((proposal) => proposal.messageId ? [proposal.messageId, proposal] : [])),
+  );
   const [draft, setDraft] = useState("");
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -174,13 +189,21 @@ function ConversationPanel({
         return;
       }
 
-      setMessages((current) => {
-        const withoutOptimistic = current.filter((message) => message.id !== `local-${request.requestId}`);
-        const withUser = mergeMessage(withoutOptimistic, result.userMessage);
-        return mergeMessage(withUser, result.assistantMessage);
-      });
-      setRetryRequest(null);
-      setError(null);
+        setMessages((current) => {
+          const withoutOptimistic = current.filter((message) => message.id !== `local-${request.requestId}`);
+          const withUser = mergeMessage(withoutOptimistic, result.userMessage);
+          return mergeMessage(withUser, result.assistantMessage);
+        });
+        const newProposal = result.proposal;
+        if (newProposal) {
+          setProposalsByMessage((current) => {
+            const next: Record<string, TaskProposal> = { ...current };
+            next[result.assistantMessage.id] = newProposal;
+            return next;
+          });
+        }
+        setRetryRequest(null);
+        setError(null);
     } catch {
       setError("We couldn't generate a response. Please try again.");
       setRetryRequest(request);
@@ -273,6 +296,42 @@ function ConversationPanel({
                         BusinessFlow AI
                       </div>
                       <AssistantMessageContent content={message.content} />
+                      {proposalsByMessage[message.id] && (
+                        <TaskProposalCard
+                          key={proposalsByMessage[message.id].proposalId}
+                          proposal={proposalsByMessage[message.id]}
+                          teamMembers={teamMembers}
+                          onUpdate={(updated) =>
+                            setProposalsByMessage((current) => ({ ...current, [message.id]: updated }))
+                          }
+                          onCreated={(proposal, taskId, title) => {
+                            setProposalsByMessage((current) => {
+                              const next: Record<string, TaskProposal> = {};
+                              for (const key of Object.keys(current)) {
+                                if (key !== message.id) next[key] = current[key];
+                              }
+                              return next;
+                            });
+                            setDraft("");
+                            void navigator.clipboard.writeText(title).catch(() => {});
+                          }}
+                          onCancel={() => {
+                            const form = new FormData();
+                            form.set("proposalId", proposalsByMessage[message.id].proposalId);
+                            void cancelAssistantTaskProposal(undefined, form).then((result) => {
+                              if (result.success) {
+                                setProposalsByMessage((current) => {
+                                  const next: Record<string, TaskProposal> = {};
+                                  for (const key of Object.keys(current)) {
+                                    if (key !== message.id) next[key] = current[key];
+                                  }
+                                  return next;
+                                });
+                              }
+                            });
+                          }}
+                        />
+                      )}
                       <button
                         type="button"
                         onClick={() => void copyMessage(message)}
@@ -356,7 +415,7 @@ function ConversationPanel({
   );
 }
 
-export function AssistantWorkspace({ conversations, initialConversation }: AssistantWorkspaceProps) {
+export function AssistantWorkspace({ conversations, initialConversation, pendingProposals, teamMembers }: AssistantWorkspaceProps) {
   const router = useRouter();
   const [createPending, startCreate] = useTransition();
   const [deletePending, startDelete] = useTransition();
@@ -497,7 +556,12 @@ export function AssistantWorkspace({ conversations, initialConversation }: Assis
             )}
           </div>
           {initialConversation ? (
-            <ConversationPanel key={initialConversation.id} conversation={initialConversation} />
+            <ConversationPanel
+              key={initialConversation.id}
+              conversation={initialConversation}
+              pendingProposals={pendingProposals}
+              teamMembers={teamMembers}
+            />
           ) : (
             <div className="flex min-h-0 flex-1 flex-col items-center justify-center px-6 py-12 text-center">
               <span className="grid size-12 place-items-center rounded-xl border border-white/10 bg-white/[0.035] text-[#c4b5fd]">

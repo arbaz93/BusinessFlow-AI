@@ -5,18 +5,8 @@ import { requireOrganization } from "@/lib/auth/dal";
 import { prisma } from "@/lib/db/prisma";
 import { taskIdSchema, taskInputSchema, taskStatusSchema, type TaskFormState } from "@/lib/tasks/schemas";
 import { taskStatusLabels } from "@/lib/tasks/options";
+import { createTask, revalidateTaskViews } from "@/lib/tasks/service";
 
-function revalidateTaskViews(taskId?: string, projectIds: string[] = []) {
-  revalidatePath("/tasks");
-  revalidatePath("/dashboard");
-  revalidatePath("/projects");
-  revalidatePath("/clients/[clientId]", "page");
-  if (taskId) revalidatePath(`/tasks/${taskId}`);
-  for (const projectId of new Set(projectIds)) {
-    revalidatePath(`/projects/${projectId}`);
-    revalidatePath(`/projects/${projectId}/tasks`);
-  }
-}
 
 function describeTaskUpdate({
   title,
@@ -152,25 +142,20 @@ async function saveTaskInternal(
         return { kind: "saved" as const, id: current.id, previousProjectId: projectChanged ? current.projectId : null };
       }
 
-      const created = await transaction.task.create({
-        data: {
-          ...persistedTaskData,
-          createdById: profile.id,
-          completedAt: parsed.data.status === "COMPLETED" ? new Date() : null,
-        },
-        select: { id: true },
-      });
-
-      await transaction.activity.create({
-        data: {
+      const created = await createTask(
+        {
           organizationId: organization.id,
-          actorId: profile.id,
-          taskId: created.id,
+          createdById: profile.id,
           projectId: parsed.data.projectId,
-          type: "TASK_CREATED",
-          description: `Task "${parsed.data.title}" was created.`,
+          title: parsed.data.title,
+          description: parsed.data.description,
+          status: parsed.data.status,
+          priority: parsed.data.priority,
+          dueDate: parsed.data.dueDate,
+          assigneeId: parsed.data.assigneeId,
         },
-      });
+        { transaction },
+      );
 
       return { kind: "saved" as const, id: created.id, previousProjectId: null };
     });

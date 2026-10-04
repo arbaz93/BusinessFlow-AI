@@ -6,6 +6,7 @@ import { Alert } from "@/components/ui/alert";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { SelectField, TextField } from "@/components/ui/field";
+import { businessTypeLabels, businessTypeValues } from "@/lib/organizations/options";
 import { cn } from "@/lib/utils";
 
 export function WorkspaceForm() {
@@ -29,12 +30,11 @@ export function WorkspaceForm() {
             <option disabled value="">
               Select business type
             </option>
-            <option value="CREATIVE_AGENCY">Creative agency</option>
-            <option value="MARKETING_AGENCY">Marketing agency</option>
-            <option value="DESIGN_STUDIO">Design studio</option>
-            <option value="SOFTWARE_DEVELOPMENT">Software development</option>
-            <option value="CONSULTING">Consulting</option>
-            <option value="OTHER">Other</option>
+            {businessTypeValues.map((value) => (
+              <option key={value} value={value}>
+                {businessTypeLabels[value]}
+              </option>
+            ))}
           </SelectField>
 
           {state.error ? <Alert role="alert">{state.error}</Alert> : null}
