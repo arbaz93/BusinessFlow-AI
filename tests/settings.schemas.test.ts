@@ -2,7 +2,6 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import {
   profileUpdateSchema,
-  emailUpdateSchema,
   passwordUpdateSchema,
   deleteAccountSchema,
 } from "@/lib/auth/schemas";
@@ -33,21 +32,6 @@ describe("Settings schemas", () => {
       const result = profileUpdateSchema.safeParse({ name: "  Ada  " });
       assert.equal(result.success, true);
       if (result.success) assert.equal(result.data.name, "Ada");
-    });
-  });
-
-  describe("emailUpdateSchema", () => {
-    it("accepts a valid email", () => {
-      assert.equal(emailUpdateSchema.safeParse({ email: "ada@example.com" }).success, true);
-    });
-
-    it("rejects an invalid email", () => {
-      const result = emailUpdateSchema.safeParse({ email: "not-an-email" });
-      assert.equal(result.success, false);
-    });
-
-    it("rejects an empty email", () => {
-      assert.equal(emailUpdateSchema.safeParse({ email: "" }).success, false);
     });
   });
 

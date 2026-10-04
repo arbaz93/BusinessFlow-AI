@@ -3,24 +3,17 @@
 import { useState, useActionState } from "react";
 import { KeyRound, LogOut } from "lucide-react";
 import { signOut } from "@/app/actions/auth";
-import { updateEmail, updatePassword } from "@/app/actions/profile";
+import { updatePassword } from "@/app/actions/profile";
 import { Input } from "@/components/ui/input";
 
 const inputClass =
   "h-10 w-full rounded-lg border border-[#27272a] bg-[#111113] px-3.5 text-sm text-white placeholder:text-white/30 focus-visible:border-[#a49bff] focus-visible:ring-[#a49bff]/20 focus-visible:ring-2 disabled:cursor-not-allowed";
 
-export function SecurityForm({ email }: { email: string }) {
-  const [emailState, emailAction, emailPending] = useActionState(updateEmail, {});
+export function SecurityForm() {
   const [passwordState, passwordAction, passwordPending] = useActionState(updatePassword, {});
-  const [newEmail, setNewEmail] = useState("");
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-
-  const emailDisabled =
-    emailPending ||
-    newEmail.trim() === "" ||
-    newEmail.trim().toLowerCase() === email.toLowerCase();
 
   const passwordDisabled =
     passwordPending ||
@@ -30,53 +23,6 @@ export function SecurityForm({ email }: { email: string }) {
 
   return (
     <div className="space-y-8">
-      <section className="space-y-4">
-        <div className="space-y-1">
-          <h3 className="text-sm font-semibold text-white">Email address</h3>
-          <p className="text-sm text-[#a1a1ab]">
-            Your confirmed email (<span className="text-white">{email}</span>) is your account identity.
-            Changing it may require confirmation.
-          </p>
-        </div>
-
-        <form action={emailAction} className="flex flex-col gap-3 sm:flex-row sm:items-end">
-          <div className="flex-1">
-            <label htmlFor="security-email" className="block text-sm font-medium text-[#f4f4f5]">
-              New email address
-            </label>
-            <Input
-              id="security-email"
-              type="email"
-              placeholder="you@example.com"
-              value={newEmail}
-              onChange={(event) => setNewEmail(event.currentTarget.value)}
-              disabled={emailPending}
-              className={inputClass}
-              aria-invalid={Boolean(emailState.error)}
-              aria-describedby={emailState.error ? "security-email-error" : undefined}
-            />
-            {emailState.error ? (
-              <p id="security-email-error" className="mt-1 text-xs text-[#fca5a5]" role="alert">
-                {emailState.error}
-              </p>
-            ) : null}
-          </div>
-          <button
-            type="submit"
-            disabled={emailDisabled}
-            className="mt-4 h-10 rounded-lg bg-[#7067e8] px-4 text-sm font-semibold text-white transition-colors hover:bg-[#8178f0] disabled:cursor-not-allowed disabled:opacity-55 sm:ml-3 sm:mt-0"
-          >
-            {emailPending ? "Sending…" : "Update email"}
-          </button>
-        </form>
-
-        {emailState.message ? (
-          <p className="text-sm text-[#86efac]" role="status">
-            {emailState.message}
-          </p>
-        ) : null}
-      </section>
-
       <section className="space-y-4">
         <div className="space-y-1">
           <h3 className="text-sm font-semibold text-white">Password</h3>

@@ -28,10 +28,6 @@ export const profileUpdateSchema = z.object({
   name: z.string().trim().min(2, "Enter your full name.").max(100, "Full name must be 100 characters or fewer."),
 });
 
-export const emailUpdateSchema = z.object({
-  email: z.email("Enter a valid email address.").trim(),
-});
-
 export const passwordUpdateSchema = z
   .object({
     currentPassword: z.string().min(1, "Enter your current password."),

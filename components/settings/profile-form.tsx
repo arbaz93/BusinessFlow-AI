@@ -57,14 +57,7 @@ export function ProfileForm({ name, email }: { name: string; email: string | nul
           )}
         />
         <p className="mt-1 text-xs text-[#71717a]">
-          Email identity is managed by your authentication provider. You can change it in{" "}
-          <a
-            className="underline decoration-[#a1a1aa]/50 hover:text-white"
-            href="/settings/security"
-          >
-            Security
-          </a>
-          .
+          Email identity is managed by your authentication provider and cannot be changed here.
         </p>
       </div>
 

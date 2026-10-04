@@ -18,9 +18,10 @@ export async function verifyUserPassword(authUserId: string, email: string, pass
     return true;
   } finally {
     try {
-      await client.auth.signOut();
+      await client.auth.signOut({ scope: "local" });
     } catch {
-      // best-effort cleanup of the throwaway verification session
+      // best-effort cleanup: "local" scope only clears this throwaway client's
+      // in-memory session and does NOT revoke the user's active server session.
     }
   }
 }

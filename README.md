@@ -39,11 +39,12 @@ Configure these values before using authentication or database-backed routes:
 
 - `DATABASE_URL`: PostgreSQL connection string used by the application runtime
 - `DIRECT_URL`: PostgreSQL connection used by Prisma CLI migrations
+- `NEXT_PUBLIC_SITE_URL`: canonical application URL used for authentication confirmation links (for example, `http://localhost:3000`)
 - `NEXT_PUBLIC_SUPABASE_URL`: Supabase project URL
 - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`: Supabase publishable key
 - `SUPABASE_SERVICE_ROLE_KEY`: Supabase service-role key required for private document uploads and signed URLs
 
-Do not commit `.env.local` or any credentials. In Supabase Auth settings, enable email/password sign-in and add `http://localhost:3000/auth/callback` to the allowed redirect URLs. Set the production callback URL there before deployment. For project documents, create a private storage bucket named `project-documents` in Supabase and keep the bucket private.
+Do not commit `.env.local` or any credentials. In Supabase Auth settings, enable email/password sign-in and add the callback URL `${NEXT_PUBLIC_SITE_URL}/auth/callback` to the allowed redirect URLs. Set `NEXT_PUBLIC_SITE_URL` to your app origin (for example, `http://localhost:3000` locally or `https://your-domain.example` in production) and allow that exact callback URL in Supabase. For project documents, create a private storage bucket named `project-documents` in Supabase and keep the bucket private.
 
 ## Development
 

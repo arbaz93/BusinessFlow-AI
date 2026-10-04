@@ -41,6 +41,7 @@ export function WorkspaceForm({
         {canManage ? (
           <Input
             id="workspace-name"
+            name="name"
             maxLength={80}
             minLength={2}
             required
@@ -74,6 +75,7 @@ export function WorkspaceForm({
         {canManage ? (
           <select
             id="workspace-business-type"
+            name="businessType"
             value={businessType}
             onChange={(event) => setBusinessType(event.currentTarget.value as BusinessType)}
             disabled={pending}
