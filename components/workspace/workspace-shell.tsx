@@ -217,7 +217,7 @@ export function WorkspaceShell({
       open={mobileNavigationOpen}
       onOpenChange={setMobileNavigationOpen}
     >
-      <div className="min-h-screen bg-[#09090b] text-[#f4f4f5]">
+      <div className="min-h-screen bg-background text-[#f4f4f5]">
         <div className="fixed inset-y-0 left-0 z-20 hidden w-62 xl:block">
           <SidebarContents
             organizationName={organizationName}

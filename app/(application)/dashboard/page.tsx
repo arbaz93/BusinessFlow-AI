@@ -7,6 +7,7 @@ import {
   CircleAlert,
   Clock3,
   FolderKanban,
+  FileText,
   MessageSquareMore,
   Plus,
   Sparkles,
@@ -16,8 +17,29 @@ import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { requireOrganization } from "@/lib/auth/dal";
 import { prisma } from "@/lib/db/prisma";
+import { projectPriorityLabels, projectStatusLabels, projectStatusTone } from "@/lib/projects/options";
+import { activeProjectStatuses, DUE_SOON_DAYS, endOfToday, getProjectTimelineState, projectTimelineLabels, startOfToday, type TimelineState } from "@/lib/projects/timeline";
+import { taskPriorityLabels, taskPriorityTone, taskStatusLabels, taskStatusTone } from "@/lib/tasks/options";
+import { getDashboardTaskData } from "@/lib/tasks/dashboard-data";
+import { formatTaskDueDate } from "@/lib/tasks/timeline";
+import { getProjectAIAnalysisState } from "@/lib/project-ai/persistence";
 
-const metrics = (leadCount: number, clientCount: number) => [
+const timelineAttentionTone: Record<TimelineState, string> = {
+  not_started: "border-white/10 bg-white/[0.04] text-white/60",
+  on_track: "border-[#3b82f6]/25 bg-[#3b82f6]/10 text-[#93c5fd]",
+  due_soon: "border-[#f59e0b]/25 bg-[#f59e0b]/10 text-[#fbbf24]",
+  overdue: "border-[#ef4444]/25 bg-[#ef4444]/10 text-[#fca5a5]",
+  completed: "border-[#22c55e]/20 bg-[#22c55e]/10 text-[#86efac]",
+  cancelled: "border-white/10 bg-white/[0.04] text-white/45",
+  no_schedule: "border-white/10 bg-white/[0.04] text-white/45",
+};
+
+const metrics = (
+  leadCount: number,
+  clientCount: number,
+  activeProjectCount: number,
+  overdueTaskCount: number | null,
+) => [
   {
     href: "/leads",
     label: "Total Leads",
@@ -39,66 +61,28 @@ const metrics = (leadCount: number, clientCount: number) => [
   {
     href: "/projects",
     label: "Active Projects",
-    value: "8",
+    value: activeProjectCount.toLocaleString(),
     note: "Projects in delivery",
     icon: FolderKanban,
     tone: "border-white/10 bg-[#18181b]",
     accent: "bg-[#22c55e]/10 text-[#86efac]",
   },
   {
-    href: "/projects",
+    href: "/tasks?due=OVERDUE&status=OPEN",
     label: "Overdue Tasks",
-    value: "3",
-    note: "Tasks requiring attention",
+    value: overdueTaskCount === null ? "—" : overdueTaskCount.toLocaleString(),
+    note: overdueTaskCount === null ? "Unable to load task data" : "Past due and still open",
     icon: CircleAlert,
-    tone: "border-[#ef4444]/20 bg-[#18181b]",
+    tone: overdueTaskCount !== null && overdueTaskCount > 0 ? "border-[#ef4444]/20 bg-[#18181b]" : "border-white/10 bg-[#18181b]",
     accent: "bg-[#ef4444]/10 text-[#fca5a5]",
   },
 ];
 
-const activeProjects = [
-  { name: "Acme Fitness", project: "Website Redesign", status: "In Progress", progress: 72, deadline: "October 15, 2026", tasks: "14 of 19 completed" },
-  { name: "Northstar Coffee", project: "E-commerce Website", status: "In Review", progress: 85, deadline: "October 8, 2026", tasks: "17 of 20 completed" },
-  { name: "BrightPath Consulting", project: "Brand & Marketing Website", status: "Planning", progress: 25, deadline: "October 28, 2026", tasks: "3 of 12 completed" },
+const assistantPrompts = [
+  "Help me plan a productive workday.",
+  "How can I prepare for a client kickoff?",
+  "Suggest a clear project status update.",
 ];
-
-const attentionItems = [
-  { type: "overdue", title: "Homepage wireframe approval", subtitle: "Acme Fitness Website Redesign • Due 2 days ago", priority: "High", href: "/projects" },
-  { type: "risk", title: "E-commerce Website", subtitle: "Deadline approaching with incomplete tasks", priority: "Warning", href: "/projects" },
-  { type: "follow-up", title: "Follow up with Sarah Johnson", subtitle: "Qualified lead awaiting next step", priority: "Normal", href: "/leads" },
-];
-
-const upcomingTasks = [
-  { title: "Finalize homepage wireframes", project: "Acme Fitness Website Redesign", due: "Today", priority: "High", href: "/projects" },
-  { title: "Review product photography", project: "Northstar Coffee E-commerce", due: "Tomorrow", priority: "Medium", href: "/projects" },
-  { title: "Prepare homepage content", project: "BrightPath Consulting Website", due: "Sep 30", priority: "Medium", href: "/projects" },
-  { title: "Confirm mobile navigation design", project: "Acme Fitness Website Redesign", due: "Oct 2", priority: "Low", href: "/projects" },
-];
-
-const recentActivity = [
-  { description: "Arbaz created a new project", entity: "Acme Fitness Website Redesign", time: "10 minutes ago", type: "human" },
-  { description: "Sarah Johnson was converted into a client", entity: "Acme Fitness", time: "2 hours ago", type: "human" },
-  { description: "Homepage wireframes were marked complete", entity: "Acme Fitness Website Redesign", time: "Yesterday", type: "system" },
-  { description: "A client brief was analyzed by AI", entity: "Acme Fitness Website Redesign", time: "Yesterday", type: "ai" },
-];
-
-const assistantPrompts = ["Which tasks are overdue?", "What projects need attention?", "Which leads need follow-up?"];
-
-const statusStyles: Record<string, string> = {
-  Planning: "border-white/10 bg-white/5 text-white/70",
-  "In Progress": "border-[#3b82f6]/25 bg-[#3b82f6]/10 text-[#93c5fd]",
-  "In Review": "border-[#8b5cf6]/25 bg-[#8b5cf6]/10 text-[#c4b5fd]",
-  Completed: "border-[#22c55e]/20 bg-[#22c55e]/10 text-[#86efac]",
-  "On Hold": "border-[#f59e0b]/20 bg-[#f59e0b]/10 text-[#fbbf24]",
-};
-
-const priorityStyles: Record<string, string> = {
-  High: "text-[#fca5a5]",
-  Warning: "text-[#fbbf24]",
-  Normal: "text-[#93c5fd]",
-  Medium: "text-[#fbbf24]",
-  Low: "text-white/55",
-};
 
 function getGreeting() {
   const hour = new Date().getHours();
@@ -108,15 +92,88 @@ function getGreeting() {
   return "Good morning";
 }
 
+function formatShortDate(value: Date) {
+  return value.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+}
+
 export default async function DashboardPage() {
   const { profile, organization } = await requireOrganization();
-  const [leadCount, clientCount] = await Promise.all([
+  const now = new Date();
+
+  const [leadCount, clientCount, activeProjectCount, activeProjects, attentionProjects, recentActivity, taskData] = await Promise.all([
     prisma.lead.count({ where: { organizationId: organization.id } }),
     prisma.client.count({ where: { organizationId: organization.id, status: "ACTIVE" } }),
+    prisma.project.count({ where: { organizationId: organization.id, status: { in: activeProjectStatuses } } }),
+    prisma.project.findMany({
+      where: { organizationId: organization.id, status: { in: activeProjectStatuses } },
+      orderBy: [{ dueDate: { sort: "asc", nulls: "last" } }, { updatedAt: "desc" }],
+      take: 4,
+      select: {
+        id: true,
+        name: true,
+        status: true,
+        priority: true,
+        startDate: true,
+        dueDate: true,
+        client: { select: { name: true, company: true } },
+      },
+    }),
+    prisma.project.findMany({
+      where: {
+        organizationId: organization.id,
+        status: { in: activeProjectStatuses },
+        dueDate: { lte: endOfToday(new Date(startOfToday(now).getTime() + DUE_SOON_DAYS * 86_400_000)) },
+      },
+      orderBy: [{ dueDate: "asc" }, { priority: "desc" }],
+      take: 5,
+      select: {
+        id: true,
+        name: true,
+        status: true,
+        priority: true,
+        startDate: true,
+        dueDate: true,
+        client: { select: { name: true, company: true } },
+      },
+    }),
+    prisma.activity.findMany({
+      where: { organizationId: organization.id },
+      orderBy: { createdAt: "desc" },
+      take: 6,
+      select: {
+        id: true,
+        type: true,
+        description: true,
+        createdAt: true,
+        actor: { select: { name: true } },
+        project: { select: { id: true } },
+        client: { select: { id: true, name: true, company: true } },
+        task: { select: { id: true } },
+      },
+    }).catch((error: unknown) => {
+      console.error("Dashboard recent activity query failed.", error);
+      return [];
+    }),
+    getDashboardTaskData(organization.id, now),
   ]);
+  const projectAIStates = await Promise.all(activeProjects.map(async (project) => {
+    try {
+      return { projectId: project.id, state: await getProjectAIAnalysisState(project.id) };
+    } catch (error) {
+      console.error("Dashboard project AI state query failed.", {
+        projectId: project.id,
+        errorName: error instanceof Error ? error.name : "UnknownError",
+      });
+      return { projectId: project.id, state: null };
+    }
+  }));
+
   const firstName = profile.name.trim().split(/\s+/)[0] || null;
   const greeting = getGreeting();
   const workspaceName = organization?.name?.trim() || "your workspace";
+  const overdueAttentionTasks = taskData.status === "success" ? taskData.overdueTasks.slice(0, 5) : [];
+  const attentionProjectLimit = Math.max(0, 5 - overdueAttentionTasks.length);
+  const visibleAttentionProjects = attentionProjects.slice(0, attentionProjectLimit);
 
   return (
     <div className="space-y-6 pb-10">
@@ -137,7 +194,7 @@ export default async function DashboardPage() {
             href="/leads"
             className={buttonVariants({
               size: "default",
-              className: "h-10 rounded-lg border border-[#8b5cf6]/35 bg-[#8b5cf6]/12 px-4 text-sm font-medium text-[#f4f4f5] hover:bg-[#8b5cf6]/18",
+              className: "h-10 rounded-lg border border-[#8b5cf6]/35 bg-[#8b5cf6]/12 px-4 text-sm font-medium text-[#f4f4f5] hover:bg-muted",
             })}
           >
             <Plus size={16} strokeWidth={2.2} />
@@ -146,8 +203,8 @@ export default async function DashboardPage() {
           <Link
             href="/projects"
             className={buttonVariants({
-              variant: "outline",
-              className: "h-10 rounded-lg border border-white/10 bg-[#18181b] px-4 text-sm font-medium text-[#f4f4f5] hover:bg-white/[0.04]",
+              variant: "primary",
+              className: "h-10 rounded-lg border border-white/10  px-4 text-sm font-medium text-[#f4f4f5] hover:bg-accent/80",
             })}
           >
             <Plus size={16} strokeWidth={2.2} />
@@ -157,7 +214,7 @@ export default async function DashboardPage() {
       </section>
 
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4" aria-label="Workspace metrics">
-        {metrics(leadCount, clientCount).map(({ href, label, value, note, icon: Icon, tone, accent }) => (
+        {metrics(leadCount, clientCount, activeProjectCount, taskData.status === "success" ? taskData.overdueCount : null).map(({ href, label, value, note, icon: Icon, tone, accent }) => (
           <Link
             key={label}
             href={href}
@@ -184,7 +241,7 @@ export default async function DashboardPage() {
           <div className="mb-4 flex items-center justify-between gap-3">
             <div>
               <h2 className="text-[17px] font-semibold tracking-[-0.02em] text-[#f4f4f5]">Active Projects</h2>
-              <p className="mt-1 text-[12px] text-white/50">Track progress and keep delivery moving.</p>
+              <p className="mt-1 text-[12px] text-white/50">Projects in planning, delivery, or on hold.</p>
             </div>
             <Link href="/projects" className="inline-flex items-center gap-1 text-sm font-medium text-[#c4b5fd] hover:text-white">
               View all projects
@@ -192,116 +249,183 @@ export default async function DashboardPage() {
             </Link>
           </div>
 
-          <div className="mb-3 rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.14em] text-white/50 w-fit">
-            Demo data
-          </div>
-
-          <div className="space-y-3">
-            {activeProjects.map((project) => (
-              <Link
-                key={project.project}
-                href="/projects"
-                className="group block rounded-xl border border-white/10 bg-[#111113] p-3 transition-colors hover:border-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8b5cf6]"
-              >
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-2">
-                      <p className="truncate text-[14px] font-semibold text-[#f4f4f5]">{project.project}</p>
-                      <span className={`inline-flex rounded-full border px-2 py-0.5 text-[10px] font-medium ${statusStyles[project.status]}`}>
-                        {project.status}
-                      </span>
+          {activeProjects.length ? (
+            <div className="space-y-3">
+              {activeProjects.map((project) => {
+                const timeline = getProjectTimelineState(project.status, project.startDate, project.dueDate, now);
+                return (
+                  <Link
+                    key={project.id}
+                    href={`/projects/${project.id}`}
+                    className="group block rounded-xl border border-white/10 bg-[#111113] p-3 transition-colors hover:border-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8b5cf6]"
+                  >
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                      <div className="min-w-0">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <p className="truncate text-[14px] font-semibold text-[#f4f4f5]">{project.name}</p>
+                          <span className={`inline-flex rounded-full border px-2 py-0.5 text-[10px] font-medium ${projectStatusTone[project.status]}`}>
+                            {projectStatusLabels[project.status]}
+                          </span>
+                          <span className={`inline-flex rounded-full border px-2 py-0.5 text-[10px] font-medium ${timelineAttentionTone[timeline]}`}>
+                            {projectTimelineLabels[timeline]}
+                          </span>
+                        </div>
+                        <p className="mt-1 text-[12px] text-white/50">{project.client.company || project.client.name}</p>
+                      </div>
+                      <div className="flex items-center gap-2 text-[12px] text-white/55">
+                        <span>{projectPriorityLabels[project.priority]} priority</span>
+                        <span className="text-white/25">•</span>
+                        <span>{project.dueDate ? `Due ${formatShortDate(project.dueDate)}` : "No due date"}</span>
+                      </div>
                     </div>
-                    <p className="mt-1 text-[12px] text-white/50">{project.name}</p>
-                  </div>
-                  <div className="flex items-center gap-2 text-[12px] text-white/55">
-                    <span>{project.tasks}</span>
-                    <span className="text-white/25">•</span>
-                    <span>{project.deadline}</span>
-                  </div>
-                </div>
-
-                <div className="mt-3">
-                  <div className="mb-1 flex items-center justify-between gap-3 text-[11px] text-white/55">
-                    <span>Progress</span>
-                    <span className="font-medium text-white/75">{project.progress}%</span>
-                  </div>
-                  <div className="h-2 overflow-hidden rounded-full bg-white/8">
-                    <div className="h-full rounded-full bg-[#8b5cf6]" style={{ width: `${project.progress}%` }} />
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
+                  </Link>
+                );
+              })}
+            </div>
+          ) : (
+            <p className="rounded-xl border border-dashed border-white/12 bg-[#111113] px-4 py-8 text-center text-sm text-white/45">
+              No active projects yet.
+            </p>
+          )}
         </Card>
 
         <Card className="border border-white/10 bg-[#18181b] p-4 text-white shadow-none sm:p-5">
           <div className="mb-4">
             <h2 className="text-[17px] font-semibold tracking-[-0.02em] text-[#f4f4f5]">Attention Required</h2>
-            <p className="mt-1 text-[12px] text-white/50">Items that may need your attention.</p>
+            <p className="mt-1 text-[12px] text-white/50">Overdue tasks and projects needing attention.</p>
           </div>
 
-          <div className="space-y-3">
-            {attentionItems.map((item) => (
-              <Link
-                key={item.title}
-                href={item.href}
-                className="flex items-start gap-3 rounded-xl border border-white/10 bg-[#111113] p-3 transition-colors hover:border-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8b5cf6]"
-              >
-                <span
-                  className={`mt-0.5 grid size-7 shrink-0 place-items-center rounded-md border ${
-                    item.type === "overdue"
-                      ? "border-[#ef4444]/20 bg-[#ef4444]/10 text-[#fca5a5]"
-                      : item.type === "risk"
-                        ? "border-[#f59e0b]/20 bg-[#f59e0b]/10 text-[#fbbf24]"
-                        : "border-[#3b82f6]/20 bg-[#3b82f6]/10 text-[#93c5fd]"
-                  }`}
+          {visibleAttentionProjects.length || overdueAttentionTasks.length ? (
+            <div className="space-y-3">
+              {overdueAttentionTasks.map((task) => (
+                <Link
+                  key={task.id}
+                  href={`/tasks/${task.id}`}
+                  className="flex items-start gap-3 rounded-xl border border-[#ef4444]/15 bg-[#111113] p-3 transition-colors hover:border-[#ef4444]/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8b5cf6]"
                 >
-                  {item.type === "overdue" ? <AlertCircle size={14} /> : item.type === "risk" ? <Clock3 size={14} /> : <MessageSquareMore size={14} />}
-                </span>
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center justify-between gap-2">
-                    <p className="text-[13px] font-medium text-[#f4f4f5]">{item.title}</p>
-                    <span className={`text-[10px] font-medium ${priorityStyles[item.priority]}`}>{item.priority}</span>
+                  <span className="mt-0.5 grid size-7 shrink-0 place-items-center rounded-md border border-[#ef4444]/20 bg-[#ef4444]/10 text-[#fca5a5]">
+                    <AlertCircle size={14} />
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center justify-between gap-2">
+                      <p className="truncate text-[13px] font-medium text-[#f4f4f5]">{task.title}</p>
+                      <span className="shrink-0 text-[10px] font-medium text-[#fca5a5]">{taskPriorityLabels[task.priority]}</span>
+                    </div>
+                    <p className="mt-1 text-[12px] leading-relaxed text-white/55">
+                      {task.project.client.company || task.project.client.name} · {task.project.name} · Due {task.dueDate ? formatTaskDueDate(task.dueDate) : ""}
+                    </p>
+                    <span className={`mt-2 inline-flex rounded-full border px-2 py-0.5 text-[10px] font-medium ${taskStatusTone[task.status]}`}>{taskStatusLabels[task.status]}</span>
                   </div>
-                  <p className="mt-1 text-[12px] leading-relaxed text-white/55">{item.subtitle}</p>
-                </div>
-              </Link>
-            ))}
-          </div>
+                </Link>
+              ))}
+              {visibleAttentionProjects.map((project) => {
+                const timeline = getProjectTimelineState(project.status, project.startDate, project.dueDate, now);
+                return (
+                  <Link
+                    key={project.id}
+                    href={`/projects/${project.id}`}
+                    className="flex items-start gap-3 rounded-xl border border-white/10 bg-[#111113] p-3 transition-colors hover:border-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8b5cf6]"
+                  >
+                    <span
+                      className={`mt-0.5 grid size-7 shrink-0 place-items-center rounded-md border ${
+                        timeline === "overdue"
+                          ? "border-[#ef4444]/20 bg-[#ef4444]/10 text-[#fca5a5]"
+                          : "border-[#f59e0b]/20 bg-[#f59e0b]/10 text-[#fbbf24]"
+                      }`}
+                    >
+                      {timeline === "overdue" ? <AlertCircle size={14} /> : <Clock3 size={14} />}
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center justify-between gap-2">
+                        <p className="truncate text-[13px] font-medium text-[#f4f4f5]">{project.name}</p>
+                        <span className={`shrink-0 text-[10px] font-medium ${timeline === "overdue" ? "text-[#fca5a5]" : "text-[#fbbf24]"}`}>
+                          {projectPriorityLabels[project.priority]}
+                        </span>
+                      </div>
+                      <p className="mt-1 text-[12px] leading-relaxed text-white/55">
+                        {project.client.company || project.client.name} · {timeline === "overdue" ? "Overdue" : "Due soon"}
+                        {project.dueDate ? ` — ${formatShortDate(project.dueDate)}` : ""}
+                      </p>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          ) : (
+            taskData.status === "error" ? (
+              <p role="status" className="rounded-xl border border-dashed border-white/12 bg-[#111113] px-4 py-8 text-center text-sm text-white/45">
+                Task attention data is temporarily unavailable.
+              </p>
+            ) : (
+              <p className="rounded-xl border border-dashed border-white/12 bg-[#111113] px-4 py-8 text-center text-sm text-white/45">
+                Nothing needs attention right now.
+              </p>
+            )
+          )}
         </Card>
       </section>
 
       <section className="grid gap-6 xl:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)]">
         <Card className="border border-white/10 bg-[#18181b] p-4 text-white shadow-none sm:p-5">
-          <div className="mb-4 flex items-center justify-between gap-3">
+          <div className="mb-4 flex items-center gap-3">
+            <span className="grid size-8 place-items-center rounded-md border border-white/10 bg-white/[0.03] text-white/50">
+              <FolderKanban size={15} />
+            </span>
             <div>
               <h2 className="text-[17px] font-semibold tracking-[-0.02em] text-[#f4f4f5]">Upcoming Tasks</h2>
               <p className="mt-1 text-[12px] text-white/50">See what needs to be completed next.</p>
             </div>
-            <Link href="/projects" className="inline-flex items-center gap-1 text-sm font-medium text-[#c4b5fd] hover:text-white">
-              View tasks
-              <ChevronRight size={15} />
-            </Link>
           </div>
-
-          <div className="space-y-3">
-            {upcomingTasks.map((task) => (
-              <Link
-                key={task.title}
-                href={task.href}
-                className="flex items-center justify-between gap-3 rounded-xl border border-white/10 bg-[#111113] px-3 py-3 transition-colors hover:border-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8b5cf6]"
-              >
-                <div className="min-w-0">
-                  <p className="truncate text-[13px] font-medium text-[#f4f4f5]">{task.title}</p>
-                  <p className="mt-1 text-[11px] text-white/50">{task.project}</p>
-                </div>
-                <div className="flex shrink-0 items-center gap-3 text-[11px] text-white/55">
-                  <span>{task.due}</span>
-                  <span className={`font-medium ${priorityStyles[task.priority]}`}>{task.priority}</span>
-                </div>
+          {taskData.status === "error" ? (
+            <p role="status" className="rounded-xl border border-dashed border-white/12 bg-[#111113] px-4 py-8 text-center text-sm text-white/45">
+              Unable to load upcoming tasks.
+            </p>
+          ) : taskData.upcomingTasks.length ? (
+            <div className="space-y-3">
+              {taskData.upcomingTasks.map((task) => (
+                <article
+                  key={task.id}
+                  className="flex items-start gap-3 rounded-xl border border-white/10 bg-[#111113] p-3 transition-colors hover:border-white/15"
+                >
+                  <span className="mt-0.5 grid size-7 shrink-0 place-items-center rounded-md border border-[#8b5cf6]/20 bg-[#8b5cf6]/10 text-[#c4b5fd]">
+                    <CheckCheck size={14} />
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-start justify-between gap-2">
+                      <Link href={`/tasks/${task.id}`} className="truncate rounded-sm text-[13px] font-medium text-[#f4f4f5] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8b5cf6]">{task.title}</Link>
+                      <span className={`inline-flex shrink-0 rounded-full border px-2 py-0.5 text-[10px] font-medium ${taskStatusTone[task.status]}`}>
+                        {taskStatusLabels[task.status]}
+                      </span>
+                    </div>
+                    <p className="mt-1 text-[12px] leading-relaxed text-white/55">
+                      <Link href={`/projects/${task.project.id}`} className="rounded-sm hover:text-[#c4b5fd] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8b5cf6]">
+                        {task.project.name}
+                      </Link>
+                      {" · "}{task.project.client.company || task.project.client.name}
+                    </p>
+                    <div className="mt-2 flex flex-wrap items-center gap-2 text-[11px] text-white/50">
+                      <span className={`inline-flex rounded-full border px-1.5 py-0.5 ${taskPriorityTone[task.priority]}`}>
+                        {taskPriorityLabels[task.priority]}
+                      </span>
+                      {task.assignee ? <span>Assigned to {task.assignee.name}</span> : <span>Unassigned</span>}
+                      {task.dueDate ? <span>Due {formatTaskDueDate(task.dueDate)}</span> : <span>No due date</span>}
+                    </div>
+                  </div>
+                </article>
+              ))}
+              <Link href="/tasks" className="inline-flex min-h-8 items-center gap-1 text-xs font-medium text-[#c4b5fd] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8b5cf6]">
+                View all tasks <ChevronRight size={14} />
               </Link>
-            ))}
-          </div>
+            </div>
+          ) : (
+            <div className="rounded-xl border border-dashed border-white/12 bg-[#111113] px-4 py-8 text-center">
+              <p className="text-sm text-white/60">No upcoming tasks</p>
+              <p className="mt-1 text-xs text-white/40">You&apos;re clear for now. New tasks with upcoming deadlines will appear here.</p>
+              <Link href="/tasks" className="mt-3 inline-flex min-h-8 items-center gap-1 text-xs font-medium text-[#c4b5fd] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8b5cf6]">
+                View Tasks <ChevronRight size={14} />
+              </Link>
+            </div>
+          )}
         </Card>
 
         <Card className="border border-white/10 bg-[#18181b] p-4 text-white shadow-none sm:p-5">
@@ -310,28 +434,62 @@ export default async function DashboardPage() {
             <p className="mt-1 text-[12px] text-white/50">A snapshot of what&apos;s been happening in your workspace.</p>
           </div>
 
-          <div className="space-y-3">
-            {recentActivity.map((item) => (
-              <div key={`${item.description}-${item.time}`} className="flex items-start gap-3 rounded-xl border border-white/10 bg-[#111113] p-3">
-                <span
-                  className={`mt-0.5 grid size-7 shrink-0 place-items-center rounded-full border ${
-                    item.type === "ai"
-                      ? "border-[#8b5cf6]/25 bg-[#8b5cf6]/10 text-[#c4b5fd]"
-                      : item.type === "system"
-                        ? "border-white/10 bg-white/5 text-white/75"
-                        : "border-[#3b82f6]/20 bg-[#3b82f6]/10 text-[#93c5fd]"
-                  }`}
-                >
-                  {item.type === "ai" ? <Sparkles size={12} /> : <CheckCheck size={12} />}
-                </span>
-                <div className="min-w-0 flex-1">
-                  <p className="text-[12px] leading-relaxed text-white/80">{item.description}</p>
-                  <p className="mt-1 text-[11px] text-white/45">{item.entity}</p>
-                  <p className="mt-1 text-[11px] text-white/40">{item.time}</p>
-                </div>
-              </div>
-            ))}
-          </div>
+          {recentActivity.length ? (
+            <div className="space-y-3">
+              {recentActivity.map((item) => {
+                const href = item.type.startsWith("DOCUMENT") && item.project
+                  ? `/projects/${item.project.id}/documents`
+                  : item.task
+                  ? `/tasks/${item.task.id}`
+                  : item.project
+                  ? `/projects/${item.project.id}`
+                  : item.client
+                    ? `/clients/${item.client.id}`
+                    : item.type.startsWith("LEAD")
+                      ? "/leads"
+                      : null;
+                const entity = item.task?.id ?? item.project?.id ?? item.client?.name ?? null;
+                const body = (
+                  <>
+                    <span
+                      className={`mt-0.5 grid size-7 shrink-0 place-items-center rounded-full border ${
+                        item.type.startsWith("TASK")
+                          ? "border-[#22c55e]/20 bg-[#22c55e]/10 text-[#86efac]"
+                          : item.type.startsWith("PROJECT") || item.type.startsWith("DOCUMENT")
+                          ? "border-[#8b5cf6]/25 bg-[#8b5cf6]/10 text-[#c4b5fd]"
+                          : "border-[#3b82f6]/20 bg-[#3b82f6]/10 text-[#93c5fd]"
+                      }`}
+                    >
+                      {item.type.startsWith("DOCUMENT")
+                        ? <FileText size={12} />
+                        : item.type.startsWith("PROJECT")
+                          ? <FolderKanban size={12} />
+                          : <CheckCheck size={12} />}
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-[12px] leading-relaxed text-white/80">{item.description}</p>
+                      <p className="mt-1 text-[11px] text-white/45">{item.actor.name}</p>
+                      <p className="mt-1 text-[11px] text-white/40">{formatShortDate(item.createdAt)}</p>
+                    </div>
+                  </>
+                );
+
+                return href ? (
+                  <Link key={`${entity}-${item.id}`} href={href} className="flex items-start gap-3 rounded-xl border border-white/10 bg-[#111113] p-3 transition-colors hover:border-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8b5cf6]">
+                    {body}
+                  </Link>
+                ) : (
+                  <div key={`${entity}-${item.id}`} className="flex items-start gap-3 rounded-xl border border-white/10 bg-[#111113] p-3">
+                    {body}
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <p className="rounded-xl border border-dashed border-white/12 bg-[#111113] px-4 py-8 text-center text-sm text-white/45">
+              No activity recorded yet.
+            </p>
+          )}
         </Card>
       </section>
 
@@ -347,35 +505,57 @@ export default async function DashboardPage() {
                 <p className="mt-1 text-[12px] text-white/55">Turn client briefs into structured project insights.</p>
               </div>
             </div>
-            <span className="rounded-full border border-[#8b5cf6]/20 bg-[#8b5cf6]/8 px-2 py-1 text-[10px] font-medium uppercase tracking-[0.12em] text-[#c4b5fd]">
-              AI-powered
-            </span>
-          </div>
-
-          <div className="rounded-xl border border-white/10 bg-[#111113] p-3">
-            <p className="text-[14px] font-medium text-[#f4f4f5]">Acme Fitness Website Redesign</p>
-            <p className="mt-1 text-[12px] text-white/55">Project brief analyzed</p>
-
-            <div className="mt-4 grid gap-3 sm:grid-cols-2">
-              <div className="rounded-lg border border-white/10 bg-white/[0.02] p-2.5">
-                <p className="text-[11px] text-white/45">Requirements identified</p>
-                <p className="mt-1 text-[20px] font-semibold text-[#f4f4f5]">12</p>
-              </div>
-              <div className="rounded-lg border border-white/10 bg-white/[0.02] p-2.5">
-                <p className="text-[11px] text-white/45">Task suggestions</p>
-                <p className="mt-1 text-[20px] font-semibold text-[#f4f4f5]">8</p>
-              </div>
-            </div>
-
-            <div className="mt-4 flex items-center justify-between gap-3 rounded-lg border border-white/10 bg-white/[0.02] p-3 text-[12px] text-white/60">
-              <span>3 risks flagged</span>
-              <span>2 questions pending</span>
-            </div>
-
-            <Link href="/projects" className={buttonVariants({ className: "mt-4 w-full bg-[#8b5cf6] text-white hover:bg-[#8b83f5]" })}>
-              View AI Insights
+            <Link href="/projects" className="inline-flex min-h-8 items-center gap-1 rounded-sm text-xs font-medium text-[#c4b5fd] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8b5cf6]">
+              Projects <ChevronRight size={13} aria-hidden="true" />
             </Link>
           </div>
+
+            {projectAIStates.length ? (
+              <ul className="space-y-2">
+                {projectAIStates.map(({ projectId, state }) => {
+                  const project = activeProjects.find((item) => item.id === projectId);
+                  if (!project) return null;
+                  const statusLabel = !state
+                    ? "AI status unavailable"
+                    : state.status === "COMPLETED" && state.analysisIsCurrent
+                      ? "Analyzed"
+                      : state.status === "READY"
+                        ? "Ready for analysis"
+                        : state.status === "PROCESSING"
+                          ? "Analyzing"
+                          : state.status === "STALE"
+                            ? "Analysis needs updating"
+                            : state.status === "SOURCE_MISSING"
+                              ? "Analysis source unavailable"
+                              : state.status === "NO_BRIEF"
+                                ? "Primary brief needed"
+                                : "Analysis needs attention";
+
+                  return (
+                    <li key={projectId}>
+                      <Link
+                        href={`/projects/${projectId}/ai`}
+                        className="flex min-h-12 items-center justify-between gap-3 rounded-lg border border-white/8 bg-[#111113] px-3 py-2 transition-colors hover:border-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8b5cf6]"
+                      >
+                        <span className="min-w-0">
+                          <span className="block truncate text-sm font-medium text-white/80">{project.name}</span>
+                          <span className="mt-0.5 block truncate text-[11px] text-white/45">
+                            {state?.status === "COMPLETED" && state.analysisIsCurrent
+                              ? `Analyzed · ${state.analysis?.sourceDocumentName ?? "Primary brief"}`
+                              : statusLabel}
+                          </span>
+                        </span>
+                        <span className="shrink-0 text-[11px] text-[#c4b5fd]">Open <ChevronRight size={12} className="inline" aria-hidden="true" /></span>
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+            ) : (
+              <p className="rounded-xl border border-dashed border-white/12 bg-[#111113] px-4 py-8 text-center text-sm text-white/45">
+                No active projects yet.
+              </p>
+            )}
         </Card>
 
         <Card className="border border-white/10 bg-[#18181b] p-4 text-white shadow-none sm:p-5">
@@ -384,8 +564,8 @@ export default async function DashboardPage() {
               <MessageSquareMore size={15} />
             </span>
             <div>
-              <h2 className="text-[17px] font-semibold tracking-[-0.02em] text-[#f4f4f5]">Ask your business</h2>
-              <p className="mt-1 text-[12px] text-white/55">Get answers about your leads, projects, and tasks.</p>
+              <h2 className="text-[17px] font-semibold tracking-[-0.02em] text-[#f4f4f5]">AI Assistant</h2>
+              <p className="mt-1 text-[12px] text-white/55">Explore general business questions and ideas.</p>
             </div>
           </div>
 
@@ -401,7 +581,7 @@ export default async function DashboardPage() {
             ))}
           </div>
 
-          <Link href="/assistant" className={buttonVariants({ variant: "outline", className: "mt-4 w-full justify-center border border-white/10 bg-[#111113] text-white hover:bg-white/[0.04]" })}>
+          <Link href="/assistant" className={buttonVariants({ variant: "primary", className: "mt-4 w-full justify-center border border-white/10 bg-accent text-white hover:bg-white/[0.04]" })}>
             Open assistant
           </Link>
         </Card>

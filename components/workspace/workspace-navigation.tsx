@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   Building2,
+  CheckCheck,
   FolderKanban,
   LayoutDashboard,
   Settings2,
@@ -25,7 +26,10 @@ const navigationGroups = [
   },
   {
     label: "Delivery",
-    items: [{ href: "/projects", label: "Projects", icon: FolderKanban }],
+    items: [
+      { href: "/projects", label: "Projects", icon: FolderKanban },
+      { href: "/tasks", label: "Tasks", icon: CheckCheck },
+    ],
   },
   {
     label: "Intelligence",
