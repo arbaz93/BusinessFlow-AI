@@ -1,6 +1,9 @@
+import { getInvitationCallbackPath, isInvitationToken } from "@/lib/members/invitation-tokens";
+
 export function getAuthCallbackUrl(
   requestHeaders: Pick<Headers, "get">,
   siteUrl = process.env.NEXT_PUBLIC_SITE_URL,
+  invitationToken?: string,
 ) {
   const origin = siteUrl || requestHeaders.get("origin");
   if (!origin) {
@@ -13,5 +16,8 @@ export function getAuthCallbackUrl(
     throw new Error("The application site URL must use HTTP or HTTPS.");
   }
 
-  return new URL("/auth/callback", url.origin).toString();
+  const callbackPath = invitationToken && isInvitationToken(invitationToken)
+    ? getInvitationCallbackPath(invitationToken)
+    : "/auth/callback";
+  return new URL(callbackPath, url.origin).toString();
 }

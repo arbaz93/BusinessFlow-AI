@@ -13,11 +13,11 @@ import type { TaskProposalPriority } from "@/lib/assistant/types";
 type TeamMember = { id: string; name: string; email: string | null };
 
 const inputClass =
-  "h-10 border-white/10 bg-[#111113] text-sm text-white placeholder:text-white/30 focus-visible:border-[#a49bff] focus-visible:ring-[#a49bff]/20 dark:bg-[#111113]";
+  "h-10 border-[var(--line)] bg-[var(--surface)] text-sm text-[var(--foreground)] placeholder:text-[var(--muted)] focus-visible:border-[#a49bff] focus-visible:ring-[#a49bff]/20 dark:bg-[var(--surface)]";
 const selectClass =
-  "h-10 w-full rounded-md border border-white/10 bg-[#111113] px-3 text-sm text-white outline-none focus-visible:border-[#a49bff] focus-visible:ring-[3px] focus-visible:ring-[#a49bff]/20";
-const labelClass = "mb-1.5 block text-xs font-medium text-white/70";
-const rowClass = "rounded-lg border border-white/10 bg-[#18181b]";
+  "h-10 w-full rounded-md border border-[var(--line)] bg-[var(--surface)] px-3 text-sm text-[var(--foreground)] outline-none focus-visible:border-[#a49bff] focus-visible:ring-[3px] focus-visible:ring-[#a49bff]/20";
+const labelClass = "mb-1.5 block text-xs font-medium text-[var(--muted)]";
+const rowClass = "rounded-lg border border-[var(--line)] bg-[var(--panel)]";
 
 export function TaskProposalCard({
   proposal,
@@ -76,11 +76,11 @@ export function TaskProposalCard({
   if (proposal.approved && proposal.taskId) {
     return (
       <div className={`${rowClass} p-4`}>
-        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#93c5fd]">Task created</p>
-        <p className="mt-1 text-sm font-medium text-white/90">{proposal.title}</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--info-line)]">Task created</p>
+        <p className="mt-1 text-sm font-medium text-[var(--foreground)]">{proposal.title}</p>
         <Link
           href={`/tasks/${proposal.taskId}`}
-          className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-[#a49bff] underline-offset-4 hover:underline focus-visible:outline-none"
+          className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-[var(--accent-muted)] underline-offset-4 hover:underline focus-visible:outline-none"
         >
           Open Task
         </Link>
@@ -92,8 +92,8 @@ export function TaskProposalCard({
     <div className={`${rowClass} p-4`}>
       <div className="flex items-start justify-between gap-3">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#93c5fd]">Task proposal</p>
-          <p className="mt-1 text-sm font-medium text-white/90">{proposal.title}</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--info-line)]">Task proposal</p>
+          <p className="mt-1 text-sm font-medium text-[var(--foreground)]">{proposal.title}</p>
         </div>
         {!editing && (
           <button
@@ -102,7 +102,7 @@ export function TaskProposalCard({
               setEditing(true);
               setEditError(null);
             }}
-            className="grid size-7 shrink-0 place-items-center rounded-md text-white/35 hover:bg-white/[0.07] hover:text-white/85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff]"
+            className="grid size-7 shrink-0 place-items-center rounded-md text-[var(--muted)] hover:bg-[var(--surface)] hover:text-[var(--foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff]"
             aria-label="Edit proposal"
             disabled={pending}
           >
@@ -131,7 +131,7 @@ export function TaskProposalCard({
               rows={4}
               value={values.description}
               onChange={(event) => setValues({ ...values, description: event.currentTarget.value })}
-              className="min-h-[100px] border-white/10 bg-[#111113] text-sm text-white placeholder:text-white/30 dark:bg-[#111113]"
+              className="min-h-[100px] border-[var(--line)] bg-[var(--surface)] text-sm text-[var(--foreground)] placeholder:text-[var(--muted)] dark:bg-[var(--surface)]"
               placeholder="What should this task cover?"
             />
           </div>
@@ -180,19 +180,19 @@ export function TaskProposalCard({
 
           {editError && <p role="alert" className="text-xs text-[#fca5a5]">{editError}</p>}
 
-          <div className="flex items-center justify-end gap-2 border-t border-white/[0.07] pt-3">
+          <div className="flex items-center justify-end gap-2 border-t border-[var(--line)] pt-3">
             <button
               type="button"
               onClick={() => setEditing(false)}
               disabled={editPending}
-              className="h-9 rounded-md px-3 text-xs font-medium text-white/65 hover:bg-white/[0.05] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff] disabled:opacity-50"
+              className="h-9 rounded-md px-3 text-xs font-medium text-[var(--muted)] hover:bg-[var(--surface)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff] disabled:opacity-50"
             >
               Back to review
             </button>
             <button
               type="submit"
               disabled={editPending}
-              className="inline-flex h-9 items-center justify-center gap-1.5 rounded-md bg-[#7067e8] px-3 text-xs font-semibold text-white hover:bg-[#8178f0] disabled:opacity-55"
+              className="inline-flex h-9 items-center justify-center gap-1.5 rounded-md bg-[#7067e8] px-3 text-xs font-semibold text-[var(--foreground)] hover:bg-[#8178f0] disabled:opacity-55"
             >
               {editPending ? <LoaderCircle size={13} className="animate-spin" /> : <X size={13} />} Save draft
             </button>
@@ -201,50 +201,50 @@ export function TaskProposalCard({
       ) : (
         <dl className="mt-3 grid gap-3 text-xs">
           <div className="flex justify-between">
-            <dt className="text-white/50">Project</dt>
-            <dd className="text-white/80">{proposal.projectName}</dd>
+            <dt className="text-[var(--muted)]">Project</dt>
+            <dd className="text-[var(--foreground)]">{proposal.projectName}</dd>
           </div>
           <div className="flex justify-between">
-            <dt className="text-white/50">Priority</dt>
-            <dd className="text-white/80">{taskPriorityLabels[proposal.priority] ?? proposal.priority}</dd>
+            <dt className="text-[var(--muted)]">Priority</dt>
+            <dd className="text-[var(--foreground)]">{taskPriorityLabels[proposal.priority] ?? proposal.priority}</dd>
           </div>
           <div className="flex justify-between">
-            <dt className="text-white/50">Due</dt>
-            <dd className="text-white/80">{proposal.dueDate ? formatDate(proposal.dueDate) : "None"}</dd>
+            <dt className="text-[var(--muted)]">Due</dt>
+            <dd className="text-[var(--foreground)]">{proposal.dueDate ? formatDate(proposal.dueDate) : "None"}</dd>
           </div>
           {proposal.assigneeName ? (
             <div className="flex justify-between">
-              <dt className="text-white/50">Assignee</dt>
-              <dd className="text-white/80">{proposal.assigneeName}</dd>
+              <dt className="text-[var(--muted)]">Assignee</dt>
+              <dd className="text-[var(--foreground)]">{proposal.assigneeName}</dd>
             </div>
           ) : null}
           {proposal.description ? (
             <div>
-              <dt className="text-white/50">Description</dt>
-              <dd className="mt-0.5 whitespace-pre-wrap text-white/80">{proposal.description}</dd>
+              <dt className="text-[var(--muted)]">Description</dt>
+              <dd className="mt-0.5 whitespace-pre-wrap text-[var(--foreground)]">{proposal.description}</dd>
             </div>
           ) : null}
         </dl>
       )}
 
-      <p className="mt-2 text-[10px] text-white/50">
+      <p className="mt-2 text-[10px] text-[var(--muted)]">
         {editing ? "Editing proposal" : "Awaiting approval. No Task will be created until you confirm."}
       </p>
 
       {!editing && (
-        <form key="approve" onSubmit={handleApprove} className="mt-2 flex items-center justify-end gap-2 border-t border-white/[0.07] pt-3">
+        <form key="approve" onSubmit={handleApprove} className="mt-2 flex items-center justify-end gap-2 border-t border-[var(--line)] pt-3">
           <button
             type="button"
             onClick={onCancel}
             disabled={pending}
-            className="inline-flex h-9 items-center justify-center gap-1.5 rounded-md px-3 text-xs font-medium text-white/65 hover:bg-white/[0.05] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff] disabled:opacity-50"
+            className="inline-flex h-9 items-center justify-center gap-1.5 rounded-md px-3 text-xs font-medium text-[var(--muted)] hover:bg-[var(--surface)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff] disabled:opacity-50"
           >
             <Trash2 size={13} /> Discard
           </button>
           <button
             type="submit"
             disabled={approvePending}
-            className="inline-flex h-9 items-center justify-center gap-1.5 rounded-md bg-[#7067e8] px-4 text-xs font-semibold text-white hover:bg-[#8178f0] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff] disabled:opacity-55"
+            className="inline-flex h-9 items-center justify-center gap-1.5 rounded-md bg-[#7067e8] px-4 text-xs font-semibold text-[var(--foreground)] hover:bg-[#8178f0] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff] disabled:opacity-55"
           >
             {approvePending ? <LoaderCircle size={13} className="animate-spin" /> : <Send size={13} />} Create Task
           </button>

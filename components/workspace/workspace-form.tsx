@@ -20,7 +20,7 @@ export function WorkspaceForm() {
             hint="This is how your team will see the workspace."
             id="workspaceName"
             label="Workspace name"
-            maxLength={80}
+            maxLength={100}
             minLength={2}
             name="name"
             placeholder="PixelForge Studio"

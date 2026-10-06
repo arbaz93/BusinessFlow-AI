@@ -7,8 +7,8 @@ export default async function ProfileSettingsPage() {
   return (
     <div className="space-y-6">
       <div className="space-y-1">
-        <h2 className="text-sm font-semibold text-white">Profile settings</h2>
-        <p className="text-sm text-[#a1a1aa]">
+        <h2 className="text-sm font-semibold text-[var(--foreground)]">Profile settings</h2>
+        <p className="text-sm text-[var(--muted)]">
           Update the name and contact details for your account.
         </p>
       </div>

@@ -1,7 +1,8 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { resolveApplicationEntryState } from "@/lib/auth/lifecycle";
 
-const protectedRoutes = ["/dashboard", "/leads", "/clients", "/projects", "/assistant", "/settings", "/onboarding"];
+const protectedRoutes = ["/dashboard", "/leads", "/clients", "/projects", "/assistant", "/settings", "/onboarding", "/no-workspace"];
 const authRoutes = ["/login", "/signup"];
 
 function matchesRoute(pathname: string, routes: string[]) {
@@ -44,7 +45,18 @@ export async function proxy(request: NextRequest) {
   }
 
   if (matchesRoute(pathname, authRoutes) && isAuthenticated) {
-    const redirectResponse = NextResponse.redirect(new URL("/dashboard", request.url));
+    let destination = "/dashboard";
+    try {
+      const { data: userData } = await supabase.auth.getUser();
+      if (userData.user) {
+        const state = await resolveApplicationEntryState(userData.user);
+        if (state.kind !== "READY") destination = "/onboarding";
+      }
+    } catch {
+      // DB query failed — fall through to default redirect to /dashboard.
+      // The page-level guard (requireOrganization) will still resolve state.
+    }
+    const redirectResponse = NextResponse.redirect(new URL(destination, request.url));
     copySessionResponse(response, redirectResponse);
     return redirectResponse;
   }
@@ -61,8 +73,11 @@ export const config = {
     "/assistant/:path*",
     "/settings/:path*",
     "/onboarding",
+    "/no-workspace",
     "/login",
+    "/login/:path*",
     "/signup",
-    "/auth/callback",
+    "/signup/:path*",
+    "/auth/callback/:path*",
   ],
 };

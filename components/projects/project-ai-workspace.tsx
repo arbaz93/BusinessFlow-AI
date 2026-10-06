@@ -23,10 +23,10 @@ import { taskPriorityValues, type TaskPriority } from "@/lib/tasks/options";
 import { taskPrioritySchema } from "@/lib/tasks/schemas";
 
 const badgeTones = {
-  LOW: "border-white/10 bg-white/[0.04] text-white/65",
+  LOW: "border-[var(--line)] bg-[var(--surface)] text-[var(--foreground)]/65",
   MEDIUM: "border-[#93c5fd]/20 bg-[#93c5fd]/[0.08] text-[#bfdbfe]",
   HIGH: "border-[#f59e0b]/25 bg-[#f59e0b]/[0.08] text-[#fbbf24]",
-  URGENT: "border-[#ef4444]/25 bg-[#ef4444]/[0.08] text-[#fca5a5]",
+  URGENT: "border-[#ef4444]/25 bg-[var(--danger)]/[0.08] text-[#fca5a5]",
 } as const;
 
 function getFileTypeLabel(mimeType: string | null, originalName: string) {
@@ -42,7 +42,7 @@ function Badge({ children, tone = badgeTones.LOW }: { children: React.ReactNode;
 }
 
 function EmptyState({ children }: { children: React.ReactNode }) {
-  return <p className="rounded-md border border-dashed border-white/10 bg-[#111113] px-3 py-4 text-sm text-white/50">{children}</p>;
+  return <p className="rounded-md border border-dashed border-[var(--line)] bg-[var(--surface)] px-3 py-4 text-sm text-[var(--foreground)]/50">{children}</p>;
 }
 
 type SuggestionDraft = {
@@ -107,15 +107,15 @@ function SuggestedTasksReview({
     <section aria-labelledby="ai-suggested-tasks">
       <div className="flex flex-wrap items-end justify-between gap-2">
         <div>
-          <h3 id="ai-suggested-tasks" className="text-base font-semibold text-[#f4f4f5]">Suggested Tasks</h3>
-          <p className="mt-1 text-sm text-white/50">Review and edit suggestions. Nothing is added until you confirm.</p>
+          <h3 id="ai-suggested-tasks" className="text-base font-semibold text-[var(--foreground)]">Suggested Tasks</h3>
+          <p className="mt-1 text-sm text-[var(--foreground)]/50">Review and edit suggestions. Nothing is added until you confirm.</p>
         </div>
         <Badge>{canApprove ? "AI suggestions · Review required" : "AI suggestions · Approval unavailable"}</Badge>
       </div>
       {suggestions.length ? (
         <div className="mt-3 space-y-3">
           {canApprove && eligibleSuggestions.length > 0 && (
-            <label className="inline-flex min-h-8 items-center gap-2 text-xs text-white/70">
+            <label className="inline-flex min-h-8 items-center gap-2 text-xs text-[var(--foreground)]/70">
               <input
                 type="checkbox"
                 checked={selectedIds.length === eligibleSuggestions.length && eligibleSuggestions.length > 0}
@@ -131,7 +131,7 @@ function SuggestedTasksReview({
               const approved = approvedById.has(item.suggestionId);
               const draft = drafts.find((value) => value.suggestionId === item.suggestionId)!;
               return (
-                <li key={item.suggestionId} className="min-w-0 rounded-lg border border-white/10 bg-[#111113] p-4">
+                <li key={item.suggestionId} className="min-w-0 rounded-lg border border-[var(--line)] bg-[var(--surface)] p-4">
                   <div className="flex items-start gap-3">
                     {canApprove && !approved && (
                       <input
@@ -151,7 +151,7 @@ function SuggestedTasksReview({
                             disabled={!canApprove || approved}
                             onChange={(event) => updateDraft(item.suggestionId, "title", event.target.value)}
                             maxLength={160}
-                            className="w-full rounded border border-white/10 bg-[#18181b] px-2 py-1.5 text-sm font-medium text-white/90 disabled:border-transparent disabled:bg-transparent disabled:px-0"
+                            className="w-full rounded border border-[var(--line)] bg-[var(--panel)] px-2 py-1.5 text-sm font-medium text-[var(--foreground)]/90 disabled:border-transparent disabled:bg-transparent disabled:px-0"
                           />
                         </label>
                         <Badge tone={badgeTones[draft.priority]}>{draft.priority} priority</Badge>
@@ -164,7 +164,7 @@ function SuggestedTasksReview({
                           onChange={(event) => updateDraft(item.suggestionId, "description", event.target.value)}
                           maxLength={2000}
                           rows={3}
-                          className="w-full resize-y rounded border border-white/10 bg-[#18181b] px-2 py-1.5 text-sm leading-6 text-white/60 disabled:border-transparent disabled:bg-transparent disabled:px-0"
+                          className="w-full resize-y rounded border border-[var(--line)] bg-[var(--panel)] px-2 py-1.5 text-sm leading-6 text-[var(--foreground)]/60 disabled:border-transparent disabled:bg-transparent disabled:px-0"
                         />
                       </label>
                       <ProjectAIAnalysisFeedbackControl
@@ -176,7 +176,7 @@ function SuggestedTasksReview({
                         feedback={feedback.filter((entry) => entry.targetType === "SUGGESTED_TASK" && entry.targetId === item.suggestionId)}
                       />
                       {canApprove && !approved && (
-                        <label className="flex items-center gap-2 text-xs text-white/60">
+                        <label className="flex items-center gap-2 text-xs text-[var(--foreground)]/60">
                           Priority
                           <select
                             value={draft.priority}
@@ -184,7 +184,7 @@ function SuggestedTasksReview({
                               const priority = taskPrioritySchema.safeParse(event.target.value);
                               if (priority.success) updatePriority(item.suggestionId, priority.data);
                             }}
-                            className="rounded border border-white/10 bg-[#18181b] px-2 py-1.5 text-xs text-white/80"
+                            className="rounded border border-[var(--line)] bg-[var(--panel)] px-2 py-1.5 text-xs text-[var(--foreground)]/80"
                           >
                             {taskPriorityValues.map((priority) => <option key={priority} value={priority}>{priority}</option>)}
                           </select>
@@ -192,10 +192,10 @@ function SuggestedTasksReview({
                       )}
                       {approved ? (
                         taskId
-                          ? <Link href={`/tasks/${taskId}`} className="inline-flex items-center gap-1 text-xs font-medium text-[#c4b5fd] hover:underline">Approved · View task <ArrowUpRight size={12} aria-hidden="true" /></Link>
-                          : <p className="text-xs text-white/50">Previously approved</p>
+                          ? <Link href={`/tasks/${taskId}`} className="inline-flex items-center gap-1 text-xs font-medium text-[var(--accent-muted)] hover:underline">Approved · View task <ArrowUpRight size={12} aria-hidden="true" /></Link>
+                          : <p className="text-xs text-[var(--foreground)]/50">Previously approved</p>
                       ) : (
-                        <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#c4b5fd]">AI suggestion · Not yet a Task</p>
+                        <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--accent-muted)]">AI suggestion · Not yet a Task</p>
                       )}
                     </div>
                   </div>
@@ -211,8 +211,8 @@ function SuggestedTasksReview({
               {result && !result.success && <p role="alert" className="text-sm text-[#fca5a5]">{result.error}</p>}
               {confirming ? (
                 <div className="rounded-md border border-[#a49bff]/20 bg-[#a49bff]/[0.05] p-4" aria-live="polite">
-                  <p className="text-sm font-medium text-white/90">Create {selectedTasks.length} reviewed task{selectedTasks.length === 1 ? "" : "s"}?</p>
-                  <ul className="mt-2 list-inside list-disc space-y-1 text-xs text-white/65">
+                  <p className="text-sm font-medium text-[var(--foreground)]/90">Create {selectedTasks.length} reviewed task{selectedTasks.length === 1 ? "" : "s"}?</p>
+                  <ul className="mt-2 list-inside list-disc space-y-1 text-xs text-[var(--foreground)]/65">
                     {selectedTasks.map((task) => <li key={task.suggestionId} className="break-words">{task.title}</li>)}
                   </ul>
                   <div className="mt-4 flex flex-wrap gap-2">
@@ -220,7 +220,7 @@ function SuggestedTasksReview({
                       {isPending && <LoaderCircle size={13} className="animate-spin" aria-hidden="true" />}
                       Confirm and create tasks
                     </button>
-                    <button type="button" disabled={isPending} onClick={() => setConfirming(false)} className="min-h-9 rounded-md border border-white/10 px-3 text-xs text-white/70">
+                    <button type="button" disabled={isPending} onClick={() => setConfirming(false)} className="min-h-9 rounded-md border border-[var(--line)] px-3 text-xs text-[var(--foreground)]/70">
                       Cancel
                     </button>
                   </div>
@@ -260,21 +260,21 @@ function HistoricalSuggestedTasks({
     <section aria-labelledby="historical-ai-suggested-tasks">
       <div className="flex flex-wrap items-end justify-between gap-2">
         <div>
-          <h3 id="historical-ai-suggested-tasks" className="text-base font-semibold text-[#f4f4f5]">Suggested Tasks</h3>
-          <p className="mt-1 text-sm text-white/50">These suggestions are preserved for reference and are not eligible for approval.</p>
+          <h3 id="historical-ai-suggested-tasks" className="text-base font-semibold text-[var(--foreground)]">Suggested Tasks</h3>
+          <p className="mt-1 text-sm text-[var(--foreground)]/50">These suggestions are preserved for reference and are not eligible for approval.</p>
         </div>
         <Badge>Historical suggestions · Reference only</Badge>
       </div>
       {suggestions.length ? (
         <ul className="mt-3 grid gap-3 md:grid-cols-2">
           {suggestions.map((item) => (
-            <li key={item.suggestionId} className="min-w-0 rounded-lg border border-white/10 bg-[#111113] p-4">
+            <li key={item.suggestionId} className="min-w-0 rounded-lg border border-[var(--line)] bg-[var(--surface)] p-4">
               <div className="flex flex-wrap items-start justify-between gap-2">
-                <h4 className="min-w-0 break-words text-sm font-medium text-white/90">{item.title}</h4>
+                <h4 className="min-w-0 break-words text-sm font-medium text-[var(--foreground)]/90">{item.title}</h4>
                 <Badge tone={badgeTones[item.priority]}>{item.priority} priority</Badge>
               </div>
-              <p className="mt-2 break-words text-sm leading-6 text-white/60">{item.description}</p>
-              <p className="mt-3 text-[11px] font-medium text-white/45">From this analysis · Historical suggestion</p>
+              <p className="mt-2 break-words text-sm leading-6 text-[var(--foreground)]/60">{item.description}</p>
+              <p className="mt-3 text-[11px] font-medium text-[var(--foreground)]/45">From this analysis · Historical suggestion</p>
               <ProjectAIAnalysisFeedbackControl
                 projectId={projectId}
                 analysisId={analysisId}
@@ -321,8 +321,8 @@ export function AnalysisSections({
   return (
     <div className="space-y-7">
       <section aria-labelledby={`${idPrefix}ai-summary`}>
-        <h3 id={`${idPrefix}ai-summary`} className="text-lg font-semibold text-[#f4f4f5]">Project Summary</h3>
-        <p className="mt-3 max-w-4xl whitespace-pre-wrap break-words text-sm leading-7 text-white/75">{intelligence.summary}</p>
+        <h3 id={`${idPrefix}ai-summary`} className="text-lg font-semibold text-[var(--foreground)]">Project Summary</h3>
+        <p className="mt-3 max-w-4xl whitespace-pre-wrap break-words text-sm leading-7 text-[var(--foreground)]/75">{intelligence.summary}</p>
         <ProjectAIAnalysisFeedbackControl
           projectId={projectId}
           analysisId={analysisId}
@@ -335,16 +335,16 @@ export function AnalysisSections({
       </section>
 
       <section aria-labelledby={`${idPrefix}ai-requirements`}>
-        <h3 id={`${idPrefix}ai-requirements`} className="text-base font-semibold text-[#f4f4f5]">Requirements</h3>
+        <h3 id={`${idPrefix}ai-requirements`} className="text-base font-semibold text-[var(--foreground)]">Requirements</h3>
         {intelligence.requirements.length ? (
           <ul className="mt-3 grid gap-3 md:grid-cols-2">
             {intelligence.requirements.map((item, index) => (
-              <li key={`${item.title}-${index}`} className="min-w-0 rounded-lg border border-white/10 bg-[#111113] p-4">
+              <li key={`${item.title}-${index}`} className="min-w-0 rounded-lg border border-[var(--line)] bg-[var(--surface)] p-4">
                 <div className="flex flex-wrap items-start justify-between gap-2">
-                  <h4 className="min-w-0 break-words text-sm font-medium text-white/90">{item.title}</h4>
+                  <h4 className="min-w-0 break-words text-sm font-medium text-[var(--foreground)]/90">{item.title}</h4>
                   <Badge tone={badgeTones[item.importance]}>{item.importance} importance</Badge>
                 </div>
-                <p className="mt-2 break-words text-sm leading-6 text-white/60">{item.description}</p>
+                <p className="mt-2 break-words text-sm leading-6 text-[var(--foreground)]/60">{item.description}</p>
                 <ProjectAIAnalysisFeedbackControl
                   projectId={projectId}
                   analysisId={analysisId}
@@ -361,13 +361,13 @@ export function AnalysisSections({
       </section>
 
       <section aria-labelledby={`${idPrefix}ai-deliverables`}>
-        <h3 id={`${idPrefix}ai-deliverables`} className="text-base font-semibold text-[#f4f4f5]">Deliverables</h3>
+        <h3 id={`${idPrefix}ai-deliverables`} className="text-base font-semibold text-[var(--foreground)]">Deliverables</h3>
         {intelligence.deliverables.length ? (
           <ul className="mt-3 grid gap-3 md:grid-cols-2">
             {intelligence.deliverables.map((item, index) => (
-              <li key={`${item.title}-${index}`} className="min-w-0 rounded-lg border border-white/10 bg-[#111113] p-4">
-                <h4 className="break-words text-sm font-medium text-white/90">{item.title}</h4>
-                <p className="mt-2 break-words text-sm leading-6 text-white/60">{item.description}</p>
+              <li key={`${item.title}-${index}`} className="min-w-0 rounded-lg border border-[var(--line)] bg-[var(--surface)] p-4">
+                <h4 className="break-words text-sm font-medium text-[var(--foreground)]/90">{item.title}</h4>
+                <p className="mt-2 break-words text-sm leading-6 text-[var(--foreground)]/60">{item.description}</p>
                 <ProjectAIAnalysisFeedbackControl
                   projectId={projectId}
                   analysisId={analysisId}
@@ -384,16 +384,16 @@ export function AnalysisSections({
       </section>
 
       <section aria-labelledby={`${idPrefix}ai-risks`}>
-        <h3 id={`${idPrefix}ai-risks`} className="text-base font-semibold text-[#f4f4f5]">Risks</h3>
+        <h3 id={`${idPrefix}ai-risks`} className="text-base font-semibold text-[var(--foreground)]">Risks</h3>
         {intelligence.risks.length ? (
           <ul className="mt-3 grid gap-3 md:grid-cols-2">
             {intelligence.risks.map((item, index) => (
               <li key={`${item.title}-${index}`} className="min-w-0 rounded-lg border border-[#f59e0b]/15 bg-[#f59e0b]/[0.03] p-4">
                 <div className="flex flex-wrap items-start justify-between gap-2">
-                  <h4 className="min-w-0 break-words text-sm font-medium text-white/90">{item.title}</h4>
+                  <h4 className="min-w-0 break-words text-sm font-medium text-[var(--foreground)]/90">{item.title}</h4>
                   <Badge tone={badgeTones[item.severity]}>{item.severity} severity</Badge>
                 </div>
-                <p className="mt-2 break-words text-sm leading-6 text-white/60">{item.description}</p>
+                <p className="mt-2 break-words text-sm leading-6 text-[var(--foreground)]/60">{item.description}</p>
                 <ProjectAIAnalysisFeedbackControl
                   projectId={projectId}
                   analysisId={analysisId}
@@ -410,14 +410,14 @@ export function AnalysisSections({
       </section>
 
       <section aria-labelledby={`${idPrefix}ai-missing-information`}>
-        <h3 id={`${idPrefix}ai-missing-information`} className="text-base font-semibold text-[#f4f4f5]">Missing Information</h3>
-        <p className="mt-1 text-sm text-white/50">AI-identified gaps that may need clarification; these are not direct source citations.</p>
+        <h3 id={`${idPrefix}ai-missing-information`} className="text-base font-semibold text-[var(--foreground)]">Missing Information</h3>
+        <p className="mt-1 text-sm text-[var(--foreground)]/50">AI-identified gaps that may need clarification; these are not direct source citations.</p>
         {intelligence.missingInformation.length ? (
           <ul className="mt-3 space-y-3">
             {intelligence.missingInformation.map((item, index) => (
-              <li key={`${item.question}-${index}`} className="min-w-0 rounded-lg border border-white/10 bg-[#111113] p-4">
-                <h4 className="break-words text-sm font-medium text-white/90">{item.question}</h4>
-                <p className="mt-2 break-words text-sm leading-6 text-white/60">{item.reason}</p>
+              <li key={`${item.question}-${index}`} className="min-w-0 rounded-lg border border-[var(--line)] bg-[var(--surface)] p-4">
+                <h4 className="break-words text-sm font-medium text-[var(--foreground)]/90">{item.question}</h4>
+                <p className="mt-2 break-words text-sm leading-6 text-[var(--foreground)]/60">{item.reason}</p>
                 <ProjectAIAnalysisFeedbackControl
                   projectId={projectId}
                   analysisId={analysisId}
@@ -506,11 +506,11 @@ export function ProjectAiWorkspace({
 
   return (
     <div className="mx-auto w-full max-w-5xl space-y-6">
-      <header className="flex flex-col gap-4 border-b border-white/[0.07] pb-5 sm:flex-row sm:items-end sm:justify-between">
+      <header className="flex flex-col gap-4 border-b border-[var(--line)] pb-5 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#93c5fd]">Project workspace</p>
-          <h2 className="mt-1 text-2xl font-semibold tracking-[-0.03em] text-[#f4f4f5] sm:text-[28px]">AI Project Intelligence</h2>
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-white/55">Turn your project brief into structured insights, requirements, risks, and actionable work.</p>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--info-line)]">Project workspace</p>
+          <h2 className="mt-1 text-2xl font-semibold tracking-[-0.03em] text-[var(--foreground)] sm:text-[28px]">AI Project Intelligence</h2>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--foreground)]/55">Turn your project brief into structured insights, requirements, risks, and actionable work.</p>
         </div>
         {canStartAnalysis && !isStale && (
           <form action={formAction} className="shrink-0">
@@ -528,18 +528,18 @@ export function ProjectAiWorkspace({
       </header>
 
       {!primaryBrief ? (
-        <section className="rounded-lg border border-dashed border-white/10 bg-[#18181b] p-6 sm:p-8" aria-labelledby="no-primary-brief">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#93c5fd]">
+        <section className="rounded-lg border border-dashed border-[var(--line)] bg-[var(--panel)] p-6 sm:p-8" aria-labelledby="no-primary-brief">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--info-line)]">
             {state.status === "SOURCE_MISSING" ? "Source unavailable" : "Source brief required"}
           </p>
-          <h3 id="no-primary-brief" className="mt-2 text-xl font-semibold text-[#f4f4f5]">
+          <h3 id="no-primary-brief" className="mt-2 text-xl font-semibold text-[var(--foreground)]">
             {state.status === "SOURCE_MISSING"
               ? "AI analysis source unavailable"
               : state.status === "FAILED"
                 ? "AI analysis unavailable"
                 : "No primary project brief"}
           </h3>
-          <p className="mt-2 max-w-xl text-sm leading-6 text-white/55">
+          <p className="mt-2 max-w-xl text-sm leading-6 text-[var(--foreground)]/55">
             {state.status === "SOURCE_MISSING"
               ? "The brief used for this analysis is no longer available."
               : state.status === "FAILED"
@@ -548,25 +548,25 @@ export function ProjectAiWorkspace({
           </p>
           <Link
             href={`/projects/${projectId}/documents`}
-            className="mt-5 inline-flex min-h-10 items-center justify-center rounded-md border border-[#a49bff]/25 bg-[#a49bff]/10 px-4 text-sm font-medium text-[#c4b5fd] transition-colors hover:bg-[#a49bff]/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff]"
+            className="mt-5 inline-flex min-h-10 items-center justify-center rounded-md border border-[#a49bff]/25 bg-[#a49bff]/10 px-4 text-sm font-medium text-[var(--accent-muted)] transition-colors hover:bg-[#a49bff]/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff]"
           >
             Go to Documents
           </Link>
         </section>
       ) : (
-        <section className="rounded-lg border border-white/10 bg-[#18181b] p-4 sm:p-5" aria-labelledby="analysis-source">
+        <section className="rounded-lg border border-[var(--line)] bg-[var(--panel)] p-4 sm:p-5" aria-labelledby="analysis-source">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex min-w-0 items-start gap-3">
-              <span className="grid size-10 shrink-0 place-items-center rounded-md border border-white/10 bg-white/[0.03] text-white/65">
+              <span className="grid size-10 shrink-0 place-items-center rounded-md border border-[var(--line)] bg-[var(--surface)] text-[var(--foreground)]/65">
                 <FileText size={17} aria-hidden="true" />
               </span>
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2">
-                  <h3 id="analysis-source" className="text-sm font-semibold text-white/90">Current primary brief</h3>
-                  <Badge tone="border-[#a49bff]/25 bg-[#a49bff]/10 text-[#c4b5fd]">Primary Brief</Badge>
+                  <h3 id="analysis-source" className="text-sm font-semibold text-[var(--foreground)]/90">Current primary brief</h3>
+                  <Badge tone="border-[#a49bff]/25 bg-[#a49bff]/10 text-[var(--accent-muted)]">Primary Brief</Badge>
                 </div>
-                <p className="mt-1 break-words text-sm text-white/75">{primaryBrief.originalName}</p>
-                <p className="mt-1 text-xs text-white/45">
+                <p className="mt-1 break-words text-sm text-[var(--foreground)]/75">{primaryBrief.originalName}</p>
+                <p className="mt-1 text-xs text-[var(--foreground)]/45">
                   Project Brief · {getFileTypeLabel(primaryBrief.mimeType, primaryBrief.originalName)} · Updated {formatProjectAIAnalysisDate(primaryBrief.updatedAt)}
                 </p>
               </div>
@@ -575,7 +575,7 @@ export function ProjectAiWorkspace({
               type="button"
               onClick={() => void openProjectBrief(primaryBrief.id)}
               disabled={openingDocumentId !== null}
-              className="inline-flex min-h-9 shrink-0 items-center justify-center gap-1.5 rounded-md border border-white/10 bg-white/[0.03] px-3 text-xs font-medium text-white/70 hover:bg-white/[0.06] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff] disabled:cursor-not-allowed disabled:opacity-50"
+              className="inline-flex min-h-9 shrink-0 items-center justify-center gap-1.5 rounded-md border border-[var(--line)] bg-[var(--surface)] px-3 text-xs font-medium text-[var(--foreground)]/70 hover:bg-[var(--surface)] hover:text-[var(--foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff] disabled:cursor-not-allowed disabled:opacity-50"
             >
               {openingDocumentId === primaryBrief.id
                 ? <LoaderCircle size={13} className="animate-spin" aria-hidden="true" />
@@ -584,18 +584,18 @@ export function ProjectAiWorkspace({
             </button>
           </div>
           {documentAccessError && <p role="status" className="mt-3 text-xs text-[#fbbf24]">{documentAccessError}</p>}
-          <p className="mt-3 text-xs leading-5 text-white/40">
+          <p className="mt-3 text-xs leading-5 text-[var(--foreground)]/40">
             Source attribution is document-level. Text extraction does not preserve reliable page or section locations for this analysis.
           </p>
         </section>
       )}
 
       {primaryBrief && (state.status === "READY" || state.status === "FAILED") && !analysis && (
-        <section className="rounded-lg border border-white/10 bg-[#18181b] px-4 py-5 sm:px-5" aria-labelledby="analysis-ready">
-          <h3 id="analysis-ready" className="text-base font-semibold text-[#f4f4f5]">
+        <section className="rounded-lg border border-[var(--line)] bg-[var(--panel)] px-4 py-5 sm:px-5" aria-labelledby="analysis-ready">
+          <h3 id="analysis-ready" className="text-base font-semibold text-[var(--foreground)]">
             {state.status === "FAILED" ? "Analysis couldn't be completed" : "Ready to analyze"}
           </h3>
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-white/55">
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--foreground)]/55">
             {state.status === "FAILED"
               ? "We couldn't generate project intelligence from the current brief. Try again when you're ready."
               : "BusinessFlow AI can analyze the primary brief to identify requirements, deliverables, risks, missing information, and suggested work."}
@@ -611,7 +611,7 @@ export function ProjectAiWorkspace({
           <LoaderCircle size={16} className="shrink-0 animate-spin" aria-hidden="true" />
           <div>
             <p className="font-medium">Analyzing Project Brief...</p>
-            <p className="mt-0.5 text-xs text-white/55">BusinessFlow AI is reviewing the primary project brief.</p>
+            <p className="mt-0.5 text-xs text-[var(--foreground)]/55">BusinessFlow AI is reviewing the primary project brief.</p>
           </div>
         </div>
       )}
@@ -624,9 +624,9 @@ export function ProjectAiWorkspace({
               <p className="text-sm font-semibold text-[#fbbf24]">
                 {state.analysisSourceMissing ? "Analysis source unavailable" : "This analysis is out of date"}
               </p>
-              <p className="mt-1 text-sm leading-6 text-white/60">{staleReason}</p>
-              {analysis && <p className="mt-2 text-xs text-white/50">Previous source: {analysis.sourceDocumentName}</p>}
-              {primaryBrief && <p className="mt-1 text-xs text-white/50">Current primary brief: {primaryBrief.originalName}</p>}
+              <p className="mt-1 text-sm leading-6 text-[var(--foreground)]/60">{staleReason}</p>
+              {analysis && <p className="mt-2 text-xs text-[var(--foreground)]/50">Previous source: {analysis.sourceDocumentName}</p>}
+              {primaryBrief && <p className="mt-1 text-xs text-[var(--foreground)]/50">Current primary brief: {primaryBrief.originalName}</p>}
               <div className="mt-3 flex flex-col items-start gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
                 {canStartAnalysis && (
                   <form action={formAction} className="w-full sm:w-auto">
@@ -645,19 +645,19 @@ export function ProjectAiWorkspace({
                   <button
                     type="button"
                     onClick={() => void openProjectBrief(primaryBrief.id)}
-                    className="inline-flex min-h-8 items-center gap-1 text-xs font-medium text-[#c4b5fd] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff]"
+                    className="inline-flex min-h-8 items-center gap-1 text-xs font-medium text-[var(--accent-muted)] hover:text-[var(--foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff]"
                   >
                     View Current Brief
                   </button>
                 ) : (
-                  <Link href={`/projects/${projectId}/documents`} className="inline-flex min-h-8 items-center text-xs font-medium text-[#c4b5fd] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff]">
+                  <Link href={`/projects/${projectId}/documents`} className="inline-flex min-h-8 items-center text-xs font-medium text-[var(--accent-muted)] hover:text-[var(--foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff]">
                     Choose a primary Project Brief
                   </Link>
                 )}
-                {analysis && <a href="#saved-analysis" className="inline-flex min-h-8 items-center text-xs font-medium text-[#c4b5fd] underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff]">View Previous Analysis</a>}
+                {analysis && <a href="#saved-analysis" className="inline-flex min-h-8 items-center text-xs font-medium text-[var(--accent-muted)] underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff]">View Previous Analysis</a>}
               </div>
               {canStartAnalysis && (
-                <p className="mt-2 text-xs leading-5 text-white/45">
+                <p className="mt-2 text-xs leading-5 text-[var(--foreground)]/45">
                   This creates a new analysis. Previous analyses and existing Tasks stay unchanged; suggested Tasks are added only if you approve them.
                 </p>
               )}
@@ -667,28 +667,28 @@ export function ProjectAiWorkspace({
       )}
 
       {analysis && (
-        <section className={`space-y-5 rounded-lg border p-4 sm:p-6 ${isStale ? "border-white/[0.07] bg-[#151517]" : "border-white/10 bg-[#18181b]"}`} aria-labelledby="saved-analysis">
-          <div className="flex flex-col gap-3 border-b border-white/[0.07] pb-4 sm:flex-row sm:items-start sm:justify-between">
+        <section className={`space-y-5 rounded-lg border p-4 sm:p-6 ${isStale ? "border-[var(--line)] bg-[#151517]" : "border-[var(--line)] bg-[var(--panel)]"}`} aria-labelledby="saved-analysis">
+          <div className="flex flex-col gap-3 border-b border-[var(--line)] pb-4 sm:flex-row sm:items-start sm:justify-between">
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-2">
-                <h3 id="saved-analysis" className="text-base font-semibold text-[#f4f4f5]">
+                <h3 id="saved-analysis" className="text-base font-semibold text-[var(--foreground)]">
                   {isStale || isProcessing ? "Previous analysis" : state.status === "FAILED" ? "Previous successful analysis" : "Project Summary"}
                 </h3>
                 <Badge tone={isStale || isProcessing ? badgeTones.MEDIUM : "border-[#34d399]/20 bg-[#34d399]/[0.07] text-[#a7f3d0]"}>
                   {isStale ? "Historical analysis" : isProcessing ? "Previous saved result" : state.status === "FAILED" ? "Last successful result" : "Current analysis"}
                 </Badge>
               </div>
-              <p className="mt-1 break-words text-xs text-white/50">Analyzed {formatProjectAIAnalysisDate(analysis.completedAt ?? analysis.createdAt)}</p>
-              <p className="mt-1 break-words text-xs text-white/50">
+              <p className="mt-1 break-words text-xs text-[var(--foreground)]/50">Analyzed {formatProjectAIAnalysisDate(analysis.completedAt ?? analysis.createdAt)}</p>
+              <p className="mt-1 break-words text-xs text-[var(--foreground)]/50">
                 Analysis source: {analysis.sourceDocumentName}
               </p>
-              <p className="mt-1 break-words text-xs text-white/40">Brief updated {formatProjectAIAnalysisDate(analysis.sourceDocumentUpdatedAt)}</p>
+              <p className="mt-1 break-words text-xs text-[var(--foreground)]/40">Brief updated {formatProjectAIAnalysisDate(analysis.sourceDocumentUpdatedAt)}</p>
               {analysis.sourceDocumentId && !state.analysisSourceMissing && (
                 <button
                   type="button"
                   onClick={() => void openProjectBrief(analysis.sourceDocumentId!)}
                   disabled={openingDocumentId !== null}
-                  className="mt-2 inline-flex min-h-8 items-center gap-1.5 text-xs font-medium text-[#c4b5fd] underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff] disabled:opacity-50"
+                  className="mt-2 inline-flex min-h-8 items-center gap-1.5 text-xs font-medium text-[var(--accent-muted)] underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff] disabled:opacity-50"
                 >
                   {openingDocumentId === analysis.sourceDocumentId
                     ? <LoaderCircle size={12} className="animate-spin" aria-hidden="true" />
@@ -698,7 +698,7 @@ export function ProjectAiWorkspace({
               )}
               {documentAccessError && <p role="status" className="mt-2 text-xs text-[#fbbf24]">{documentAccessError}</p>}
             </div>
-            <p className="inline-flex shrink-0 items-center gap-1.5 text-xs text-white/45">
+            <p className="inline-flex shrink-0 items-center gap-1.5 text-xs text-[var(--foreground)]/45">
               <Sparkles size={13} aria-hidden="true" /> AI-generated
             </p>
           </div>
@@ -718,11 +718,11 @@ export function ProjectAiWorkspace({
             </div>
           )}
           {isProcessing && analysis && (
-            <p role="status" className="text-sm text-[#c4b5fd]">A new analysis is running. This is the previous saved result.</p>
+            <p role="status" className="text-sm text-[var(--accent-muted)]">A new analysis is running. This is the previous saved result.</p>
           )}
-          <p className="text-xs leading-5 text-white/45">Generated from the analysis source shown above. Review insights before using them for project decisions; suggested Tasks require your approval.</p>
+          <p className="text-xs leading-5 text-[var(--foreground)]/45">Generated from the analysis source shown above. Review insights before using them for project decisions; suggested Tasks require your approval.</p>
           {analysis.sourceMetadata?.truncated && (
-            <p role="note" className="rounded-md border border-[#f59e0b]/15 bg-[#f59e0b]/[0.03] px-3 py-2 text-xs leading-5 text-white/55">
+            <p role="note" className="rounded-md border border-[#f59e0b]/15 bg-[#f59e0b]/[0.03] px-3 py-2 text-xs leading-5 text-[var(--foreground)]/55">
               This analysis used {analysis.sourceMetadata.finalCharacterCount.toLocaleString()} of {analysis.sourceMetadata.originalCharacterCount.toLocaleString()} extracted characters from the source brief. Omitted text may contain additional details.
             </p>
           )}

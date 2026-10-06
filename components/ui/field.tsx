@@ -4,7 +4,7 @@ import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const controlClassName =
-  "h-11 w-full rounded-lg border border-[var(--line-strong)] bg-white px-3.5 text-sm text-black/80 outline-none transition-colors placeholder:text-[var(--muted)] focus-visible:border-[var(--accent)] focus-visible:ring-2 focus-visible:ring-[var(--accent)]/20 disabled:cursor-not-allowed disabled:opacity-60 aria-invalid:border-[var(--danger)] aria-invalid:ring-2 aria-invalid:ring-[var(--danger)]/20";
+  "h-11 w-full rounded-lg border border-[var(--line-strong)] bg-[var(--surface)] px-3.5 text-sm text-[var(--foreground)] outline-none transition-colors placeholder:text-[var(--muted)] focus-visible:border-[var(--accent)] focus-visible:ring-2 focus-visible:ring-[var(--accent)]/20 disabled:cursor-not-allowed disabled:opacity-60 aria-invalid:border-[var(--danger)] aria-invalid:ring-2 aria-invalid:ring-[var(--danger)]/20";
 
 type BaseFieldProps = {
   id: string;

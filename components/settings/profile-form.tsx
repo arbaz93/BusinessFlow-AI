@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 
 const inputClass =
-  "h-10 w-full rounded-lg border border-[#27272a] bg-[#111113] px-3.5 text-sm text-white placeholder:text-white/30 focus-visible:border-[#a49bff] focus-visible:ring-[#a49bff]/20 focus-visible:ring-2 disabled:cursor-not-allowed";
+  "h-10 w-full rounded-lg border border-[var(--line)] bg-[var(--surface)] px-3.5 text-sm text-[var(--foreground)] placeholder:text-[var(--foreground)]/30 focus-visible:border-[#a49bff] focus-visible:ring-[#a49bff]/20 focus-visible:ring-2 disabled:cursor-not-allowed";
 
 export function ProfileForm({ name, email }: { name: string; email: string | null }) {
   const [state, action, pending] = useActionState(updateProfile, {});
@@ -18,7 +18,7 @@ export function ProfileForm({ name, email }: { name: string; email: string | nul
   return (
     <form action={action} className="space-y-6">
       <div>
-        <label htmlFor="profile-name" className="block text-sm font-medium text-[#f4f4f5]">
+        <label htmlFor="profile-name" className="block text-sm font-medium text-[var(--foreground)]">
           Full name
         </label>
         <Input
@@ -35,14 +35,14 @@ export function ProfileForm({ name, email }: { name: string; email: string | nul
           aria-describedby={state.error ? "profile-name-error" : undefined}
         />
         {state.error ? (
-          <p id="profile-name-error" className="mt-1 text-xs text-[#fca5a5]" role="alert">
+          <p id="profile-name-error" className="mt-1 text-xs text-[var(--danger-line)]" role="alert">
             {state.error}
           </p>
         ) : null}
       </div>
 
       <div>
-        <label htmlFor="profile-email" className="block text-sm font-medium text-[#f4f4f5]">
+        <label htmlFor="profile-email" className="block text-sm font-medium text-[var(--foreground)]">
           Email address
         </label>
         <Input
@@ -53,25 +53,25 @@ export function ProfileForm({ name, email }: { name: string; email: string | nul
           aria-readonly
           className={cn(
             inputClass,
-            "read-only:bg-[#0f0f12] read-only:text-white/50",
+            "read-only:bg-[var(--surface)] read-only:text-[var(--foreground)]/50",
           )}
         />
-        <p className="mt-1 text-xs text-[#71717a]">
+        <p className="mt-1 text-xs text-[var(--muted-foreground)]">
           Email identity is managed by your authentication provider and cannot be changed here.
         </p>
       </div>
 
       {state.message ? (
-        <p className="text-sm text-[#86efac]" role="status">
+        <p className="text-sm text-[var(--success-line)]" role="status">
           {state.message}
         </p>
       ) : null}
 
-      <div className="flex items-center justify-between border-t border-[#27272a] pt-4">
+      <div className="flex items-center justify-between border-t border-[var(--line)] pt-4">
         <button
           type="submit"
           disabled={pending || !value.trim() || unchanged}
-          className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-[#7067e8] px-4 text-sm font-semibold text-white transition-colors hover:bg-[#8178f0] disabled:cursor-not-allowed disabled:opacity-55"
+          className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-[var(--accent)] px-4 text-sm font-semibold text-[var(--accent-foreground)] transition-colors hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-55"
         >
           {pending ? (
             <>

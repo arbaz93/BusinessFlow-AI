@@ -13,8 +13,8 @@ const projectData = [
 
 const metricData = [
   { label: "Total Leads", value: "24", note: "Across all stages", icon: Users, tone: "bg-[var(--accent)]/10 text-[var(--accent)]" },
-  { label: "Active Clients", value: "8", note: "Active relationships", icon: BriefcaseBusiness, tone: "bg-[#3b82f6]/10 text-[#3b82f6]" },
-  { label: "Active Projects", value: "5", note: "In delivery", icon: FolderKanban, tone: "bg-[#22c55e]/10 text-[#22c55e]" },
+  { label: "Active Clients", value: "8", note: "Active relationships", icon: BriefcaseBusiness, tone: "bg-[var(--info-surface)] text-[#3b82f6]" },
+  { label: "Active Projects", value: "5", note: "In delivery", icon: FolderKanban, tone: "bg-[var(--success-surface)] text-[#22c55e]" },
   { label: "Overdue Projects", value: "1", note: "Past due", icon: Sparkles, tone: "bg-[#ef4444]/10 text-[#ef4444]" },
 ];
 
@@ -23,7 +23,7 @@ function MetricCard({ label, value, note, icon: Icon, tone }: typeof metricData[
     <div className="rounded-xl border border-[var(--line)] bg-[var(--panel)] p-4">
       <div className="flex items-center justify-between">
         <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--muted)]">{label}</p>
-        <span className={`grid size-8 place-items-center rounded-md border border-white/10 ${tone}`}>
+        <span className={`grid size-8 place-items-center rounded-md border border-[var(--line)] ${tone}`}>
           <Icon size={16} strokeWidth={2} />
         </span>
       </div>
@@ -37,14 +37,14 @@ function MetricCard({ label, value, note, icon: Icon, tone }: typeof metricData[
 
 function ProjectRow({ name, client, status, priority, due }: typeof projectData[0]) {
   const statusTone = {
-    "In Progress": "border-[#3b82f6]/25 bg-[#3b82f6]/10 text-[#93c5fd]",
-    "Planning": "border-[#8b5cf6]/25 bg-[#8b5cf6]/10 text-[#c4b5fd]",
+    "In Progress": "border-[var(--info-border)]/25 bg-[var(--info-surface)] text-[var(--info-line)]",
+    "Planning": "border-[var(--accent)]/25 bg-[var(--accent)]/10 text-[var(--accent-muted)]",
     "On Hold": "border-[#f59e0b]/25 bg-[#f59e0b]/10 text-[#fbbf24]",
   };
   const priorityTone = {
-    "High": "border-[#ef4444]/20 bg-[#ef4444]/10 text-[#fca5a5]",
+    "High": "border-[var(--danger-border)]/20 bg-[#ef4444]/10 text-[#fca5a5]",
     "Medium": "border-[#f59e0b]/20 bg-[#f59e0b]/10 text-[#fbbf24]",
-    "Low": "border-[#3b82f6]/20 bg-[#3b82f6]/10 text-[#93c5fd]",
+    "Low": "border-[#3b82f6]/20 bg-[var(--info-surface)] text-[var(--info-line)]",
   };
 
   return (
@@ -60,12 +60,12 @@ function ProjectRow({ name, client, status, priority, due }: typeof projectData[
         <div className="flex items-center justify-between gap-2 text-[12px] text-[var(--muted-foreground)] md:min-w-[200px]">
           <div className="flex flex-wrap items-center gap-2">
             <span
-              className={`inline-flex rounded-full border px-2 py-0.5 text-[10px] font-medium ${statusTone[status as keyof typeof statusTone] || "border-white/10 bg-white/[0.04] text-white/60"}`}
+              className={`inline-flex rounded-full border px-2 py-0.5 text-[10px] font-medium ${statusTone[status as keyof typeof statusTone] || "border-[var(--line)] bg-[var(--surface)] text-[var(--foreground)]/60"}`}
             >
               {status}
             </span>
             <span
-              className={`inline-flex rounded-full border px-2 py-0.5 text-[10px] font-medium ${priorityTone[priority as keyof typeof priorityTone] || "border-white/10 bg-white/[0.04] text-white/60"}`}
+              className={`inline-flex rounded-full border px-2 py-0.5 text-[10px] font-medium ${priorityTone[priority as keyof typeof priorityTone] || "border-[var(--line)] bg-[var(--surface)] text-[var(--foreground)]/60"}`}
             >
               {priority}
             </span>

@@ -3,12 +3,17 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { getAuthCallbackUrl } from "@/lib/auth/callback-url";
-import { getOrganizationContext } from "@/lib/auth/dal";
+import { resolveApplicationEntryState } from "@/lib/auth/lifecycle";
 import { loginSchema, signupSchema } from "@/lib/auth/schemas";
+import { getInvitationTokenFromReturnTo } from "@/lib/members/invitation-tokens";
 import type { FormState } from "@/lib/auth/types";
 import { createClient } from "@/lib/supabase/server";
 
 export async function login(_previousState: FormState, formData: FormData): Promise<FormState> {
+  const returnTo = String(formData.get("returnTo") ?? "");
+  const invitationReturnTo = getInvitationTokenFromReturnTo(returnTo)
+    ? returnTo
+    : undefined;
   const parsed = loginSchema.safeParse({
     email: formData.get("email"),
     password: formData.get("password"),
@@ -16,15 +21,15 @@ export async function login(_previousState: FormState, formData: FormData): Prom
 
   if (!parsed.success) return { error: parsed.error.issues[0]?.message ?? "Check your details and try again." };
 
-  let destination: "/dashboard" | "/onboarding";
+  let destination: string;
   try {
     const supabase = await createClient();
     const { data, error } = await supabase.auth.signInWithPassword(parsed.data);
 
     if (error || !data.user) return { error: "Email or password is incorrect." };
 
-    const context = await getOrganizationContext(data.user);
-    destination = context.membership ? "/dashboard" : "/onboarding";
+    const state = await resolveApplicationEntryState(data.user);
+    destination = invitationReturnTo ?? (state.kind === "READY" ? "/dashboard" : "/onboarding");
   } catch {
     return { error: "We couldn't sign you in right now. Please try again." };
   }
@@ -33,6 +38,9 @@ export async function login(_previousState: FormState, formData: FormData): Prom
 }
 
 export async function signup(_previousState: FormState, formData: FormData): Promise<FormState> {
+  const returnTo = String(formData.get("returnTo") ?? "");
+  const invitationToken = getInvitationTokenFromReturnTo(returnTo);
+  const invitationReturnTo = invitationToken ? returnTo : undefined;
   const parsed = signupSchema.safeParse({
     name: formData.get("name"),
     email: formData.get("email"),
@@ -42,7 +50,7 @@ export async function signup(_previousState: FormState, formData: FormData): Pro
 
   if (!parsed.success) return { error: parsed.error.issues[0]?.message ?? "Check your details and try again." };
 
-  let destination: "/dashboard" | "/onboarding" | undefined;
+  let destination: string | undefined;
   try {
     const supabase = await createClient();
     const requestHeaders = await headers();
@@ -51,7 +59,7 @@ export async function signup(_previousState: FormState, formData: FormData): Pro
       password: parsed.data.password,
       options: {
         data: { name: parsed.data.name },
-        emailRedirectTo: getAuthCallbackUrl(requestHeaders),
+        emailRedirectTo: getAuthCallbackUrl(requestHeaders, undefined, invitationToken),
       },
     });
 
@@ -70,7 +78,7 @@ export async function signup(_previousState: FormState, formData: FormData): Pro
     }
 
     if (data.user && data.session) {
-      destination = "/onboarding";
+      destination = invitationReturnTo ?? "/onboarding";
     } else {
       return { message: "Check your email to confirm your account, then return here to sign in." };
     }
@@ -85,10 +93,13 @@ export async function signup(_previousState: FormState, formData: FormData): Pro
   return { error: "We couldn't create your account right now. Please try again." };
 }
 
-export async function signOut() {
+export async function signOut(formData?: FormData) {
+  const returnTo = getInvitationTokenFromReturnTo(
+    String(formData?.get("returnTo") ?? ""),
+  );
   const supabase = await createClient();
   const { error } = await supabase.auth.signOut();
 
   if (error) redirect("/dashboard?notice=signout");
-  redirect("/login");
+  redirect(returnTo ? `/login${returnTo}` : "/login");
 }

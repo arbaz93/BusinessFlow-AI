@@ -72,22 +72,22 @@ export default async function TaskDetailPage({ params }: PageProps<"/tasks/[task
   return (
     <div className="space-y-6 pb-10">
       <div className="pt-2 sm:pt-5">
-        <Link href="/tasks" className="inline-flex h-8 items-center gap-1.5 rounded-md pr-2 text-xs font-medium text-white/50 transition-colors hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff]">
+        <Link href="/tasks" className="inline-flex h-8 items-center gap-1.5 rounded-md pr-2 text-xs font-medium text-[var(--muted)] transition-colors hover:text-[var(--foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff]">
           <ArrowLeft size={14} /> Tasks
         </Link>
         <div className="mt-4 flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between">
           <div className="min-w-0">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#93c5fd]">Task details</p>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--accent-muted)]">Task details</p>
             <div className="mt-2 flex flex-wrap items-center gap-2.5">
-              <h1 className="text-[30px] font-semibold tracking-[-0.04em] text-[#f4f4f5] sm:text-[32px]">{task.title}</h1>
+              <h1 className="text-[30px] font-semibold tracking-[-0.04em] text-[var(--foreground)] sm:text-[32px]">{task.title}</h1>
               <span className={`inline-flex h-6 items-center rounded-full border px-2.5 text-[11px] font-medium ${taskStatusTone[task.status]}`}>{taskStatusLabels[task.status]}</span>
               <span className={`inline-flex h-6 items-center rounded-full border px-2.5 text-[11px] font-medium ${taskPriorityTone[task.priority]}`}>{taskPriorityLabels[task.priority]}</span>
             </div>
-            <p className="mt-1 text-sm text-white/55">
-              <Link href={`/projects/${task.project.id}/tasks`} className="inline-flex items-center gap-1 text-[#c4b5fd] hover:text-white">
-                {task.project.name} <span className="text-white/25">·</span> {task.project.client.company || task.project.client.name}
+            <p className="mt-1 text-sm text-[var(--muted)]">
+              <Link href={`/projects/${task.project.id}/tasks`} className="inline-flex items-center gap-1 text-[var(--accent-muted)] hover:text-[var(--foreground)]">
+                {task.project.name} <span className="text-[var(--muted-foreground)]">·</span> {task.project.client.company || task.project.client.name}
               </Link>
-              <span className="mx-1.5 text-white/20">·</span> Created {formatDate(task.createdAt)}
+              <span className="mx-1.5 text-[var(--muted-foreground)]">·</span> Created {formatDate(task.createdAt)}
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
@@ -100,8 +100,8 @@ export default async function TaskDetailPage({ params }: PageProps<"/tasks/[task
 
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1.5fr)_minmax(300px,0.8fr)]">
         <section className="space-y-6">
-          <div className="rounded-[10px] border border-white/10 bg-[#18181b] p-4 sm:p-5">
-            <h2 className="text-[15px] font-semibold text-[#f4f4f5]">Task information</h2>
+          <div className="rounded-[10px] border border-[var(--line)] bg-[var(--surface)] p-4 sm:p-5">
+            <h2 className="text-[15px] font-semibold text-[var(--foreground)]">Task information</h2>
             <div className="mt-5 grid gap-x-6 gap-y-5 sm:grid-cols-2">
               <ContactItem icon={FolderKanban} label="Project" value={task.project.name} href={`/projects/${task.project.id}`} />
               <ContactItem icon={UserRound} label="Assignee" value={task.assignee?.name ?? "Unassigned"} />
@@ -114,20 +114,20 @@ export default async function TaskDetailPage({ params }: PageProps<"/tasks/[task
             </div>
           </div>
 
-          <div className="rounded-[10px] border border-white/10 bg-[#18181b] p-4 sm:p-5">
-            <h2 className="text-[15px] font-semibold text-[#f4f4f5]">Description</h2>
-            {task.description ? <p className="mt-3 whitespace-pre-wrap text-sm leading-6 text-white/70">{task.description}</p> : <p className="mt-3 text-sm text-white/40">No task description yet.</p>}
+          <div className="rounded-[10px] border border-[var(--line)] bg-[var(--surface)] p-4 sm:p-5">
+            <h2 className="text-[15px] font-semibold text-[var(--foreground)]">Description</h2>
+            {task.description ? <p className="mt-3 whitespace-pre-wrap text-sm leading-6 text-[var(--muted)]">{task.description}</p> : <p className="mt-3 text-sm text-[var(--muted)]">No task description yet.</p>}
           </div>
         </section>
 
         <aside className="space-y-6">
-          <section className="rounded-[10px] border border-white/10 bg-[#18181b] p-4 sm:p-5">
+          <section className="rounded-[10px] border border-[var(--line)] bg-[var(--surface)] p-4 sm:p-5">
             <div className="flex items-center justify-between gap-3">
               <div>
-                <h2 className="text-[15px] font-semibold text-[#f4f4f5]">Project details</h2>
-                <p className="mt-1 text-xs text-white/45">Connected client and delivery context.</p>
+                <h2 className="text-[15px] font-semibold text-[var(--foreground)]">Project details</h2>
+                <p className="mt-1 text-xs text-[var(--muted)]">Connected client and delivery context.</p>
               </div>
-              <Link href={`/projects/${task.project.id}/tasks`} className="inline-flex h-8 items-center gap-1.5 rounded-md border border-white/10 bg-white/[0.03] px-2.5 text-xs font-medium text-white/70 transition-colors hover:bg-white/[0.06] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff]">
+              <Link href={`/projects/${task.project.id}/tasks`} className="inline-flex h-8 items-center gap-1.5 rounded-md border border-[var(--line)] bg-[var(--panel)] px-2.5 text-xs font-medium text-[var(--muted)] transition-colors hover:bg-[var(--surface)] hover:text-[var(--foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff]">
                 Back to Project Tasks
               </Link>
             </div>
@@ -138,31 +138,31 @@ export default async function TaskDetailPage({ params }: PageProps<"/tasks/[task
             </div>
           </section>
 
-          <section className="rounded-[10px] border border-white/10 bg-[#18181b] p-4 sm:p-5" aria-labelledby="task-activity-heading">
+          <section className="rounded-[10px] border border-[var(--line)] bg-[var(--surface)] p-4 sm:p-5" aria-labelledby="task-activity-heading">
             <div className="flex items-center justify-between gap-3">
               <div>
-                <h2 id="task-activity-heading" className="text-[15px] font-semibold text-[#f4f4f5]">Activity</h2>
-                <p className="mt-1 text-xs text-white/45">Recent changes to this task.</p>
+                <h2 id="task-activity-heading" className="text-[15px] font-semibold text-[var(--foreground)]">Activity</h2>
+                <p className="mt-1 text-xs text-[var(--muted)]">Recent changes to this task.</p>
               </div>
-              <span className="rounded-md border border-white/10 bg-white/[0.035] px-2 py-1 text-[11px] text-white/50">{activityCount}</span>
+              <span className="rounded-md border border-[var(--line)] bg-[var(--panel)] px-2 py-1 text-[11px] text-[var(--muted)]">{activityCount}</span>
             </div>
             {task.activities.length ? (
               <ol className="mt-5 space-y-0">
                 {task.activities.map((activity, index) => (
                   <li key={activity.id} className="relative flex gap-3 pb-5 last:pb-0">
-                    {index < task.activities.length - 1 && <span aria-hidden="true" className="absolute left-[5px] top-3 h-full w-px bg-white/10" />}
-                    <span aria-hidden="true" className="relative mt-1 size-3 shrink-0 rounded-full border-2 border-[#93c5fd]/50 bg-[#18181b]" />
+                    {index < task.activities.length - 1 && <span aria-hidden="true" className="absolute left-[5px] top-3 h-full w-px bg-[var(--line)]" />}
+                    <span aria-hidden="true" className="relative mt-1 size-3 shrink-0 rounded-full border-2 border-[var(--accent)]/50 bg-[var(--surface)]" />
                     <div className="min-w-0">
-                      <p className="text-[13px] leading-5 text-white/75">{activity.description}</p>
-                      <p className="mt-1 text-[11px] text-white/40">{activity.actor.name} <span className="mx-1 text-white/20">·</span> {activity.createdAt.toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}</p>
+                      <p className="text-[13px] leading-5 text-[var(--foreground)]">{activity.description}</p>
+                      <p className="mt-1 text-[11px] text-[var(--muted)]">{activity.actor.name} <span className="mx-1 text-[var(--muted-foreground)]">·</span> {activity.createdAt.toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}</p>
                     </div>
                   </li>
                 ))}
               </ol>
             ) : (
-              <p className="mt-5 text-sm text-white/40">No activity has been recorded yet.</p>
+              <p className="mt-5 text-sm text-[var(--muted)]">No activity has been recorded yet.</p>
             )}
-            {activityCount > task.activities.length && <p className="mt-4 border-t border-white/[0.07] pt-3 text-[11px] text-white/40">Showing the 20 most recent events.</p>}
+            {activityCount > task.activities.length && <p className="mt-4 border-t border-[var(--line)] pt-3 text-[11px] text-[var(--muted)]">Showing the 20 most recent events.</p>}
           </section>
         </aside>
       </div>
@@ -173,10 +173,10 @@ export default async function TaskDetailPage({ params }: PageProps<"/tasks/[task
 function ContactItem({ icon: Icon, label, value, href }: { icon: typeof CalendarDays; label: string; value: string | null; href?: string }) {
   return (
     <div className="flex min-w-0 gap-3">
-      <span aria-hidden="true" className="mt-0.5 grid size-8 shrink-0 place-items-center rounded-md border border-white/10 bg-white/[0.03] text-white/50"><Icon size={15} /></span>
+      <span aria-hidden="true" className="mt-0.5 grid size-8 shrink-0 place-items-center rounded-md border border-[var(--line)] bg-[var(--panel)] text-[var(--muted)]"><Icon size={15} /></span>
       <div className="min-w-0">
-        <p className="text-[11px] font-medium text-white/40">{label}</p>
-        {href && value ? <a href={href} className="mt-1 block truncate text-sm text-[#c4b5fd] hover:text-white">{value}</a> : <p className="mt-1 truncate text-sm text-white/80">{value || "Not set"}</p>}
+        <p className="text-[11px] font-medium text-[var(--muted)]">{label}</p>
+        {href && value ? <a href={href} className="mt-1 block truncate text-sm text-[var(--accent-muted)] hover:text-[var(--foreground)]">{value}</a> : <p className="mt-1 truncate text-sm text-[var(--foreground)]">{value || "Not set"}</p>}
       </div>
     </div>
   );

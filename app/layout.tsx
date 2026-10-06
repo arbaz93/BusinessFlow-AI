@@ -37,13 +37,32 @@ export const metadata: Metadata = {
   },
 };
 
+const themeInitializer = `
+  (function() {
+    try {
+      const storedTheme = window.localStorage.getItem('businessflow-theme');
+      const preferredTheme = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+      const theme = storedTheme === 'dark' || storedTheme === 'light' ? storedTheme : preferredTheme;
+      document.documentElement.dataset.theme = theme;
+      document.documentElement.style.colorScheme = theme;
+    } catch (error) {
+      document.documentElement.dataset.theme = 'dark';
+      document.documentElement.style.colorScheme = 'dark';
+    }
+  })();
+`;
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html
       lang="en"
+      suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        <script dangerouslySetInnerHTML={{ __html: themeInitializer }} />
+        {children}
+      </body>
     </html>
   );
 }

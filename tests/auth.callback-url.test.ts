@@ -27,4 +27,19 @@ describe("getAuthCallbackUrl", () => {
   it("rejects non-HTTP protocols", () => {
     assert.throws(() => getAuthCallbackUrl(new Headers(), "ftp://app.example.com"));
   });
+
+  it("preserves a valid invitation token in the callback path", () => {
+    const token = "A".repeat(43);
+    assert.equal(
+      getAuthCallbackUrl(new Headers(), "https://app.example.com", token),
+      `https://app.example.com/auth/callback/invitations/${token}`,
+    );
+  });
+
+  it("falls back to the standard callback for an invalid invitation token", () => {
+    assert.equal(
+      getAuthCallbackUrl(new Headers(), "https://app.example.com", "not-valid"),
+      "https://app.example.com/auth/callback",
+    );
+  });
 });

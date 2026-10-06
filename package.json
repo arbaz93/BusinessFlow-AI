@@ -9,6 +9,7 @@
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "test": "node --test --import ./tests/helpers/register.mjs \"tests/**/*.test.ts\"",
+    "audit:storage": "node --import ./tests/helpers/register.mjs scripts/audit-project-document-storage.ts",
     "db:generate": "prisma generate"
   },
   "dependencies": {

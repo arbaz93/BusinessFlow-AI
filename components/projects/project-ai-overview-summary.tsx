@@ -19,7 +19,7 @@ function ViewAIIntelligenceLink({
   return (
     <Link
       href={`/projects/${projectId}/ai${anchor}`}
-      className="inline-flex min-h-8 items-center gap-1 rounded-sm text-xs font-medium text-[#c4b5fd] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff]"
+      className="inline-flex min-h-8 items-center gap-1 rounded-sm text-xs font-medium text-[var(--accent-muted)] hover:text-[var(--foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff]"
     >
       {children} <ArrowUpRight size={13} aria-hidden="true" />
     </Link>
@@ -30,7 +30,7 @@ function DocumentLink({ projectId, children = "View Document" }: { projectId: st
   return (
     <Link
       href={`/projects/${projectId}/documents`}
-      className="inline-flex min-h-8 items-center gap-1 rounded-sm text-xs font-medium text-white/60 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff]"
+      className="inline-flex min-h-8 items-center gap-1 rounded-sm text-xs font-medium text-[var(--foreground)]/60 hover:text-[var(--foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff]"
     >
       <FileText size={13} aria-hidden="true" />
       {children}
@@ -60,11 +60,11 @@ function AnalyzeProjectForm({
   if (noBrief) {
     return (
       <div className="mt-4">
-        <h3 className="text-sm font-medium text-white/85">AI Intelligence unavailable</h3>
-        <p className="mt-1 text-xs leading-5 text-white/50">Add a primary project brief to analyze this project.</p>
+        <h3 className="text-sm font-medium text-[var(--foreground)]/85">AI Intelligence unavailable</h3>
+        <p className="mt-1 text-xs leading-5 text-[var(--foreground)]/50">Add a primary project brief to analyze this project.</p>
         <DocumentLink projectId={projectId}>Go to Documents</DocumentLink>
         {state.analysis && (
-          <p className="mt-2 flex flex-wrap items-center gap-x-2 text-[11px] text-white/45">
+          <p className="mt-2 flex flex-wrap items-center gap-x-2 text-[11px] text-[var(--foreground)]/45">
             A previous analysis is available as historical context.
             <ViewAIIntelligenceLink projectId={projectId} anchor="#saved-analysis">View previous analysis</ViewAIIntelligenceLink>
           </p>
@@ -80,7 +80,7 @@ function AnalyzeProjectForm({
           <LoaderCircle size={15} className="animate-spin" aria-hidden="true" />
           Analyzing Project Brief...
         </p>
-        <p className="text-xs text-white/50">Your previous analysis, Tasks, and Documents remain available while analysis runs.</p>
+        <p className="text-xs text-[var(--foreground)]/50">Your previous analysis, Tasks, and Documents remain available while analysis runs.</p>
         <ViewAIIntelligenceLink projectId={projectId}>Open AI Intelligence</ViewAIIntelligenceLink>
       </div>
     );
@@ -90,13 +90,13 @@ function AnalyzeProjectForm({
     return (
       <div className="mt-4">
         <p role="status" className="text-sm font-medium text-[#fbbf24]">AI analysis source unavailable</p>
-        <p className="mt-1 text-xs leading-5 text-white/55">The brief used for this analysis is no longer available.</p>
+        <p className="mt-1 text-xs leading-5 text-[var(--foreground)]/55">The brief used for this analysis is no longer available.</p>
         <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1">
           <DocumentLink projectId={projectId}>Go to Documents</DocumentLink>
           {state.primaryBrief && (
             <form action={formAction}>
               <input type="hidden" name="projectId" value={projectId} />
-              <button type="submit" disabled={isPending} className="inline-flex min-h-8 items-center gap-1 text-xs font-medium text-[#c4b5fd] hover:text-white disabled:opacity-60">
+              <button type="submit" disabled={isPending} className="inline-flex min-h-8 items-center gap-1 text-xs font-medium text-[var(--accent-muted)] hover:text-[var(--foreground)] disabled:opacity-60">
                 {isPending && <LoaderCircle size={13} className="animate-spin" aria-hidden="true" />}
                 Analyze Updated Brief
               </button>
@@ -104,7 +104,7 @@ function AnalyzeProjectForm({
           )}
           {state.analysis && <ViewAIIntelligenceLink projectId={projectId} anchor="#saved-analysis">View Previous Analysis</ViewAIIntelligenceLink>}
           {state.primaryBrief && (
-            <p className="mt-2 text-[11px] leading-5 text-white/45">
+            <p className="mt-2 text-[11px] leading-5 text-[var(--foreground)]/45">
               A new analysis will leave previous analyses and existing Tasks unchanged.
             </p>
           )}
@@ -120,7 +120,7 @@ function AnalyzeProjectForm({
           <AlertTriangle size={15} className="mt-0.5 shrink-0 text-[#fbbf24]" aria-hidden="true" />
           <div>
             <p className="text-sm font-medium text-[#fbbf24]">AI analysis needs updating</p>
-            <p className="mt-1 text-xs leading-5 text-white/55">
+            <p className="mt-1 text-xs leading-5 text-[var(--foreground)]/55">
               {state.analysisStaleReason === "SOURCE_UPDATED"
                 ? "The primary Project Brief was updated after this analysis was created."
                 : state.analysisStaleReason === "NO_PRIMARY_BRIEF"
@@ -129,8 +129,8 @@ function AnalyzeProjectForm({
                     ? "The Project Brief used for this analysis is no longer available."
                     : "The current primary Project Brief is different from the one used for this analysis."}
             </p>
-            {state.analysis && <p className="mt-1 text-[11px] text-white/45">Previous source: {state.analysis.sourceDocumentName}</p>}
-            {state.primaryBrief && <p className="mt-1 text-[11px] text-white/45">Current brief: {state.primaryBrief.originalName}</p>}
+            {state.analysis && <p className="mt-1 text-[11px] text-[var(--foreground)]/45">Previous source: {state.analysis.sourceDocumentName}</p>}
+            {state.primaryBrief && <p className="mt-1 text-[11px] text-[var(--foreground)]/45">Current brief: {state.primaryBrief.originalName}</p>}
           </div>
         </div>
         <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
@@ -144,7 +144,7 @@ function AnalyzeProjectForm({
           <DocumentLink projectId={projectId}>View Current Brief</DocumentLink>
           <ViewAIIntelligenceLink projectId={projectId} anchor="#saved-analysis">View Previous Analysis</ViewAIIntelligenceLink>
         </div>
-        <p className="text-[11px] leading-5 text-white/45">
+        <p className="text-[11px] leading-5 text-[var(--foreground)]/45">
           A new analysis will leave previous analyses and existing Tasks unchanged.
         </p>
       </div>
@@ -158,7 +158,7 @@ function AnalyzeProjectForm({
           {state.errorMessage ?? "AI analysis could not be completed. Please try again."}
         </p>
         {state.analysis && (
-          <p className="text-xs text-white/45">The latest attempt failed. Your previous successful analysis remains available.</p>
+          <p className="text-xs text-[var(--foreground)]/45">The latest attempt failed. Your previous successful analysis remains available.</p>
         )}
         <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
           <form action={formAction}>
@@ -177,9 +177,9 @@ function AnalyzeProjectForm({
   if (!currentAnalysis || !overview) {
     return (
       <div className="mt-4 space-y-3">
-        <h3 className="text-sm font-medium text-white/85">Ready for AI analysis</h3>
-        <p className="text-xs leading-5 text-white/50">Analyze the primary brief to identify requirements, risks, and suggested work.</p>
-        <p className="text-[11px] text-white/45">Primary brief: {state.primaryBrief?.originalName}</p>
+        <h3 className="text-sm font-medium text-[var(--foreground)]/85">Ready for AI analysis</h3>
+        <p className="text-xs leading-5 text-[var(--foreground)]/50">Analyze the primary brief to identify requirements, risks, and suggested work.</p>
+        <p className="text-[11px] text-[var(--foreground)]/45">Primary brief: {state.primaryBrief?.originalName}</p>
         <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
           <form action={formAction}>
             <input type="hidden" name="projectId" value={projectId} />
@@ -203,14 +203,14 @@ function AnalyzeProjectForm({
     <div className="mt-4 space-y-4">
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div className="min-w-0">
-          <p className="text-xs text-white/50">Analyzed from</p>
-          <p className="mt-0.5 break-words text-sm font-medium text-white/85">{currentAnalysis.sourceDocumentName}</p>
+          <p className="text-xs text-[var(--foreground)]/50">Analyzed from</p>
+          <p className="mt-0.5 break-words text-sm font-medium text-[var(--foreground)]/85">{currentAnalysis.sourceDocumentName}</p>
         </div>
         <DocumentLink projectId={projectId} />
       </div>
-      <p className="text-sm leading-6 text-white/70">{overview.summaryPreview.text}</p>
+      <p className="text-sm leading-6 text-[var(--foreground)]/70">{overview.summaryPreview.text}</p>
       {currentAnalysis.sourceMetadata?.truncated && (
-        <p role="note" className="text-xs leading-5 text-white/50">
+        <p role="note" className="text-xs leading-5 text-[var(--foreground)]/50">
           The brief was truncated for analysis; omitted text may contain additional details.
         </p>
       )}
@@ -225,19 +225,19 @@ function AnalyzeProjectForm({
         <OverviewMetric label="Pending suggestions" value={overview.pendingSuggestionCount} />
       </dl>
       {(overview.highRiskCount > 0 || overview.missingInformationCount > 0 || overview.pendingSuggestionCount > 0) && (
-        <div className="space-y-2 border-t border-white/[0.07] pt-3">
+        <div className="space-y-2 border-t border-[var(--line)] pt-3">
           {overview.highRiskCount > 0 && (
             <p className="text-xs text-[#fbbf24]">
-              <span className="font-medium">{riskLabel}</span> <span className="text-white/45">· AI-identified; review before acting.</span>
+              <span className="font-medium">{riskLabel}</span> <span className="text-[var(--foreground)]/45">· AI-identified; review before acting.</span>
             </p>
           )}
           {overview.missingInformationCount > 0 && (
-            <p className="text-xs text-white/65">
+            <p className="text-xs text-[var(--foreground)]/65">
               <span className="font-medium">Information needed</span> · {infoLabel}.
             </p>
           )}
           {overview.pendingSuggestionCount > 0 && (
-            <p className="text-xs text-white/65">
+            <p className="text-xs text-[var(--foreground)]/65">
               <span className="font-medium">Suggested Tasks</span> · {suggestionLabel}.
             </p>
           )}
@@ -256,9 +256,9 @@ function AnalyzeProjectForm({
 
 function OverviewMetric({ label, value }: { label: string; value: number }) {
   return (
-    <div className="min-w-0 rounded-md border border-white/[0.07] bg-[#111113] px-2.5 py-2">
-      <dt className="truncate text-[10px] leading-4 text-white/45">{label}</dt>
-      <dd className="mt-0.5 text-sm font-semibold tabular-nums text-white/85">{value.toLocaleString()}</dd>
+    <div className="min-w-0 rounded-md border border-[var(--line)] bg-[var(--surface)] px-2.5 py-2">
+      <dt className="truncate text-[10px] leading-4 text-[var(--foreground)]/45">{label}</dt>
+      <dd className="mt-0.5 text-sm font-semibold tabular-nums text-[var(--foreground)]/85">{value.toLocaleString()}</dd>
     </div>
   );
 }
@@ -273,17 +273,17 @@ export function ProjectAIOverviewSummary({
   const unavailable = !initialState;
 
   return (
-    <section className="rounded-[10px] border border-white/10 bg-[#18181b] p-4 sm:p-5" aria-labelledby="project-ai-intelligence">
+    <section className="rounded-[10px] border border-[var(--line)] bg-[var(--panel)] p-4 sm:p-5" aria-labelledby="project-ai-intelligence">
       <div className="flex items-start gap-3">
-        <span className="grid size-8 shrink-0 place-items-center rounded-md border border-[#a49bff]/20 bg-[#a49bff]/[0.06] text-[#c4b5fd]">
+        <span className="grid size-8 shrink-0 place-items-center rounded-md border border-[#a49bff]/20 bg-[#a49bff]/[0.06] text-[var(--accent-muted)]">
           <Sparkles size={15} aria-hidden="true" />
         </span>
         <div className="min-w-0 flex-1">
-          <h2 id="project-ai-intelligence" className="text-[15px] font-semibold text-[#f4f4f5]">AI Project Intelligence</h2>
-          <p className="mt-1 text-xs text-white/45">Insights generated from your project brief.</p>
+          <h2 id="project-ai-intelligence" className="text-[15px] font-semibold text-[var(--foreground)]">AI Project Intelligence</h2>
+          <p className="mt-1 text-xs text-[var(--foreground)]/45">Insights generated from your project brief.</p>
           {unavailable ? (
             <div className="mt-4 space-y-2">
-              <p role="status" className="text-sm text-white/60">AI project intelligence is temporarily unavailable.</p>
+              <p role="status" className="text-sm text-[var(--foreground)]/60">AI project intelligence is temporarily unavailable.</p>
               <ViewAIIntelligenceLink projectId={projectId}>Open AI Intelligence</ViewAIIntelligenceLink>
             </div>
           ) : (

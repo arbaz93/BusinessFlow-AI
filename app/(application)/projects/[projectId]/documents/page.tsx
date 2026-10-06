@@ -27,10 +27,14 @@ export default async function ProjectDocumentsPage({ params }: PageProps<"/proje
       projectId={project.id}
       projectName={project.name}
       documents={documents.map((document) => ({
-        ...document,
-        sizeBytes: document.sizeBytes ?? null,
-        storagePath: document.storagePath ?? null,
+        id: document.id,
+        name: document.name,
+        originalName: document.originalName,
+        documentType: document.documentType,
         mimeType: document.mimeType ?? null,
+        sizeBytes: document.sizeBytes ?? null,
+        hasFile: document.storagePath !== null,
+        isPrimary: document.isPrimary,
         createdAt: document.createdAt.toISOString(),
       }))}
     />

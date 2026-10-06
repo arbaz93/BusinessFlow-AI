@@ -9,6 +9,12 @@ export default async function ApplicationLayout({ children }: { children: ReactN
   return (
     <WorkspaceShell
       organizationName={context.organization.name}
+      organizationId={context.organization.id}
+       workspaces={context.memberships.map((m) => ({
+        id: m.id,
+        name: m.name,
+        role: m.role,
+      }))}
       userName={userName}
       userEmail={context.profile.email}
       avatarUrl={context.profile.avatarUrl}

@@ -131,6 +131,7 @@ async function deleteWorkspaceStorage(_orgIds: string[], storagePaths: string[])
   if (storagePaths.length === 0) return;
 
   const supabase = getSupabaseAdminClient();
+  const failedBatches: string[] = [];
   for (let index = 0; index < storagePaths.length; index += STORAGE_BATCH_SIZE) {
     const batch = storagePaths.slice(index, index + STORAGE_BATCH_SIZE);
     const { error } = await supabase.storage
@@ -139,8 +140,16 @@ async function deleteWorkspaceStorage(_orgIds: string[], storagePaths: string[])
     if (error) {
       console.error("Account deletion: storage object cleanup failed for a batch.", {
         errorName: error instanceof Error ? error.name : "UnknownError",
+        batchIndex: index / STORAGE_BATCH_SIZE,
+        batchSize: batch.length,
       });
-      return;
+      failedBatches.push(`${index}-${index + batch.length}`);
     }
+  }
+  if (failedBatches.length > 0) {
+    console.error("Account deletion: some storage object batches could not be removed.", {
+      failedBatchCount: failedBatches.length,
+      totalBatches: Math.ceil(storagePaths.length / STORAGE_BATCH_SIZE),
+    });
   }
 }

@@ -6,5 +6,10 @@ type LoginPageProps = {
 
 export default async function LoginPage({ searchParams }: LoginPageProps) {
   const { notice } = await searchParams;
-  return <AuthForm mode="login" notice={Array.isArray(notice) ? notice[0] : notice} />;
+  return (
+    <AuthForm
+      mode="login"
+      notice={Array.isArray(notice) ? notice[0] : notice}
+    />
+  );
 }

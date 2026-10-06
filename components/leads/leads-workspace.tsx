@@ -33,12 +33,12 @@ const filters: { value: "ALL" | LeadStatusValue; label: string }[] = [
 ];
 
 const statusTone: Record<LeadStatusValue, string> = {
-  NEW: "border-white/10 bg-white/[0.04] text-white/70",
-  CONTACTED: "border-[#3b82f6]/25 bg-[#3b82f6]/10 text-[#93c5fd]",
-  QUALIFIED: "border-[#8b5cf6]/25 bg-[#8b5cf6]/10 text-[#c4b5fd]",
-  PROPOSAL_SENT: "border-[#3b82f6]/25 bg-[#3b82f6]/10 text-[#93c5fd]",
-  WON: "border-[#22c55e]/20 bg-[#22c55e]/10 text-[#86efac]",
-  LOST: "border-[#ef4444]/20 bg-[#ef4444]/10 text-[#fca5a5]",
+  NEW: "border-[var(--line)] bg-[var(--surface)] text-[var(--muted)]",
+  CONTACTED: "border-[var(--info-border)]/25 bg-[var(--info-surface)] text-[var(--info-line)]",
+  QUALIFIED: "border-[var(--accent)]/25 bg-[var(--accent)]/10 text-[var(--accent-muted)]",
+  PROPOSAL_SENT: "border-[var(--info-border)]/25 bg-[var(--info-surface)] text-[var(--info-line)]",
+  WON: "border-[var(--success-border)]/20 bg-[var(--success-surface)] text-[var(--success-line)]",
+  LOST: "border-[var(--danger-border)]/20 bg-[#ef4444]/10 text-[#fca5a5]",
 };
 
 export function LeadsWorkspace({
@@ -66,39 +66,39 @@ export function LeadsWorkspace({
     <div className="space-y-6 pb-10">
       <section className="flex flex-col gap-5 pt-2 sm:flex-row sm:items-end sm:justify-between sm:pt-5">
         <div className="min-w-0">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#a49bff]">Sales pipeline</p>
-          <h1 className="mt-2 text-[30px] font-semibold tracking-[-0.04em] text-[#f4f4f5] sm:text-[32px]">Leads</h1>
-          <p className="mt-2 text-sm text-white/55">Manage new opportunities and keep the next step moving.</p>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--accent-muted)]">Sales pipeline</p>
+          <h1 className="mt-2 text-[30px] font-semibold tracking-[-0.04em] text-[var(--foreground)] sm:text-[32px]">Leads</h1>
+          <p className="mt-2 text-sm text-[var(--muted)]">Manage new opportunities and keep the next step moving.</p>
         </div>
         <LeadFormDialog />
       </section>
 
       {showDeletionNotice && (
-        <div role="status" className="flex items-center justify-between gap-3 rounded-lg border border-[#22c55e]/20 bg-[#22c55e]/[0.08] px-3.5 py-2.5 text-sm text-[#86efac]">
+        <div role="status" className="flex items-center justify-between gap-3 rounded-lg border border-[var(--success-border)]/20 bg-[var(--success-surface)] px-3.5 py-2.5 text-sm text-[var(--success-line)]">
           <span>Lead deleted successfully.</span>
-          <button type="button" onClick={() => setShowDeletionNotice(false)} aria-label="Dismiss deletion notification" className="grid size-7 shrink-0 place-items-center rounded-md text-[#86efac]/70 transition-colors hover:bg-white/[0.06] hover:text-[#86efac] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#86efac]">
+          <button type="button" onClick={() => setShowDeletionNotice(false)} aria-label="Dismiss deletion notification" className="grid size-7 shrink-0 place-items-center rounded-md text-[var(--success-line)]/70 transition-colors hover:bg-[var(--surface)] hover:text-[var(--success-line)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#86efac]">
             <X size={15} />
           </button>
         </div>
       )}
 
       <section className="grid gap-3 sm:grid-cols-3" aria-label="Lead summary">
-        <SummaryMetric label="Total leads" value={leads.length} note="In your workspace" tone="text-[#f4f4f5]" />
-        <SummaryMetric label="Qualified" value={qualifiedCount} note="Ready for a decision" tone="text-[#c4b5fd]" />
-        <SummaryMetric label="Converted" value={convertedCount} note="Now active clients" tone="text-[#86efac]" />
+        <SummaryMetric label="Total leads" value={leads.length} note="In your workspace" tone="text-[var(--foreground)]" />
+        <SummaryMetric label="Qualified" value={qualifiedCount} note="Ready for a decision" tone="text-[var(--accent-muted)]" />
+        <SummaryMetric label="Converted" value={convertedCount} note="Now active clients" tone="text-[var(--success-line)]" />
       </section>
 
-      <section className="rounded-[10px] border border-white/10 bg-[#18181b] p-3 sm:p-4" aria-label="Lead search and filters">
+      <section className="rounded-[10px] border border-[var(--line)] bg-[var(--panel)] p-3 sm:p-4" aria-label="Lead search and filters">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
           <div className="relative w-full lg:max-w-sm">
-            <Search size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-white/35" />
+            <Search size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[var(--muted)]" />
             <Input
               type="search"
               value={search}
               onChange={(event) => setSearch(event.target.value)}
               placeholder="Search name, company, email…"
               aria-label="Search leads"
-              className="h-10 border-white/10 bg-[#111113] pl-9 text-sm text-white placeholder:text-white/35 focus-visible:border-[#a49bff] focus-visible:ring-[#a49bff]/20 dark:bg-[#111113]"
+              className="h-10 border-[var(--line)] bg-[var(--surface)] pl-9 text-sm text-[var(--foreground)] placeholder:text-[var(--muted)] focus-visible:border-[#a49bff] focus-visible:ring-[#a49bff]/20 dark:bg-[var(--surface)]"
             />
           </div>
           <div className="flex max-w-full gap-1 overflow-x-auto pb-0.5" role="group" aria-label="Filter leads by status">
@@ -111,9 +111,9 @@ export function LeadsWorkspace({
                   type="button"
                   onClick={() => setStatusFilter(filter.value)}
                   aria-pressed={active}
-                  className={`inline-flex h-9 shrink-0 items-center gap-1.5 rounded-md px-2.5 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff] ${active ? "bg-white/10 text-white" : "text-white/50 hover:bg-white/[0.05] hover:text-white/80"}`}
+                  className={`inline-flex h-9 shrink-0 items-center gap-1.5 rounded-md px-2.5 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff] ${active ? "bg-[var(--surface)] text-[var(--foreground)]" : "text-[var(--muted)] hover:bg-[var(--surface)] hover:text-[var(--foreground)]"}`}
                 >
-                  {filter.label}<span className={active ? "text-white/55" : "text-white/30"}>{count}</span>
+                  {filter.label}<span className={active ? "text-[var(--muted)]" : "text-[var(--muted)]"}>{count}</span>
                 </button>
               );
             })}
@@ -125,24 +125,24 @@ export function LeadsWorkspace({
         {visibleLeads.length > 0 ? (
           <div className="space-y-2.5">
             {visibleLeads.map((lead) => (
-              <article key={lead.id} className="flex flex-col gap-3 rounded-[10px] border border-white/10 bg-[#151518] p-3.5 transition-colors hover:border-white/15 sm:flex-row sm:items-center sm:gap-4 sm:px-4">
+              <article key={lead.id} className="flex flex-col gap-3 rounded-[10px] border border-[var(--line)] bg-[var(--surface)] p-3.5 transition-colors hover:border-[var(--line)] sm:flex-row sm:items-center sm:gap-4 sm:px-4">
                 <Link href={`/leads/${lead.id}`} className="flex min-w-0 flex-1 items-center gap-3 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff]">
-                  <span className="grid size-10 shrink-0 place-items-center rounded-lg border border-[#8b5cf6]/20 bg-[#8b5cf6]/10 text-xs font-semibold text-[#c4b5fd]">
+                  <span className="grid size-10 shrink-0 place-items-center rounded-lg border border-[var(--accent)]/20 bg-[var(--accent)]/10 text-xs font-semibold text-[var(--accent-muted)]">
                     {lead.name.trim().split(/\s+/).slice(0, 2).map((part) => part[0]).join("").toUpperCase()}
                   </span>
                   <span className="min-w-0 flex-1">
                     <span className="flex flex-wrap items-center gap-2">
-                      <span className="max-w-full truncate text-sm font-semibold text-[#f4f4f5]">{lead.name}</span>
+                      <span className="max-w-full truncate text-sm font-semibold text-[var(--foreground)]">{lead.name}</span>
                       <span className={`inline-flex h-5 items-center rounded-full border px-2 text-[10px] font-medium ${statusTone[lead.status]}`}>{leadStatusLabels[lead.status]}</span>
                     </span>
-                    <span className="mt-1 block truncate text-xs text-white/50">{lead.company || lead.email || "No company or email"}</span>
+                    <span className="mt-1 block truncate text-xs text-[var(--muted)]">{lead.company || lead.email || "No company or email"}</span>
                   </span>
                 </Link>
 
-                <div className="flex flex-wrap items-center justify-between gap-3 border-t border-white/[0.06] pt-3 sm:justify-end sm:border-0 sm:pt-0">
-                  <div className="min-w-0 text-xs text-white/40 sm:w-28 sm:text-right">
+                <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[var(--line)] pt-3 sm:justify-end sm:border-0 sm:pt-0">
+                  <div className="min-w-0 text-xs text-[var(--muted)] sm:w-28 sm:text-right">
                     <span className="block">{getSourceLabel(lead.source)}</span>
-                    {lead.estimatedValue !== null && <span className="mt-1 block font-medium text-white/65">{formatEstimate(lead.estimatedValue, lead.currency)}</span>}
+                    {lead.estimatedValue !== null && <span className="mt-1 block font-medium text-[var(--muted)]">{formatEstimate(lead.estimatedValue, lead.currency)}</span>}
                     <span className="mt-1 block">{lead.createdAtLabel}</span>
                   </div>
                   <LeadStatusControl key={`${lead.id}-${lead.status}`} leadId={lead.id} initialStatus={lead.status} readOnly={lead.converted} />
@@ -151,17 +151,17 @@ export function LeadsWorkspace({
             ))}
           </div>
         ) : leads.length === 0 ? (
-          <div className="rounded-[10px] border border-dashed border-white/15 bg-[#151518] px-5 py-14 text-center">
-            <span className="mx-auto grid size-11 place-items-center rounded-xl border border-white/10 bg-white/[0.04] text-white/60"><Users size={19} /></span>
-            <h2 className="mt-4 text-base font-semibold text-[#f4f4f5]">No leads yet</h2>
-            <p className="mx-auto mt-1.5 max-w-sm text-sm leading-6 text-white/50">Add your first lead to start tracking potential clients.</p>
+          <div className="rounded-[10px] border border-dashed border-[var(--line)] bg-[var(--surface)] px-5 py-14 text-center">
+            <span className="mx-auto grid size-11 place-items-center rounded-xl border border-[var(--line)] bg-[var(--surface)] text-[var(--muted)]"><Users size={19} /></span>
+            <h2 className="mt-4 text-base font-semibold text-[var(--foreground)]">No leads yet</h2>
+            <p className="mx-auto mt-1.5 max-w-sm text-sm leading-6 text-[var(--muted)]">Add your first lead to start tracking potential clients.</p>
             <div className="mt-5 flex justify-center"><LeadFormDialog /></div>
           </div>
         ) : (
-          <div className="rounded-[10px] border border-dashed border-white/15 bg-[#151518] px-5 py-12 text-center">
-            <h2 className="text-sm font-semibold text-[#f4f4f5]">No matching leads</h2>
-            <p className="mt-1 text-sm text-white/50">Try another search or clear the status filter.</p>
-            <button type="button" onClick={() => { setSearch(""); setStatusFilter("ALL"); }} className="mt-4 rounded-md px-3 py-2 text-sm font-medium text-[#c4b5fd] hover:bg-white/[0.05]">Clear filters</button>
+          <div className="rounded-[10px] border border-dashed border-[var(--line)] bg-[var(--surface)] px-5 py-12 text-center">
+            <h2 className="text-sm font-semibold text-[var(--foreground)]">No matching leads</h2>
+            <p className="mt-1 text-sm text-[var(--muted)]">Try another search or clear the status filter.</p>
+            <button type="button" onClick={() => { setSearch(""); setStatusFilter("ALL"); }} className="mt-4 rounded-md px-3 py-2 text-sm font-medium text-[var(--accent-muted)] hover:bg-[var(--surface)]">Clear filters</button>
           </div>
         )}
       </section>
@@ -180,11 +180,11 @@ function formatEstimate(value: string, currency: string) {
 
 function SummaryMetric({ label, value, note, tone }: { label: string; value: number; note: string; tone: string }) {
   return (
-    <div className="rounded-[10px] border border-white/10 bg-[#18181b] px-4 py-3.5">
-      <p className="text-xs font-medium text-white/55">{label}</p>
+    <div className="rounded-[10px] border border-[var(--line)] bg-[var(--panel)] px-4 py-3.5">
+      <p className="text-xs font-medium text-[var(--muted)]">{label}</p>
       <div className="mt-2 flex items-end justify-between gap-2">
         <p className={`text-[24px] font-semibold leading-none tracking-[-0.04em] ${tone}`}>{value}</p>
-        <p className="text-[11px] text-white/35">{note}</p>
+        <p className="text-[11px] text-[var(--muted)]">{note}</p>
       </div>
     </div>
   );

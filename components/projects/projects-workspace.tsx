@@ -138,17 +138,17 @@ export function ProjectsWorkspace({
     <div className="space-y-6 pb-10">
       <section className="flex flex-col gap-5 pt-2 sm:flex-row sm:items-end sm:justify-between sm:pt-5">
         <div className="min-w-0">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#93c5fd]">Delivery pipeline</p>
-          <h1 className="mt-2 text-[30px] font-semibold tracking-[-0.04em] text-[#f4f4f5] sm:text-[32px]">Projects</h1>
-          <p className="mt-2 text-sm text-white/55">Manage client projects, track progress, and keep delivery on course.</p>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--info-line)]">Delivery pipeline</p>
+          <h1 className="mt-2 text-[30px] font-semibold tracking-[-0.04em] text-[var(--foreground)] sm:text-[32px]">Projects</h1>
+          <p className="mt-2 text-sm text-[var(--muted)]">Manage client projects, track progress, and keep delivery on course.</p>
         </div>
         <ProjectFormDialog clients={clients} triggerLabel="New Project" />
       </section>
 
       {showDeletionNotice && (
-        <div role="status" className="flex items-center justify-between gap-3 rounded-lg border border-[#22c55e]/20 bg-[#22c55e]/[0.08] px-3.5 py-2.5 text-sm text-[#86efac]">
+        <div role="status" className="flex items-center justify-between gap-3 rounded-lg border border-[var(--success-border)]/20 bg-[var(--success-surface)] px-3.5 py-2.5 text-sm text-[var(--success-line)]">
           <span>Project deleted successfully.</span>
-          <button type="button" onClick={() => setShowDeletionNotice(false)} aria-label="Dismiss deletion notification" className="grid size-7 shrink-0 place-items-center rounded-md text-[#86efac]/70 transition-colors hover:bg-white/[0.06] hover:text-[#86efac] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#86efac]">
+          <button type="button" onClick={() => setShowDeletionNotice(false)} aria-label="Dismiss deletion notification" className="grid size-7 shrink-0 place-items-center rounded-md text-[var(--success-line)]/70 transition-colors hover:bg-[var(--surface)] hover:text-[var(--success-line)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#86efac]">
             <X size={15} />
           </button>
         </div>
@@ -161,11 +161,11 @@ export function ProjectsWorkspace({
         <SummaryMetric label="Overdue" value={projects.filter((project) => getProjectTimelineState(project.status, project.startDate, project.dueDate) === "overdue").length} note="Past due and still open" />
       </section>
 
-      <section className="rounded-[10px] border border-white/10 bg-[#18181b] p-3 sm:p-4" aria-label="Project search and filters">
+      <section className="rounded-[10px] border border-[var(--line)] bg-[var(--panel)] p-3 sm:p-4" aria-label="Project search and filters">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
           <div className="relative w-full lg:max-w-sm">
-            <Search size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-white/35" />
-            <Input type="search" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search projects or clients…" aria-label="Search projects" className="h-10 border-white/10 bg-[#111113] pl-9 text-sm text-white placeholder:text-white/35 focus-visible:border-[#a49bff] focus-visible:ring-[#a49bff]/20 dark:bg-[#111113]" />
+            <Search size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[var(--muted)]" />
+            <Input type="search" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search projects or clients…" aria-label="Search projects" className="h-10 border-[var(--line)] bg-[var(--surface)] pl-9 text-sm text-[var(--foreground)] placeholder:text-[var(--muted)] focus-visible:border-[#a49bff] focus-visible:ring-[#a49bff]/20 dark:bg-[var(--surface)]" />
           </div>
           <div className="flex flex-wrap items-center gap-2">
             <FilterSelect label="Client" value={clientFilter} onChange={setClientFilter} id="project-client-filter">
@@ -191,7 +191,7 @@ export function ProjectsWorkspace({
               ))}
             </FilterSelect>
             {hasActiveFilters && (
-              <button type="button" onClick={resetFilters} className="inline-flex h-9 items-center gap-1.5 rounded-md px-2.5 text-xs font-medium text-white/55 transition-colors hover:bg-white/[0.05] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff]">
+              <button type="button" onClick={resetFilters} className="inline-flex h-9 items-center gap-1.5 rounded-md px-2.5 text-xs font-medium text-[var(--muted)] transition-colors hover:bg-[var(--surface)] hover:text-[var(--foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff]">
                 <X size={13} /> Reset
               </button>
             )}
@@ -203,9 +203,9 @@ export function ProjectsWorkspace({
             const active = statusFilter === status;
             const count = status === allStatuses ? totalCount : statusCounts[status] ?? 0;
             return (
-              <button key={status} type="button" onClick={() => setStatusFilter(status)} aria-pressed={active} className={`inline-flex h-9 items-center gap-1.5 rounded-md px-3 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff] ${active ? "bg-white/10 text-white" : "text-white/50 hover:bg-white/[0.05] hover:text-white/80"}`}>
+              <button key={status} type="button" onClick={() => setStatusFilter(status)} aria-pressed={active} className={`inline-flex h-9 items-center gap-1.5 rounded-md px-3 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff] ${active ? "bg-[var(--surface)] text-[var(--foreground)]" : "text-[var(--muted)] hover:bg-[var(--surface)] hover:text-[var(--foreground)]"}`}>
                 {status === allStatuses ? "All" : projectStatusLabels[status]}
-                <span className={active ? "text-white/55" : "text-white/30"}>{count}</span>
+                <span className={active ? "text-[var(--muted)]" : "text-[var(--muted)]"}>{count}</span>
               </button>
             );
           })}
@@ -214,8 +214,8 @@ export function ProjectsWorkspace({
 
       <section aria-label="Projects" aria-live="polite">
         {visibleProjects.length ? (
-          <div className="overflow-hidden rounded-[10px] border border-white/10 bg-[#151518]">
-            <div className="hidden grid-cols-[minmax(200px,1.5fr)_minmax(150px,0.9fr)_minmax(130px,0.75fr)_110px_110px_110px] gap-4 border-b border-white/10 bg-white/[0.025] px-4 py-3 text-[10px] font-semibold uppercase tracking-[0.12em] text-white/40 xl:grid">
+          <div className="overflow-hidden rounded-[10px] border border-[var(--line)] bg-[var(--surface)]">
+            <div className="hidden grid-cols-[minmax(200px,1.5fr)_minmax(150px,0.9fr)_minmax(130px,0.75fr)_110px_110px_110px] gap-4 border-b border-[var(--line)] bg-[var(--surface)] px-4 py-3 text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--muted)] xl:grid">
               <span>Project</span>
               <span>Client</span>
               <span>Priority</span>
@@ -223,36 +223,36 @@ export function ProjectsWorkspace({
               <span>Due</span>
               <span>Updated</span>
             </div>
-            <div className="divide-y divide-white/[0.07]">
+            <div className="divide-y divide-[var(--line)]">
               {visibleProjects.map((project) => (
-                <Link key={project.id} href={`/projects/${project.id}`} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-2 px-3.5 py-3.5 transition-colors hover:bg-white/[0.025] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#a49bff] sm:px-4 lg:grid-cols-[minmax(200px,1.5fr)_minmax(140px,1fr)_110px_110px] xl:grid-cols-[minmax(200px,1.5fr)_minmax(150px,0.9fr)_minmax(130px,0.75fr)_110px_110px_110px] xl:gap-4">
+                <Link key={project.id} href={`/projects/${project.id}`} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-2 px-3.5 py-3.5 transition-colors hover:bg-[var(--surface)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#a49bff] sm:px-4 lg:grid-cols-[minmax(200px,1.5fr)_minmax(140px,1fr)_110px_110px] xl:grid-cols-[minmax(200px,1.5fr)_minmax(150px,0.9fr)_minmax(130px,0.75fr)_110px_110px_110px] xl:gap-4">
                   <span className="flex min-w-0 items-center gap-3">
-                    <span className="grid size-9 shrink-0 place-items-center rounded-lg border border-[#8b5cf6]/20 bg-[#8b5cf6]/10 text-[11px] font-semibold text-[#c4b5fd]"><FolderKanban size={16} /></span>
+                    <span className="grid size-9 shrink-0 place-items-center rounded-lg border border-[var(--accent)]/20 bg-[var(--accent)]/10 text-[11px] font-semibold text-[var(--accent-muted)]"><FolderKanban size={16} /></span>
                     <span className="min-w-0">
-                      <span className="block truncate text-sm font-semibold text-[#f4f4f5]">{project.name}</span>
-                      <span className="mt-0.5 block truncate text-xs text-white/45 xl:hidden">{project.clientName}</span>
+                      <span className="block truncate text-sm font-semibold text-[var(--foreground)]">{project.name}</span>
+                      <span className="mt-0.5 block truncate text-xs text-[var(--muted)] xl:hidden">{project.clientName}</span>
                     </span>
                   </span>
-                  <span className="hidden min-w-0 truncate text-xs text-white/65 xl:block">{project.clientCompany || project.clientName}</span>
+                  <span className="hidden min-w-0 truncate text-xs text-[var(--muted)] xl:block">{project.clientCompany || project.clientName}</span>
                   <span className={`inline-flex h-6 items-center justify-self-end rounded-full border px-2 text-[10px] font-medium xl:justify-self-start ${projectPriorityTone[project.priority]}`}>{projectPriorityLabels[project.priority]}</span>
                   <span className={`inline-flex h-6 items-center justify-self-end rounded-full border px-2 text-[10px] font-medium xl:justify-self-start ${projectStatusTone[project.status]}`}>{projectStatusLabels[project.status]}</span>
-                  <span className="hidden truncate text-xs text-white/45 lg:block">{project.dueDate ? new Date(project.dueDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "No date"}</span>
-                  <span className="hidden text-xs text-white/45 xl:block">{new Date(project.updatedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</span>
+                  <span className="hidden truncate text-xs text-[var(--muted)] lg:block">{project.dueDate ? new Date(project.dueDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "No date"}</span>
+                  <span className="hidden text-xs text-[var(--muted)] xl:block">{new Date(project.updatedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</span>
                 </Link>
               ))}
             </div>
           </div>
         ) : totalCount === 0 ? (
-          <div className="rounded-[10px] border border-dashed border-white/15 bg-[#151518] px-5 py-14 text-center">
-            <span className="mx-auto grid size-11 place-items-center rounded-xl border border-white/10 bg-white/[0.04] text-white/60"><BriefcaseBusiness size={19} /></span>
-            <h2 className="mt-4 text-base font-semibold text-[#f4f4f5]">No projects yet</h2>
-            <p className="mx-auto mt-2 max-w-md text-sm text-white/45">Create your first project to start organizing client work and tracking delivery.</p>
+          <div className="rounded-[10px] border border-dashed border-[var(--line)] bg-[var(--surface)] px-5 py-14 text-center">
+            <span className="mx-auto grid size-11 place-items-center rounded-xl border border-[var(--line)] bg-[var(--surface)] text-[var(--muted)]"><BriefcaseBusiness size={19} /></span>
+            <h2 className="mt-4 text-base font-semibold text-[var(--foreground)]">No projects yet</h2>
+            <p className="mx-auto mt-2 max-w-md text-sm text-[var(--muted)]">Create your first project to start organizing client work and tracking delivery.</p>
             <div className="mt-5 flex justify-center"><ProjectFormDialog clients={clients} triggerLabel="New Project" /></div>
           </div>
         ) : (
-          <div className="rounded-[10px] border border-dashed border-white/15 bg-[#151518] px-5 py-10 text-center">
-            <p className="text-sm text-white/45">No projects match your filters.</p>
-            <button type="button" onClick={resetFilters} className="mt-3 inline-flex h-9 items-center gap-1.5 rounded-md border border-white/10 px-3 text-xs font-medium text-white/70 transition-colors hover:bg-white/[0.05] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff]">
+          <div className="rounded-[10px] border border-dashed border-[var(--line)] bg-[var(--surface)] px-5 py-10 text-center">
+            <p className="text-sm text-[var(--muted)]">No projects match your filters.</p>
+            <button type="button" onClick={resetFilters} className="mt-3 inline-flex h-9 items-center gap-1.5 rounded-md border border-[var(--line)] px-3 text-xs font-medium text-[var(--muted)] transition-colors hover:bg-[var(--surface)] hover:text-[var(--foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff]">
               <SlidersHorizontal size={13} /> Reset filters
             </button>
           </div>
@@ -289,24 +289,24 @@ function FilterSelect<T extends string>({
         id={id}
         value={value}
         onChange={(event) => onChange(event.target.value as T)}
-        className="h-9 max-w-full appearance-none rounded-md border border-white/10 bg-[#111113] py-0 pl-2.5 pr-7 text-xs font-medium text-white/75 outline-none transition-colors hover:border-white/20 focus-visible:ring-2 focus-visible:ring-[#a49bff]"
+        className="h-9 max-w-full appearance-none rounded-md border border-[var(--line)] bg-[var(--surface)] py-0 pl-2.5 pr-7 text-xs font-medium text-[var(--foreground)] outline-none transition-colors hover:border-[var(--line-strong)] focus-visible:ring-2 focus-visible:ring-[#a49bff]"
       >
         {children}
       </select>
-      <SlidersHorizontal size={12} aria-hidden="true" className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-white/30" />
+      <SlidersHorizontal size={12} aria-hidden="true" className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-[var(--muted)]" />
     </div>
   );
 }
 
 function SummaryMetric({ label, value, note }: { label: string; value: number; note: string }) {
   return (
-    <div className="min-w-0 rounded-[10px] border border-white/10 bg-[#18181b] p-3.5">
+    <div className="min-w-0 rounded-[10px] border border-[var(--line)] bg-[var(--panel)] p-3.5">
       <div className="flex items-center justify-between gap-2">
-        <p className="text-xs font-medium text-white/50">{label}</p>
-        <CalendarDays size={14} className="shrink-0 text-white/35" />
+        <p className="text-xs font-medium text-[var(--muted)]">{label}</p>
+        <CalendarDays size={14} className="shrink-0 text-[var(--muted)]" />
       </div>
-      <p className="mt-2 text-xl font-semibold tracking-[-0.03em] text-[#f4f4f5]">{value.toLocaleString()}</p>
-      <p className="mt-1 truncate text-[11px] text-white/40">{note}</p>
+      <p className="mt-2 text-xl font-semibold tracking-[-0.03em] text-[var(--foreground)]">{value.toLocaleString()}</p>
+      <p className="mt-1 truncate text-[11px] text-[var(--muted)]">{note}</p>
     </div>
   );
 }

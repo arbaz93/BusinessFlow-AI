@@ -2,11 +2,11 @@ import "server-only";
 
 import { cache } from "react";
 import { notFound } from "next/navigation";
-import { requireOrganization } from "@/lib/auth/dal";
+import { requireCurrentOrganization } from "@/lib/auth/dal";
 import { prisma } from "@/lib/db/prisma";
 
 export const getProjectWorkspace = cache(async (projectId: string) => {
-  const { organization } = await requireOrganization();
+  const { organization } = await requireCurrentOrganization();
   const project = await prisma.project.findFirst({
     where: { id: projectId, organizationId: organization.id },
     select: {

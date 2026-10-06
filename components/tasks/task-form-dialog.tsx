@@ -35,8 +35,8 @@ export function TaskFormDialog({
         <button
           type="button"
           className={task
-            ? "inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-white/10 bg-[#18181b] px-3 text-sm font-medium text-white/80 transition-colors hover:bg-white/[0.06] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff]"
-            : "inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-[#7067e8] px-4 text-sm font-medium text-white transition-colors hover:bg-[#8178f0] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff]"}
+            ? "inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-[var(--line)] bg-[var(--panel)] px-3 text-sm font-medium text-[var(--foreground)] transition-colors hover:bg-[var(--surface)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff]"
+            : "inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-[#7067e8] px-4 text-sm font-medium text-[var(--foreground)] transition-colors hover:bg-[#8178f0] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff]"}
         >
           {task ? <Pencil size={15} /> : <Plus size={16} />}
           {task ? "Edit Task" : triggerLabel ?? "New Task"}
@@ -85,21 +85,21 @@ function TaskForm({
     return state.fieldErrors?.[field]?.[0];
   }
 
-  const inputClass = "h-10 border-white/10 bg-[#111113] text-sm text-white placeholder:text-white/30 focus-visible:border-[#a49bff] focus-visible:ring-[#a49bff]/20 dark:bg-[#111113]";
-  const selectClass = "h-10 w-full rounded-md border border-white/10 bg-[#111113] px-3 text-sm text-white outline-none focus-visible:border-[#a49bff] focus-visible:ring-[3px] focus-visible:ring-[#a49bff]/20";
-  const labelClass = "mb-1.5 block text-xs font-medium text-white/70";
+  const inputClass = "h-10 border-[var(--line)] bg-[var(--surface)] text-sm text-[var(--foreground)] placeholder:text-[var(--muted)] focus-visible:border-[#a49bff] focus-visible:ring-[#a49bff]/20";
+  const selectClass = "h-10 w-full rounded-md border border-[var(--line)] bg-[var(--surface)] px-3 text-sm text-[var(--foreground)] outline-none focus-visible:border-[#a49bff] focus-visible:ring-[3px] focus-visible:ring-[#a49bff]/20";
+  const labelClass = "mb-1.5 block text-xs font-medium text-[var(--muted)]";
 
   return (
     <Dialog.Portal>
       <Dialog.Overlay className="fixed inset-0 z-50 bg-black/70 backdrop-blur-[2px]" />
-      <Dialog.Content className="fixed left-1/2 top-1/2 z-50 max-h-[90dvh] w-[calc(100vw-2rem)] max-w-[620px] -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-xl border border-white/10 bg-[#18181b] p-5 text-white shadow-2xl outline-none sm:p-6">
+      <Dialog.Content className="fixed left-1/2 top-1/2 z-50 max-h-[90dvh] w-[calc(100vw-2rem)] max-w-[620px] -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-xl border border-[var(--line)] bg-[var(--panel)] p-5 text-[var(--foreground)] shadow-2xl outline-none sm:p-6">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <Dialog.Title className="text-lg font-semibold tracking-[-0.02em] text-[#f4f4f5]">{task ? "Edit Task" : "New Task"}</Dialog.Title>
-            <Dialog.Description className="mt-1 text-sm text-white/50">{task ? "Update task details and project delivery timing." : "Create a delivery task connected to a project."}</Dialog.Description>
+            <Dialog.Title className="text-lg font-semibold tracking-[-0.02em] text-[var(--foreground)]">{task ? "Edit Task" : "New Task"}</Dialog.Title>
+            <Dialog.Description className="mt-1 text-sm text-[var(--muted)]">{task ? "Update task details and project delivery timing." : "Create a delivery task connected to a project."}</Dialog.Description>
           </div>
           <Dialog.Close asChild>
-            <button type="button" aria-label="Close dialog" className="grid size-9 shrink-0 place-items-center rounded-lg text-white/55 transition-colors hover:bg-white/[0.07] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff]">
+            <button type="button" aria-label="Close dialog" className="grid size-9 shrink-0 place-items-center rounded-lg text-[var(--muted)] transition-colors hover:bg-[var(--surface)] hover:text-[var(--foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff]">
               <X size={17} />
             </button>
           </Dialog.Close>
@@ -131,7 +131,7 @@ function TaskForm({
                 <>
                   <p className={labelClass}>Project <span className="text-[#fca5a5]">*</span></p>
                   <input type="hidden" name="projectId" value={fixedProjectId} />
-                  <p className="flex h-10 items-center rounded-md border border-white/10 bg-[#111113] px-3 text-sm text-white/80">
+                  <p className="flex h-10 items-center rounded-md border border-[var(--line)] bg-[var(--surface)] px-3 text-sm text-[var(--foreground)]">
                     {projects.find((project) => project.id === fixedProjectId)?.name ?? "Current project"}
                     {projects.find((project) => project.id === fixedProjectId)?.clientName
                       ? ` · ${projects.find((project) => project.id === fixedProjectId)?.clientName}`
@@ -187,17 +187,17 @@ function TaskForm({
 
             <div className="sm:col-span-2">
               <label htmlFor="task-description" className={labelClass}>Description</label>
-              <Textarea id="task-description" name="description" rows={5} value={values.description} onChange={(event) => setValues({ ...values, description: event.currentTarget.value })} className="min-h-[120px] border-white/10 bg-[#111113] text-sm text-white placeholder:text-white/30 focus-visible:border-[#a49bff] focus-visible:ring-[#a49bff]/20 dark:bg-[#111113]" placeholder="Describe the task and expected outcome." />
+              <Textarea id="task-description" name="description" rows={5} value={values.description} onChange={(event) => setValues({ ...values, description: event.currentTarget.value })} className="min-h-[120px] border-[var(--line)] bg-[var(--surface)] text-sm text-[var(--foreground)] placeholder:text-[var(--muted)] focus-visible:border-[#a49bff] focus-visible:ring-[#a49bff]/20 dark:bg-[var(--surface)]" placeholder="Describe the task and expected outcome." />
             </div>
           </div>
 
-          {state.error && <p role="alert" className="mt-4 rounded-md border border-[#ef4444]/20 bg-[#ef4444]/[0.08] px-3 py-2 text-sm text-[#fca5a5]">{state.error}</p>}
+          {state.error && <p role="alert" className="mt-4 rounded-md border border-[var(--danger-border)]/20 bg-[var(--danger)]/[0.08] px-3 py-2 text-sm text-[#fca5a5]">{state.error}</p>}
 
-          <div className="mt-6 flex flex-col-reverse gap-2 border-t border-white/8 pt-4 sm:flex-row sm:justify-end">
+          <div className="mt-6 flex flex-col-reverse gap-2 border-t border-[var(--line)] pt-4 sm:flex-row sm:justify-end">
             <Dialog.Close asChild>
-              <button type="button" disabled={pending} className="h-10 rounded-lg px-4 text-sm font-medium text-white/65 transition-colors hover:bg-white/[0.05] hover:text-white disabled:opacity-50">Cancel</button>
+              <button type="button" disabled={pending} className="h-10 rounded-lg px-4 text-sm font-medium text-[var(--muted)] transition-colors hover:bg-[var(--surface)] hover:text-[var(--foreground)] disabled:opacity-50">Cancel</button>
             </Dialog.Close>
-            <button type="submit" disabled={pending} className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-[#7067e8] px-4 text-sm font-semibold text-white transition-colors hover:bg-[#8178f0] disabled:cursor-not-allowed disabled:opacity-55">
+            <button type="submit" disabled={pending} className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-[#7067e8] px-4 text-sm font-semibold text-[var(--foreground)] transition-colors hover:bg-[#8178f0] disabled:cursor-not-allowed disabled:opacity-55">
               {pending ? (task ? "Saving…" : "Creating…") : task ? "Save task" : "Create task"}
             </button>
           </div>

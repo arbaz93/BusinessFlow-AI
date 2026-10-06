@@ -7,8 +7,8 @@ export default async function SecuritySettingsPage() {
   return (
     <div className="space-y-6">
       <div className="space-y-1">
-        <h2 className="text-sm font-semibold text-white">Security</h2>
-        <p className="text-sm text-[#a1a1aa]">
+        <h2 className="text-sm font-semibold text-[var(--foreground)]">Security</h2>
+        <p className="text-sm text-[var(--muted)]">
           Manage your password and session controls.
         </p>
       </div>

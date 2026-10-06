@@ -41,10 +41,10 @@ const cards: SettingCard[] = [
 export default function SettingsPage() {
   return (
     <div className="space-y-1">
-      <h2 className="text-xs font-semibold uppercase tracking-[0.18em] text-white/40">
+      <h2 className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--muted)]">
         Settings
       </h2>
-      <p className="text-sm text-[#a1a1aa]">
+      <p className="text-sm text-[var(--muted)]">
         Manage your profile, workspace, security, and account settings.
       </p>
 
@@ -53,7 +53,7 @@ export default function SettingsPage() {
           <Link
             key={href}
             href={href}
-            className="group flex items-start gap-3.5 rounded-xl border border-[#27272a] bg-[#18181b] p-4 text-left transition-colors hover:border-[#3f3f46] hover:bg-[#1f1f23] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff]"
+            className="group flex items-start gap-3.5 rounded-xl border border-[var(--line)] bg-[var(--panel)] p-4 text-left transition-colors hover:border-[var(--line-strong)] hover:bg-[var(--elevated)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff]"
           >
             <span
               className="mt-0.5 grid size-9 shrink-0 place-items-center rounded-lg"
@@ -63,19 +63,19 @@ export default function SettingsPage() {
             >
               <Icon
                 size={17}
-                className={danger ? "text-[#fca5a5]" : "text-[#c4b5fd]"}
+                className={danger ? "text-[#fca5a5]" : "text-[var(--accent-muted)]"}
               />
             </span>
             <span className="min-w-0 flex-1">
               <span
                 className={
                   "block text-sm font-medium " +
-                  (danger ? "text-[#fca5a5]" : "group-hover:text-white text-[#f4f4f5]")
+                  (danger ? "text-[#fca5a5]" : "group-hover:text-[var(--foreground)] text-[var(--foreground)]")
                 }
               >
                 {label}
               </span>
-              <span className="mt-0.5 block text-sm text-[#a1a1aa]">{description}</span>
+              <span className="mt-0.5 block text-sm text-[var(--muted)]">{description}</span>
             </span>
           </Link>
         ))}

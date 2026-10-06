@@ -1,5 +1,7 @@
-import { Sparkle, SparkleIcon, SparklesIcon } from "lucide-react";
+import { SparklesIcon } from "lucide-react";
 import Link from "next/link";
+
+import { ThemeToggle } from "@/components/theme-toggle";
 
 type AuthShellProps = {
   children?: React.ReactNode;
@@ -9,7 +11,10 @@ type AuthShellProps = {
 
 export function AuthShell({ children, title, description }: AuthShellProps) {
   return (
-    <main className="flex min-h-screen items-center bg-gradient-to-br from-[var(--accent)]/10 to-[var(--muted)]/10 px-6 py-12 sm:px-8 lg:px-10">
+    <main className="relative flex min-h-screen items-center bg-gradient-to-br from-[var(--accent)]/10 to-[var(--muted)]/10 px-6 py-12 sm:px-8 lg:px-10">
+      <div className="absolute right-6 top-6 z-10">
+        <ThemeToggle />
+      </div>
 
       <div className="mx-auto grid w-full max-w-6xl grid-cols-1 items-center gap-12 sm:max-lg:max-w-[640px] lg:grid-cols-2 lg:items-start lg:gap-20">
         <section className="w-full px-8 lg:px-0 max-w-xl">
@@ -18,7 +23,7 @@ export function AuthShell({ children, title, description }: AuthShellProps) {
             aria-label="BusinessFlow AI home"
             className="inline-flex items-center gap-3 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-4 focus-visible:ring-offset-[var(--surface)]"
           >
-            <span className="grid size-9 place-items-center rounded-lg bg-[var(--ink)] text-sm font-bold text-white">
+            <span className="grid size-9 place-items-center rounded-lg bg-[var(--ink)] text-sm font-bold text-[var(--foreground)]">
               <SparklesIcon />
             </span>
             <span className="text-base font-semibold tracking-tight text-[var(--ink)]">

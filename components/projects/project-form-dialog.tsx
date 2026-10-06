@@ -32,8 +32,8 @@ export function ProjectFormDialog({
         <button
           type="button"
           className={project
-            ? "inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-white/10 bg-[#18181b] px-3 text-sm font-medium text-white/80 transition-colors hover:bg-white/[0.06] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff]"
-            : "inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-[#7067e8] px-4 text-sm font-medium text-white transition-colors hover:bg-[#8178f0] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff]"}
+            ? "inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-[var(--line)] bg-[var(--panel)] px-3 text-sm font-medium text-[var(--foreground)] transition-colors hover:bg-[var(--surface)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff]"
+            : "inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-[#7067e8] px-4 text-sm font-medium text-[var(--foreground)] transition-colors hover:bg-[#8178f0] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff]"}
         >
           {project ? <Pencil size={15} /> : <Plus size={16} />}
           {project ? "Edit Project" : triggerLabel ?? "New Project"}
@@ -80,21 +80,21 @@ function ProjectForm({
     return state.fieldErrors?.[field]?.[0];
   }
 
-  const inputClass = "h-10 border-white/10 bg-[#111113] text-sm text-white placeholder:text-white/30 focus-visible:border-[#a49bff] focus-visible:ring-[#a49bff]/20 dark:bg-[#111113]";
-  const selectClass = "h-10 w-full rounded-md border border-white/10 bg-[#111113] px-3 text-sm text-white outline-none focus-visible:border-[#a49bff] focus-visible:ring-[3px] focus-visible:ring-[#a49bff]/20";
-  const labelClass = "mb-1.5 block text-xs font-medium text-white/70";
+  const inputClass = "h-10 border-[var(--line)] bg-[var(--surface)] text-sm text-[var(--foreground)] placeholder:text-[var(--muted)] focus-visible:border-[#a49bff] focus-visible:ring-[#a49bff]/20 dark:bg-[var(--surface)]";
+  const selectClass = "h-10 w-full rounded-md border border-[var(--line)] bg-[var(--surface)] px-3 text-sm text-[var(--foreground)] outline-none focus-visible:border-[#a49bff] focus-visible:ring-[3px] focus-visible:ring-[#a49bff]/20";
+  const labelClass = "mb-1.5 block text-xs font-medium text-[var(--muted)]";
 
   return (
     <Dialog.Portal>
       <Dialog.Overlay className="fixed inset-0 z-50 bg-black/70 backdrop-blur-[2px]" />
-      <Dialog.Content className="fixed left-1/2 top-1/2 z-50 max-h-[90dvh] w-[calc(100vw-2rem)] max-w-[620px] -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-xl border border-white/10 bg-[#18181b] p-5 text-white shadow-2xl outline-none sm:p-6">
+      <Dialog.Content className="fixed left-1/2 top-1/2 z-50 max-h-[90dvh] w-[calc(100vw-2rem)] max-w-[620px] -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-xl border border-[var(--line)] bg-[var(--panel)] p-5 text-[var(--foreground)] shadow-2xl outline-none sm:p-6">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <Dialog.Title className="text-lg font-semibold tracking-[-0.02em] text-[#f4f4f5]">{project ? "Edit Project" : "New Project"}</Dialog.Title>
-            <Dialog.Description className="mt-1 text-sm text-white/50">{project ? "Update the project details and delivery timeline." : "Create a delivery project for a client in your workspace."}</Dialog.Description>
+            <Dialog.Title className="text-lg font-semibold tracking-[-0.02em] text-[var(--foreground)]">{project ? "Edit Project" : "New Project"}</Dialog.Title>
+            <Dialog.Description className="mt-1 text-sm text-[var(--muted)]">{project ? "Update the project details and delivery timeline." : "Create a delivery project for a client in your workspace."}</Dialog.Description>
           </div>
           <Dialog.Close asChild>
-            <button type="button" aria-label="Close dialog" className="grid size-9 shrink-0 place-items-center rounded-lg text-white/55 transition-colors hover:bg-white/[0.07] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff]">
+            <button type="button" aria-label="Close dialog" className="grid size-9 shrink-0 place-items-center rounded-lg text-[var(--muted)] transition-colors hover:bg-[var(--surface)] hover:text-[var(--foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff]">
               <X size={17} />
             </button>
           </Dialog.Close>
@@ -180,26 +180,26 @@ function ProjectForm({
 
             <div className="sm:col-span-2">
               <label htmlFor="project-description" className={labelClass}>Description</label>
-              <Textarea id="project-description" name="description" value={values.description} onChange={(event) => setValues({ ...values, description: event.currentTarget.value })} rows={4} maxLength={2000} placeholder="What are we delivering, and what is the goal?" className="min-h-[120px] border-white/10 bg-[#111113] text-sm text-white placeholder:text-white/30 focus-visible:border-[#a49bff] focus-visible:ring-[#a49bff]/20 dark:bg-[#111113]" />
+              <Textarea id="project-description" name="description" value={values.description} onChange={(event) => setValues({ ...values, description: event.currentTarget.value })} rows={4} maxLength={2000} placeholder="What are we delivering, and what is the goal?" className="min-h-[120px] border-[var(--line)] bg-[var(--surface)] text-sm text-[var(--foreground)] placeholder:text-[var(--muted)] focus-visible:border-[#a49bff] focus-visible:ring-[#a49bff]/20 dark:bg-[var(--surface)]" />
             </div>
 
             <div className="sm:col-span-2">
               <label htmlFor="project-notes" className={labelClass}>Notes</label>
-              <Textarea id="project-notes" name="notes" value={values.notes} onChange={(event) => setValues({ ...values, notes: event.currentTarget.value })} rows={4} maxLength={5000} placeholder="Internal notes, scope context, and delivery reminders." className="min-h-[120px] border-white/10 bg-[#111113] text-sm text-white placeholder:text-white/30 focus-visible:border-[#a49bff] focus-visible:ring-[#a49bff]/20 dark:bg-[#111113]" />
+              <Textarea id="project-notes" name="notes" value={values.notes} onChange={(event) => setValues({ ...values, notes: event.currentTarget.value })} rows={4} maxLength={5000} placeholder="Internal notes, scope context, and delivery reminders." className="min-h-[120px] border-[var(--line)] bg-[var(--surface)] text-sm text-[var(--foreground)] placeholder:text-[var(--muted)] focus-visible:border-[#a49bff] focus-visible:ring-[#a49bff]/20 dark:bg-[var(--surface)]" />
             </div>
           </div>
 
           {state.error && (
-            <div role="alert" className="rounded-lg border border-[#ef4444]/20 bg-[#ef4444]/[0.08] px-3 py-2 text-sm text-[#fca5a5]">
+            <div role="alert" className="rounded-lg border border-[var(--danger-border)]/20 bg-[var(--danger)]/[0.08] px-3 py-2 text-sm text-[#fca5a5]">
               {state.error}
             </div>
           )}
 
-          <div className="mt-6 flex flex-col-reverse gap-2 border-t border-white/8 pt-4 sm:flex-row sm:justify-end">
+          <div className="mt-6 flex flex-col-reverse gap-2 border-t border-[var(--line)] pt-4 sm:flex-row sm:justify-end">
             <Dialog.Close asChild>
-              <button type="button" disabled={pending} className="h-10 rounded-lg px-4 text-sm font-medium text-white/65 transition-colors hover:bg-white/[0.05] hover:text-white disabled:opacity-50">Cancel</button>
+              <button type="button" disabled={pending} className="h-10 rounded-lg px-4 text-sm font-medium text-[var(--muted)] transition-colors hover:bg-[var(--surface)] hover:text-[var(--foreground)] disabled:opacity-50">Cancel</button>
             </Dialog.Close>
-            <button type="submit" disabled={pending || !values.name.trim() || !values.clientId} className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-[#7067e8] px-4 text-sm font-semibold text-white transition-colors hover:bg-[#8178f0] disabled:cursor-not-allowed disabled:opacity-55">
+            <button type="submit" disabled={pending || !values.name.trim() || !values.clientId} className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-[#7067e8] px-4 text-sm font-semibold text-[var(--foreground)] transition-colors hover:bg-[#8178f0] disabled:cursor-not-allowed disabled:opacity-55">
               {pending ? (project ? "Saving…" : "Creating…") : project ? "Save Project" : "Create Project"}
             </button>
           </div>

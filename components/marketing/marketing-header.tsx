@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useState } from "react";
 import { Menu, Sparkle, X } from "lucide-react";
+
+import { ThemeToggle } from "@/components/theme-toggle";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -38,7 +40,9 @@ export function MarketingHeader() {
           ))}
         </nav>
 
-        <div className="flex items-center gap-4 text-sm font-medium">
+        <div className="flex items-center gap-3 text-sm font-medium">
+          <ThemeToggle />
+
           <Link
             href="/login"
             className="text-[var(--muted)] transition-colors hover:text-[var(--foreground)] hidden sm:inline-block"
