@@ -327,6 +327,9 @@ export function WorkspaceShell({
       onOpenChange={setMobileNavigationOpen}
     >
       <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)]">
+        <a href="#main-content" className="skip-link">
+          Skip to main content
+        </a>
         <div className="fixed inset-y-0 left-0 z-20 hidden w-62 xl:block">
           <SidebarContents
             organizationName={organizationName}
@@ -429,7 +432,7 @@ export function WorkspaceShell({
               <GlobalSearch />
             </div>
           </header>
-          <main className="mx-auto w-full max-w-375 px-4 py-6 sm:px-6 sm:py-8 xl:px-10">
+          <main id="main-content" className="mx-auto w-full max-w-375 px-4 py-6 sm:px-6 sm:py-8 xl:px-10">
             {children}
           </main>
         </div>

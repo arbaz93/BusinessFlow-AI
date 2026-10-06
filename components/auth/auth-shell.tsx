@@ -12,6 +12,9 @@ type AuthShellProps = {
 export function AuthShell({ children, title, description }: AuthShellProps) {
   return (
     <main className="relative flex min-h-screen items-center bg-gradient-to-br from-[var(--accent)]/10 to-[var(--muted)]/10 px-6 py-12 sm:px-8 lg:px-10">
+      <a href="#main-content" className="skip-link">
+        Skip to main content
+      </a>
       <div className="absolute right-6 top-6 z-10">
         <ThemeToggle />
       </div>
@@ -37,7 +40,7 @@ export function AuthShell({ children, title, description }: AuthShellProps) {
             {description}
           </p>
         </section>
-        <div className="w-full lg:max-w-150 lg:justify-self-end">
+        <div id="main-content" className="w-full lg:max-w-150 lg:justify-self-end">
           {children}
         </div>
       </div>

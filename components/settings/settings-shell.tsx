@@ -38,6 +38,9 @@ export function SettingsShell({
 
   return (
     <div className="flex flex-col gap-6">
+      <a href="#main-content" className="skip-link">
+        Skip to main content
+      </a>
       <header className="flex items-center justify-between gap-3">
         <div className="min-w-0">
           <h1 className="text-[22px] font-semibold tracking-[-0.03em] text-[var(--foreground)]">{title}</h1>
@@ -66,7 +69,7 @@ export function SettingsShell({
           </div>
         </aside>
 
-        <main className="flex-1 min-w-0 space-y-6">{children}</main>
+        <main id="main-content" className="flex-1 min-w-0 space-y-6">{children}</main>
       </div>
 
       <Dialog.Root open={drawerOpen} onOpenChange={setDrawerOpen}>

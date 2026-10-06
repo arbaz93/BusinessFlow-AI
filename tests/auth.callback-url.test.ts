@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { getAuthCallbackUrl } from "@/lib/auth/callback-url";
+import { getAuthPathForReturnTo } from "@/lib/members/invitation-tokens";
 
 describe("getAuthCallbackUrl", () => {
   it("uses the configured canonical site origin", () => {
@@ -41,5 +42,21 @@ describe("getAuthCallbackUrl", () => {
       getAuthCallbackUrl(new Headers(), "https://app.example.com", "not-valid"),
       "https://app.example.com/auth/callback",
     );
+  });
+});
+
+describe("getAuthPathForReturnTo", () => {
+  it("keeps a valid invitation path on the login flow", () => {
+    const token = "A".repeat(43);
+    assert.equal(getAuthPathForReturnTo(`/invitations/${token}`, "login"), `/login/invitations/${token}`);
+  });
+
+  it("accepts a bare invitation token from a sign-out redirect", () => {
+    const token = "B".repeat(43);
+    assert.equal(getAuthPathForReturnTo(token, "login"), `/login/invitations/${token}`);
+  });
+
+  it("falls back to the standard auth page when there is no invitation", () => {
+    assert.equal(getAuthPathForReturnTo("", "signup"), "/signup");
   });
 });

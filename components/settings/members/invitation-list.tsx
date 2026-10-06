@@ -100,7 +100,16 @@ export function InvitationList({
                 </form>
                 <form action={cancelAction}>
                   <input type="hidden" name="invitationId" value={invitation.id} />
-                  <button type="submit" className="inline-flex items-center gap-1 rounded-lg border border-[var(--danger-border)]/30 bg-[var(--danger)]/10 px-2.5 py-1.5 text-xs font-medium text-[var(--danger)] hover:border-[var(--danger-border)]/50 hover:bg-[var(--danger)]/20" aria-label={`Cancel invitation for ${invitation.email}`}>
+                  <button
+                    type="submit"
+                    onClick={(event) => {
+                      if (!window.confirm(`Cancel the invitation for ${invitation.email}? This stops the invite from being accepted.`)) {
+                        event.preventDefault();
+                      }
+                    }}
+                    className="inline-flex items-center gap-1 rounded-lg border border-[var(--danger-border)]/30 bg-[var(--danger)]/10 px-2.5 py-1.5 text-xs font-medium text-[var(--danger)] hover:border-[var(--danger-border)]/50 hover:bg-[var(--danger)]/20"
+                    aria-label={`Cancel invitation for ${invitation.email}`}
+                  >
                     <Trash2 size={12} /> Cancel
                   </button>
                 </form>

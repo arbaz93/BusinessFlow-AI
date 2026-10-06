@@ -46,11 +46,13 @@ export function LeadsWorkspace({
   qualifiedCount,
   convertedCount,
   deletionComplete,
+  loadError,
 }: {
   leads: LeadSummary[];
   qualifiedCount: number;
   convertedCount: number;
   deletionComplete: boolean;
+  loadError?: boolean;
 }) {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<(typeof filters)[number]["value"]>("ALL");
@@ -81,6 +83,12 @@ export function LeadsWorkspace({
           </button>
         </div>
       )}
+
+      {loadError ? (
+        <div role="alert" className="rounded-lg border border-[var(--danger-border)]/25 bg-[var(--danger-surface)] px-4 py-3 text-sm text-[var(--danger)]">
+          We couldn&apos;t load your leads. Refresh the page or try again in a moment.
+        </div>
+      ) : null}
 
       <section className="grid gap-3 sm:grid-cols-3" aria-label="Lead summary">
         <SummaryMetric label="Total leads" value={leads.length} note="In your workspace" tone="text-[var(--foreground)]" />

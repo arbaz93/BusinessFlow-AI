@@ -49,5 +49,10 @@ export function getInvitationCallbackPath(token: string) {
 
 export function getInvitationTokenFromReturnTo(returnTo: string | null | undefined) {
   const match = returnTo?.match(/^\/invitations\/([A-Za-z0-9_-]{43})$/);
-  return match?.[1];
+  return match?.[1] ?? (typeof returnTo === "string" && /^[A-Za-z0-9_-]{43}$/.test(returnTo) ? returnTo : undefined);
+}
+
+export function getAuthPathForReturnTo(returnTo: string | null | undefined, mode: "login" | "signup") {
+  const token = getInvitationTokenFromReturnTo(returnTo);
+  return token ? `/${mode}/invitations/${token}` : `/${mode}`;
 }

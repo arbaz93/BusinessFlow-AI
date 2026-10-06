@@ -45,6 +45,7 @@ export function ProjectTasksWorkspace({
   completedCount,
   overdueCount,
   deletionComplete,
+  loadError,
 }: {
   projectId: string;
   projectName: string;
@@ -55,6 +56,7 @@ export function ProjectTasksWorkspace({
   completedCount: number;
   overdueCount: number;
   deletionComplete: boolean;
+  loadError?: boolean;
 }) {
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState<TaskStatus | "ALL">("ALL");
@@ -96,6 +98,12 @@ export function ProjectTasksWorkspace({
           <Link href={`/projects/${projectId}/tasks`} className="rounded-sm underline underline-offset-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#86efac]">Dismiss</Link>
         </div>
       )}
+
+      {loadError ? (
+        <div role="alert" className="rounded-xl border border-[var(--danger-border)]/25 bg-[var(--danger-surface)] px-4 py-3 text-sm text-[var(--danger)]">
+          We couldn&apos;t load this project&apos;s tasks. Refresh and try again.
+        </div>
+      ) : null}
 
       <section className="grid gap-3 sm:grid-cols-3" aria-label="Project task summary">
         <Metric label="Open tasks" value={openCount} />

@@ -52,6 +52,7 @@ type Props = {
   activeCount: number;
   totalCount: number;
   deletionComplete: boolean;
+  loadError?: boolean;
 };
 
 const allStatuses = "ALL" as const;
@@ -66,6 +67,7 @@ export function ProjectsWorkspace({
   activeCount,
   totalCount,
   deletionComplete,
+  loadError,
 }: Props) {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<ProjectStatus | typeof allStatuses>(allStatuses);
@@ -154,6 +156,12 @@ export function ProjectsWorkspace({
         </div>
       )}
 
+      {loadError ? (
+        <div role="alert" className="rounded-lg border border-[var(--danger-border)]/25 bg-[var(--danger-surface)] px-4 py-3 text-sm text-[var(--danger)]">
+          We couldn&apos;t load your projects. Refresh the page or try again in a moment.
+        </div>
+      ) : null}
+
       <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4" aria-label="Project summary">
         <SummaryMetric label="Total projects" value={totalCount} note="Across your workspace" />
         <SummaryMetric label="Active projects" value={activeCount} note="Planning, in progress, or on hold" />
@@ -195,7 +203,7 @@ export function ProjectsWorkspace({
                 <X size={13} /> Reset
               </button>
             )}
-          </div>
+</div>
         </div>
 
         <div className="mt-3 flex flex-wrap gap-1" role="group" aria-label="Filter projects by status">
@@ -214,34 +222,38 @@ export function ProjectsWorkspace({
 
       <section aria-label="Projects" aria-live="polite">
         {visibleProjects.length ? (
-          <div className="overflow-hidden rounded-[10px] border border-[var(--line)] bg-[var(--surface)]">
-            <div className="hidden grid-cols-[minmax(200px,1.5fr)_minmax(150px,0.9fr)_minmax(130px,0.75fr)_110px_110px_110px] gap-4 border-b border-[var(--line)] bg-[var(--surface)] px-4 py-3 text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--muted)] xl:grid">
-              <span>Project</span>
-              <span>Client</span>
-              <span>Priority</span>
-              <span>Status</span>
-              <span>Due</span>
-              <span>Updated</span>
+          <>
+            <div className="overflow-hidden rounded-[10px] border border-[var(--line)] bg-[var(--surface)]">
+              <div className="overflow-x-auto sm:overflow-visible">
+                <div className="hidden min-w-[800px] grid-cols-[minmax(200px,1.5fr)_minmax(150px,0.9fr)_minmax(130px,0.75fr)_110px_110px_110px] gap-4 border-b border-[var(--line)] bg-[var(--surface)] px-4 py-3 text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--muted)] xl:grid">
+                  <span>Project</span>
+                  <span>Client</span>
+                  <span>Priority</span>
+                  <span>Status</span>
+                  <span>Due</span>
+                  <span>Updated</span>
+                </div>
+                <div className="divide-y divide-[var(--line)] min-w-[800px] sm:min-w-0">
+                  {visibleProjects.map((project) => (
+                    <Link key={project.id} href={`/projects/${project.id}`} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-2 px-3.5 py-3.5 transition-colors hover:bg-[var(--surface)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#a49bff] sm:px-4 lg:grid-cols-[minmax(200px,1.5fr)_minmax(140px,1fr)_110px_110px] xl:grid-cols-[minmax(200px,1.5fr)_minmax(150px,0.9fr)_minmax(130px,0.75fr)_110px_110px_110px] xl:gap-4">
+                      <span className="flex min-w-0 items-center gap-3">
+                        <span className="grid size-9 shrink-0 place-items-center rounded-lg border border-[var(--accent)]/20 bg-[var(--accent)]/10 text-[11px] font-semibold text-[var(--accent-muted)]"><FolderKanban size={16} /></span>
+                        <span className="min-w-0">
+                          <span className="block truncate text-sm font-semibold text-[var(--foreground)]">{project.name}</span>
+                          <span className="mt-0.5 block truncate text-xs text-[var(--muted)] xl:hidden">{project.clientName}</span>
+                        </span>
+                      </span>
+                      <span className="hidden min-w-0 truncate text-xs text-[var(--muted)] xl:block">{project.clientCompany || project.clientName}</span>
+                      <span className={`inline-flex h-6 items-center justify-self-end rounded-full border px-2 text-[10px] font-medium xl:justify-self-start ${projectPriorityTone[project.priority]}`}>{projectPriorityLabels[project.priority]}</span>
+                      <span className={`inline-flex h-6 items-center justify-self-end rounded-full border px-2 text-[10px] font-medium xl:justify-self-start ${projectStatusTone[project.status]}`}>{projectStatusLabels[project.status]}</span>
+                      <span className="hidden truncate text-xs text-[var(--muted)] lg:block">{project.dueDate ? new Date(project.dueDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "No date"}</span>
+                      <span className="hidden text-xs text-[var(--muted)] xl:block">{new Date(project.updatedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</span>
+                    </Link>
+                  ))}
+                </div>
+              </div>
             </div>
-            <div className="divide-y divide-[var(--line)]">
-              {visibleProjects.map((project) => (
-                <Link key={project.id} href={`/projects/${project.id}`} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-2 px-3.5 py-3.5 transition-colors hover:bg-[var(--surface)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#a49bff] sm:px-4 lg:grid-cols-[minmax(200px,1.5fr)_minmax(140px,1fr)_110px_110px] xl:grid-cols-[minmax(200px,1.5fr)_minmax(150px,0.9fr)_minmax(130px,0.75fr)_110px_110px_110px] xl:gap-4">
-                  <span className="flex min-w-0 items-center gap-3">
-                    <span className="grid size-9 shrink-0 place-items-center rounded-lg border border-[var(--accent)]/20 bg-[var(--accent)]/10 text-[11px] font-semibold text-[var(--accent-muted)]"><FolderKanban size={16} /></span>
-                    <span className="min-w-0">
-                      <span className="block truncate text-sm font-semibold text-[var(--foreground)]">{project.name}</span>
-                      <span className="mt-0.5 block truncate text-xs text-[var(--muted)] xl:hidden">{project.clientName}</span>
-                    </span>
-                  </span>
-                  <span className="hidden min-w-0 truncate text-xs text-[var(--muted)] xl:block">{project.clientCompany || project.clientName}</span>
-                  <span className={`inline-flex h-6 items-center justify-self-end rounded-full border px-2 text-[10px] font-medium xl:justify-self-start ${projectPriorityTone[project.priority]}`}>{projectPriorityLabels[project.priority]}</span>
-                  <span className={`inline-flex h-6 items-center justify-self-end rounded-full border px-2 text-[10px] font-medium xl:justify-self-start ${projectStatusTone[project.status]}`}>{projectStatusLabels[project.status]}</span>
-                  <span className="hidden truncate text-xs text-[var(--muted)] lg:block">{project.dueDate ? new Date(project.dueDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "No date"}</span>
-                  <span className="hidden text-xs text-[var(--muted)] xl:block">{new Date(project.updatedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</span>
-                </Link>
-              ))}
-            </div>
-          </div>
+          </>
         ) : totalCount === 0 ? (
           <div className="rounded-[10px] border border-dashed border-[var(--line)] bg-[var(--surface)] px-5 py-14 text-center">
             <span className="mx-auto grid size-11 place-items-center rounded-xl border border-[var(--line)] bg-[var(--surface)] text-[var(--muted)]"><BriefcaseBusiness size={19} /></span>

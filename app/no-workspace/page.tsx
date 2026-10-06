@@ -25,8 +25,21 @@ export default async function NoWorkspacePage() {
     );
   }
 
+  if (state.kind === "UNAUTHENTICATED") {
+    redirect("/login");
+  }
+
   if (state.kind === "READY") {
     redirect("/dashboard");
+  }
+
+  if (state.kind === "INVITATION_AVAILABLE") {
+    return (
+      <AuthShell
+        description="Your workspace invitation is waiting. Open the invitation link from your email to accept it and continue."
+        title="Invitation ready"
+      />
+    );
   }
 
   return (

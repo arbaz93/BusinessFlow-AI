@@ -141,7 +141,15 @@ function TaskForm({
               ) : (
                 <>
                   <label htmlFor="task-project" className={labelClass}>Project <span className="text-[#fca5a5]">*</span></label>
-                  <select id="task-project" name="projectId" value={values.projectId} onChange={(event) => setValues({ ...values, projectId: event.currentTarget.value })} className={selectClass}>
+                  <select
+                    id="task-project"
+                    name="projectId"
+                    value={values.projectId}
+                    onChange={(event) => setValues({ ...values, projectId: event.currentTarget.value })}
+                    aria-invalid={Boolean(fieldError("projectId"))}
+                    aria-describedby={fieldError("projectId") ? "task-project-error" : undefined}
+                    className={selectClass}
+                  >
                     <option value="" disabled>Select a project</option>
                     {projects.map((project) => (
                       <option key={project.id} value={project.id}>{project.name}{project.clientName ? ` · ${project.clientName}` : ""}</option>
@@ -154,7 +162,13 @@ function TaskForm({
 
             <div>
               <label htmlFor="task-assignee" className={labelClass}>Assignee</label>
-              <select id="task-assignee" name="assigneeId" value={values.assigneeId} onChange={(event) => setValues({ ...values, assigneeId: event.currentTarget.value })} className={selectClass}>
+              <select
+                id="task-assignee"
+                name="assigneeId"
+                value={values.assigneeId}
+                onChange={(event) => setValues({ ...values, assigneeId: event.currentTarget.value })}
+                className={selectClass}
+              >
                 <option value="">Unassigned</option>
                 {teamMembers.map((member) => (
                   <option key={member.id} value={member.id}>{member.name}</option>
@@ -164,7 +178,13 @@ function TaskForm({
 
             <div>
               <label htmlFor="task-status" className={labelClass}>Status</label>
-              <select id="task-status" name="status" value={values.status} onChange={(event) => setValues({ ...values, status: event.currentTarget.value as TaskInput["status"] })} className={selectClass}>
+              <select
+                id="task-status"
+                name="status"
+                value={values.status}
+                onChange={(event) => setValues({ ...values, status: event.currentTarget.value as TaskInput["status"] })}
+                className={selectClass}
+              >
                 {taskStatusValues.map((status) => (
                   <option key={status} value={status}>{taskStatusLabels[status]}</option>
                 ))}
@@ -173,7 +193,13 @@ function TaskForm({
 
             <div>
               <label htmlFor="task-priority" className={labelClass}>Priority</label>
-              <select id="task-priority" name="priority" value={values.priority} onChange={(event) => setValues({ ...values, priority: event.currentTarget.value as TaskInput["priority"] })} className={selectClass}>
+              <select
+                id="task-priority"
+                name="priority"
+                value={values.priority}
+                onChange={(event) => setValues({ ...values, priority: event.currentTarget.value as TaskInput["priority"] })}
+                className={selectClass}
+              >
                 {taskPriorityValues.map((priority) => (
                   <option key={priority} value={priority}>{taskPriorityLabels[priority]}</option>
                 ))}
@@ -182,12 +208,27 @@ function TaskForm({
 
             <div className="sm:col-span-2">
               <label htmlFor="task-due-date" className={labelClass}>Due date</label>
-              <Input id="task-due-date" name="dueDate" type="date" value={values.dueDate} onChange={(event) => setValues({ ...values, dueDate: event.currentTarget.value })} className={inputClass} />
+              <Input
+                id="task-due-date"
+                name="dueDate"
+                type="date"
+                value={values.dueDate}
+                onChange={(event) => setValues({ ...values, dueDate: event.currentTarget.value })}
+                className={inputClass}
+              />
             </div>
 
             <div className="sm:col-span-2">
               <label htmlFor="task-description" className={labelClass}>Description</label>
-              <Textarea id="task-description" name="description" rows={5} value={values.description} onChange={(event) => setValues({ ...values, description: event.currentTarget.value })} className="min-h-[120px] border-[var(--line)] bg-[var(--surface)] text-sm text-[var(--foreground)] placeholder:text-[var(--muted)] focus-visible:border-[#a49bff] focus-visible:ring-[#a49bff]/20 dark:bg-[var(--surface)]" placeholder="Describe the task and expected outcome." />
+              <Textarea
+                id="task-description"
+                name="description"
+                rows={5}
+                value={values.description}
+                onChange={(event) => setValues({ ...values, description: event.currentTarget.value })}
+                className="min-h-[120px] border-[var(--line)] bg-[var(--surface)] text-sm text-[var(--foreground)] placeholder:text-[var(--muted)] focus-visible:border-[#a49bff] focus-visible:ring-[#a49bff]/20 dark:bg-[var(--surface)]"
+                placeholder="Describe the task and expected outcome."
+              />
             </div>
           </div>
 

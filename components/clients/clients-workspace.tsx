@@ -19,7 +19,7 @@ type ClientSummary = {
 
 const statusFilters = ["ALL", "ACTIVE", "INACTIVE"] as const;
 
-export function ClientsWorkspace({ clients, deletionComplete }: { clients: ClientSummary[]; deletionComplete: boolean }) {
+export function ClientsWorkspace({ clients, deletionComplete, loadError }: { clients: ClientSummary[]; deletionComplete: boolean; loadError?: boolean }) {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<(typeof statusFilters)[number]>("ALL");
   const [showDeletionNotice, setShowDeletionNotice] = useState(deletionComplete);
@@ -52,6 +52,12 @@ export function ClientsWorkspace({ clients, deletionComplete }: { clients: Clien
         </div>
       )}
 
+      {loadError ? (
+        <div role="alert" className="rounded-lg border border-[var(--danger-border)]/25 bg-[var(--danger-surface)] px-4 py-3 text-sm text-[var(--danger)]">
+          We couldn&apos;t load your clients. Refresh the page or try again in a moment.
+        </div>
+      ) : null}
+
       <section className="grid gap-3 sm:grid-cols-2" aria-label="Client summary">
         <SummaryMetric label="Active clients" value={activeCount} note="Currently working with you" tone="text-[var(--success-line)]" />
         <SummaryMetric label="Inactive clients" value={inactiveCount} note="Relationship history retained" tone="text-[var(--muted)]" />
@@ -73,35 +79,39 @@ export function ClientsWorkspace({ clients, deletionComplete }: { clients: Clien
                 </button>
               );
             })}
+</div>
           </div>
-        </div>
-      </section>
+        </section>
 
       <section aria-label="Clients" aria-live="polite">
         {visibleClients.length ? (
-          <div className="overflow-hidden rounded-[10px] border border-[var(--line)] bg-[var(--surface)]">
-            <div className="hidden grid-cols-[minmax(200px,1.35fr)_minmax(150px,1fr)_minmax(160px,1fr)_112px_145px_118px] gap-4 border-b border-[var(--line)] bg-[var(--surface)] px-4 py-3 text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--muted)] xl:grid">
-              <span>Client</span><span>Company</span><span>Email</span><span>Status</span><span>Last Activity</span><span>Created</span>
+          <>
+            <div className="overflow-hidden rounded-[10px] border border-[var(--line)] bg-[var(--surface)]">
+              <div className="overflow-x-auto sm:overflow-visible">
+                <div className="hidden min-w-[900px] grid-cols-[minmax(200px,1.35fr)_minmax(150px,1fr)_minmax(160px,1fr)_112px_145px_118px] gap-4 border-b border-[var(--line)] bg-[var(--surface)] px-4 py-3 text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--muted)] xl:grid">
+                  <span>Client</span><span>Company</span><span>Email</span><span>Status</span><span>Last Activity</span><span>Created</span>
+                </div>
+                <div className="divide-y divide-[var(--line)] min-w-[900px] sm:min-w-0">
+                  {visibleClients.map((client) => (
+                    <Link key={client.id} href={`/clients/${client.id}`} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-2 px-3.5 py-3.5 transition-colors hover:bg-[var(--surface)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#a49bff] sm:px-4 lg:grid-cols-[minmax(200px,1.4fr)_minmax(160px,1fr)_112px_145px] xl:grid-cols-[minmax(200px,1.35fr)_minmax(150px,1fr)_minmax(160px,1fr)_112px_145px_118px] xl:gap-4">
+                      <span className="flex min-w-0 items-center gap-3">
+                        <span className="grid size-9 shrink-0 place-items-center rounded-lg border border-[#3b82f6]/20 bg-[var(--info-surface)] text-[11px] font-semibold text-[var(--info-line)]">{initials(client.name)}</span>
+                        <span className="min-w-0">
+                          <span className="block truncate text-sm font-semibold text-[var(--foreground)]">{client.name}</span>
+                          <span className="mt-0.5 block truncate text-xs text-[var(--muted)] xl:hidden">{client.company || client.email || "Individual client"}</span>
+                        </span>
+                      </span>
+                      <span className="hidden min-w-0 truncate text-xs text-[var(--muted)] xl:block">{client.company || "—"}</span>
+                      <span className="hidden min-w-0 items-center gap-1.5 truncate text-xs text-[var(--muted)] md:flex xl:block">{client.email ? <><Mail size={13} className="inline-block xl:hidden" />{client.email}</> : "—"}</span>
+                      <span className={`inline-flex h-6 items-center justify-self-end rounded-full border px-2 text-[10px] font-medium xl:justify-self-start ${client.status === "ACTIVE" ? "border-[var(--success-border)]/20 bg-[var(--success-surface)] text-[var(--success-line)]" : "border-[var(--line)] bg-[var(--surface)] text-[var(--muted)]"}`}>{client.status === "ACTIVE" ? "Active" : "Inactive"}</span>
+                      <span className="hidden truncate text-xs text-[var(--muted)] lg:block">{client.lastActivityLabel || "No activity"}</span>
+                      <span className="hidden text-xs text-[var(--muted)] xl:block">{client.createdAtLabel}</span>
+                    </Link>
+                  ))}
+                </div>
+              </div>
             </div>
-            <div className="divide-y divide-[var(--line)]">
-              {visibleClients.map((client) => (
-                <Link key={client.id} href={`/clients/${client.id}`} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-2 px-3.5 py-3.5 transition-colors hover:bg-[var(--surface)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#a49bff] sm:px-4 lg:grid-cols-[minmax(200px,1.4fr)_minmax(160px,1fr)_112px_145px] xl:grid-cols-[minmax(200px,1.35fr)_minmax(150px,1fr)_minmax(160px,1fr)_112px_145px_118px] xl:gap-4">
-                  <span className="flex min-w-0 items-center gap-3">
-                    <span className="grid size-9 shrink-0 place-items-center rounded-lg border border-[#3b82f6]/20 bg-[var(--info-surface)] text-[11px] font-semibold text-[var(--info-line)]">{initials(client.name)}</span>
-                    <span className="min-w-0">
-                      <span className="block truncate text-sm font-semibold text-[var(--foreground)]">{client.name}</span>
-                      <span className="mt-0.5 block truncate text-xs text-[var(--muted)] xl:hidden">{client.company || client.email || "Individual client"}</span>
-                    </span>
-                  </span>
-                  <span className="hidden min-w-0 truncate text-xs text-[var(--muted)] xl:block">{client.company || "—"}</span>
-                  <span className="hidden min-w-0 items-center gap-1.5 truncate text-xs text-[var(--muted)] md:flex xl:block">{client.email ? <><Mail size={13} className="inline-block xl:hidden" />{client.email}</> : "—"}</span>
-                  <span className={`inline-flex h-6 items-center justify-self-end rounded-full border px-2 text-[10px] font-medium xl:justify-self-start ${client.status === "ACTIVE" ? "border-[var(--success-border)]/20 bg-[var(--success-surface)] text-[var(--success-line)]" : "border-[var(--line)] bg-[var(--surface)] text-[var(--muted)]"}`}>{client.status === "ACTIVE" ? "Active" : "Inactive"}</span>
-                  <span className="hidden truncate text-xs text-[var(--muted)] lg:block">{client.lastActivityLabel || "No activity"}</span>
-                  <span className="hidden text-xs text-[var(--muted)] xl:block">{client.createdAtLabel}</span>
-                </Link>
-              ))}
-            </div>
-          </div>
+          </>
         ) : clients.length === 0 ? (
           <div className="rounded-[10px] border border-dashed border-[var(--line)] bg-[var(--surface)] px-5 py-14 text-center">
             <span className="mx-auto grid size-11 place-items-center rounded-xl border border-[var(--line)] bg-[var(--surface)] text-[var(--muted)]"><BriefcaseBusiness size={19} /></span>

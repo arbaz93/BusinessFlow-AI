@@ -19,7 +19,20 @@ export default async function OnboardingPage() {
     );
   }
 
+  if (state.kind === "UNAUTHENTICATED") {
+    redirect("/login");
+  }
+
   if (state.kind === "READY") redirect("/dashboard");
+
+  if (state.kind === "INVITATION_AVAILABLE") {
+    return (
+      <AuthShell
+        description="You have a pending workspace invitation. Use the invitation link to accept it and continue."
+        title="Invitation pending"
+      />
+    );
+  }
 
   if (state.kind === "NO_WORKSPACE") {
     return (

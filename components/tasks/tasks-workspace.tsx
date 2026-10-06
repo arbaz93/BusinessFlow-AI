@@ -55,6 +55,7 @@ type Props = {
   deletionComplete: boolean;
   initialDueFilter: TaskDueFilter;
   initialOpenOnly: boolean;
+  loadError?: boolean;
 };
 
 const allStatuses = "ALL" as const;
@@ -84,6 +85,7 @@ export function TasksWorkspace({
   deletionComplete,
   initialDueFilter,
   initialOpenOnly,
+  loadError,
 }: Props) {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<StatusFilter>(initialOpenOnly ? "OPEN" : allStatuses);
@@ -172,6 +174,12 @@ export function TasksWorkspace({
           </button>
         </div>
       )}
+
+      {loadError ? (
+        <div role="alert" className="rounded-lg border border-[var(--danger-border)]/25 bg-[var(--danger-surface)] px-4 py-3 text-sm text-[var(--danger)]">
+          We couldn&apos;t load your tasks. Refresh the page or try again in a moment.
+        </div>
+      ) : null}
 
       <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4" aria-label="Task summary">
         <SummaryMetric label="Total open tasks" value={totalOpen} note="To do, in progress, or blocked" />

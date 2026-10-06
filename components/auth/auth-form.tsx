@@ -8,6 +8,7 @@ import { Alert } from "@/components/ui/alert";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { TextField } from "@/components/ui/field";
+import { getAuthPathForReturnTo } from "@/lib/members/invitation-tokens";
 import { cn } from "@/lib/utils";
 
 type AuthFormProps = {
@@ -32,19 +33,16 @@ export function AuthForm({ mode, notice, returnTo }: AuthFormProps) {
 
   const passwordMismatch =
     isSignup && confirmPassword.length > 0 && password.length > 0 && password !== confirmPassword;
+  const successMessage = state.message ? String(state.message) : undefined;
   const submitDisabled =
     pending ||
+    Boolean(successMessage) ||
     (isSignup
-      ? !name.trim() || !email.trim() || password.length < 8 || !confirmPassword || passwordMismatch
+      ? !name.trim() || !email.trim() || password.length < 8 || !confirmPassword.trim() || passwordMismatch
       : !email.trim() || !password);
 
   const error = state.error ?? (notice ? noticeMessages[notice] : undefined);
-  const invitationToken = returnTo?.match(/^\/invitations\/([A-Za-z0-9_-]{43})$/)?.[1];
-  const alternateAuthPath = invitationToken
-    ? `/${isSignup ? "login" : "signup"}/invitations/${invitationToken}`
-    : isSignup
-      ? "/login"
-      : "/signup";
+  const alternateAuthPath = getAuthPathForReturnTo(returnTo, isSignup ? "login" : "signup");
 
   return (
     <AuthShell
@@ -57,7 +55,7 @@ export function AuthForm({ mode, notice, returnTo }: AuthFormProps) {
     >
       <Card className="bg-transparent border-0">
         <CardContent className="px-6 sm:px-8">
-          <form action={action} className="space-y-5">
+          <form action={action} aria-busy={pending || Boolean(successMessage)} className="space-y-5">
             {returnTo ? <input type="hidden" name="returnTo" value={returnTo} /> : null}
             {isSignup && (
               <TextField
@@ -117,15 +115,20 @@ export function AuthForm({ mode, notice, returnTo }: AuthFormProps) {
               />
             )}
 
-            {error ? <Alert role="alert">{error}</Alert> : null}
-            {state.message ? <Alert role="status" tone="success">{state.message}</Alert> : null}
+            {error ? <Alert aria-live="assertive" role="alert">{error}</Alert> : null}
+            {successMessage ? (
+              <Alert aria-live="polite" role="status" tone="success">
+                {successMessage}
+              </Alert>
+            ) : null}
 
             <button
+              aria-busy={pending}
               className={cn(buttonVariants({ size: "lg", variant: "primary" }), "w-full")}
               disabled={submitDisabled}
               type="submit"
             >
-              {pending ? "Please wait..." : isSignup ? "Create account" : "Log in"}
+              {pending ? "Please wait..." : successMessage ? "Check your email" : isSignup ? "Create account" : "Log in"}
             </button>
           </form>
 

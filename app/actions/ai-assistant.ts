@@ -112,7 +112,13 @@ export async function submitAssistantMessage(rawInput: unknown): Promise<Assista
     },
     select: { id: true, contextProjectId: true },
   });
-  if (!conversation) return { success: false, error: "This conversation is unavailable." };
+  if (!conversation) {
+    return {
+      success: false,
+      error: "This conversation is no longer available. Refresh the page and open it again.",
+      requestId,
+    };
+  }
   const activeConversationId = conversation.id;
 
   async function refreshConversationMemory() {

@@ -21,6 +21,7 @@ export async function createWorkspace(_previousState: FormState, formData: FormD
 
   try {
     const state = await resolveApplicationEntryState(authUser);
+    if (state.kind === "UNAUTHENTICATED") redirect("/login");
     if (state.kind === "READY") redirect("/dashboard");
   } catch {
     return { error: "We couldn't load your account. Please try again." };

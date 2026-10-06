@@ -5,7 +5,10 @@ import { redirect } from "next/navigation";
 import { getAuthCallbackUrl } from "@/lib/auth/callback-url";
 import { resolveApplicationEntryState } from "@/lib/auth/lifecycle";
 import { loginSchema, signupSchema } from "@/lib/auth/schemas";
-import { getInvitationTokenFromReturnTo } from "@/lib/members/invitation-tokens";
+import {
+  getAuthPathForReturnTo,
+  getInvitationTokenFromReturnTo,
+} from "@/lib/members/invitation-tokens";
 import type { FormState } from "@/lib/auth/types";
 import { createClient } from "@/lib/supabase/server";
 
@@ -29,7 +32,7 @@ export async function login(_previousState: FormState, formData: FormData): Prom
     if (error || !data.user) return { error: "Email or password is incorrect." };
 
     const state = await resolveApplicationEntryState(data.user);
-    destination = invitationReturnTo ?? (state.kind === "READY" ? "/dashboard" : "/onboarding");
+    destination = invitationReturnTo ?? (state.kind === "READY" ? "/dashboard" : state.kind === "NO_WORKSPACE" ? "/no-workspace" : "/onboarding");
   } catch {
     return { error: "We couldn't sign you in right now. Please try again." };
   }
@@ -78,7 +81,7 @@ export async function signup(_previousState: FormState, formData: FormData): Pro
     }
 
     if (data.user && data.session) {
-      destination = invitationReturnTo ?? "/onboarding";
+      destination = invitationReturnTo ?? "/no-workspace";
     } else {
       return { message: "Check your email to confirm your account, then return here to sign in." };
     }
@@ -94,12 +97,11 @@ export async function signup(_previousState: FormState, formData: FormData): Pro
 }
 
 export async function signOut(formData?: FormData) {
-  const returnTo = getInvitationTokenFromReturnTo(
-    String(formData?.get("returnTo") ?? ""),
-  );
+  const returnTo = String(formData?.get("returnTo") ?? "");
+  const signInRedirect = getAuthPathForReturnTo(returnTo, "login");
   const supabase = await createClient();
   const { error } = await supabase.auth.signOut();
 
   if (error) redirect("/dashboard?notice=signout");
-  redirect(returnTo ? `/login${returnTo}` : "/login");
+  redirect(signInRedirect);
 }

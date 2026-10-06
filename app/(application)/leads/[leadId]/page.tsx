@@ -25,19 +25,25 @@ function readable(value: string) {
 export default async function LeadDetailPage({ params }: PageProps<"/leads/[leadId]">) {
   const { leadId } = await params;
   const { organization } = await requireOrganization();
-  const lead = await prisma.lead.findFirst({
-    where: { id: leadId, organizationId: organization.id },
-    include: {
-      client: { select: { id: true, name: true } },
-      activities: {
-        where: { organizationId: organization.id },
-        orderBy: { createdAt: "desc" },
-        take: 20,
-        include: { actor: { select: { name: true } } },
+  let lead;
+  try {
+    lead = await prisma.lead.findFirst({
+      where: { id: leadId, organizationId: organization.id },
+      include: {
+        client: { select: { id: true, name: true } },
+        activities: {
+          where: { organizationId: organization.id },
+          orderBy: { createdAt: "desc" },
+          take: 20,
+          include: { actor: { select: { name: true } } },
+        },
+        _count: { select: { activities: { where: { organizationId: organization.id } } } },
       },
-      _count: { select: { activities: { where: { organizationId: organization.id } } } },
-    },
-  });
+    });
+  } catch (error) {
+    console.error("Lead detail failed to load.", { leadId, error });
+    throw error;
+  }
 
   if (!lead) notFound();
 

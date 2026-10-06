@@ -128,6 +128,8 @@ function ProjectForm({
                 name="clientId"
                 value={values.clientId}
                 onChange={(event) => setValues({ ...values, clientId: event.currentTarget.value })}
+                aria-invalid={Boolean(fieldError("clientId"))}
+                aria-describedby={fieldError("clientId") ? "project-client-error" : undefined}
                 className={selectClass}
               >
                 <option value="" disabled>Select a client</option>

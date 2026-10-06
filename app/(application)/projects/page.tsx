@@ -7,40 +7,65 @@ export default async function ProjectsPage({ searchParams }: PageProps<"/project
   const { organization } = await requireOrganization();
   const query = await searchParams;
 
-  const [projects, clients, statusGroups, priorityGroups, totalCount] = await Promise.all([
-    prisma.project.findMany({
-      where: { organizationId: organization.id },
-      orderBy: { updatedAt: "desc" },
-      select: {
-        id: true,
-        name: true,
-        description: true,
-        status: true,
-        priority: true,
-        startDate: true,
-        dueDate: true,
-        updatedAt: true,
-        createdAt: true,
-        client: { select: { id: true, name: true, company: true } },
-      },
-    }),
-    prisma.client.findMany({
-      where: { organizationId: organization.id },
-      orderBy: { name: "asc" },
-      select: { id: true, name: true, company: true },
-    }),
-    prisma.project.groupBy({
-      by: ["status"],
-      where: { organizationId: organization.id },
-      _count: { _all: true },
-    }),
-    prisma.project.groupBy({
-      by: ["priority"],
-      where: { organizationId: organization.id },
-      _count: { _all: true },
-    }),
-    prisma.project.count({ where: { organizationId: organization.id } }),
-  ]);
+  let projects: Array<{
+    id: string;
+    name: string;
+    description: string | null;
+    status: "PLANNING" | "IN_PROGRESS" | "ON_HOLD" | "COMPLETED" | "CANCELLED";
+    priority: "LOW" | "MEDIUM" | "HIGH" | "URGENT";
+    startDate: Date | null;
+    dueDate: Date | null;
+    updatedAt: Date;
+    createdAt: Date;
+    client: { id: string; name: string; company: string | null };
+  }> = [];
+  let clients: Array<{ id: string; name: string; company: string | null }> = [];
+  let statusGroups: Array<{ status: string; _count: { _all: number } }> = [];
+  let priorityGroups: Array<{ priority: string; _count: { _all: number } }> = [];
+  let totalCount = 0;
+  let loadError = false;
+
+  try {
+    const result = await Promise.all([
+      prisma.project.findMany({
+        where: { organizationId: organization.id },
+        orderBy: { updatedAt: "desc" },
+        select: {
+          id: true,
+          name: true,
+          description: true,
+          status: true,
+          priority: true,
+          startDate: true,
+          dueDate: true,
+          updatedAt: true,
+          createdAt: true,
+          client: { select: { id: true, name: true, company: true } },
+        },
+      }),
+      prisma.client.findMany({
+        where: { organizationId: organization.id },
+        orderBy: { name: "asc" },
+        select: { id: true, name: true, company: true },
+      }),
+      prisma.project.groupBy({
+        by: ["status"],
+        where: { organizationId: organization.id },
+        _count: { _all: true },
+      }),
+      prisma.project.groupBy({
+        by: ["priority"],
+        where: { organizationId: organization.id },
+        _count: { _all: true },
+      }),
+      prisma.project.count({ where: { organizationId: organization.id } }),
+    ]);
+
+    [projects, clients, statusGroups, priorityGroups, totalCount] = result;
+  } catch (error) {
+    console.error("Projects list failed to load.", error);
+    loadError = true;
+  }
 
   const statusCounts = Object.fromEntries(statusGroups.map((group) => [group.status, group._count._all]));
   const priorityCounts = Object.fromEntries(priorityGroups.map((group) => [group.priority, group._count._all]));
@@ -69,6 +94,7 @@ export default async function ProjectsPage({ searchParams }: PageProps<"/project
         updatedAt: project.updatedAt.toISOString(),
         createdAt: project.createdAt.toISOString(),
       }))}
+      loadError={loadError}
     />
   );
 }

@@ -19,51 +19,64 @@ export default async function ProjectOverviewPage({ params }: PageProps<"/projec
   const { projectId } = await params;
   const { organizationId, project } = await getProjectWorkspace(projectId);
   const { overdueBefore } = getTaskDateWindow();
-  const [taskStatusCounts, openTaskCount, overdueTaskCount, recentTasks, activities, teamMembers] = await Promise.all([
-    prisma.task.groupBy({
-      by: ["status"],
-      where: { organizationId, projectId: project.id },
-      _count: { _all: true },
-    }),
-    prisma.task.count({ where: { organizationId, projectId: project.id, status: { in: activeTaskStatuses } } }),
-    prisma.task.count({
-      where: {
-        organizationId,
-        projectId: project.id,
-        status: { notIn: ["COMPLETED", "CANCELLED"] },
-        dueDate: { lt: overdueBefore },
-      },
-    }),
-    prisma.task.findMany({
-      where: { organizationId, projectId: project.id, status: { not: "CANCELLED" } },
-      orderBy: [{ dueDate: { sort: "asc", nulls: "last" } }, { updatedAt: "desc" }],
-      take: 5,
-      select: {
-        id: true,
-        title: true,
-        status: true,
-        priority: true,
-        dueDate: true,
-        assignee: { select: { name: true } },
-      },
-    }),
-    prisma.activity.findMany({
-      where: { organizationId, projectId: project.id },
-      orderBy: { createdAt: "desc" },
-      take: 8,
-      select: {
-        id: true,
-        description: true,
-        createdAt: true,
-        actor: { select: { name: true } },
-      },
-    }),
-    prisma.organizationMember.findMany({
-      where: { organizationId },
-      orderBy: { user: { name: "asc" } },
-      select: { user: { select: { id: true, name: true, email: true } } },
-    }),
-  ]);
+
+  let taskStatusCounts: Array<{ status: "TODO" | "IN_PROGRESS" | "BLOCKED" | "COMPLETED" | "CANCELLED"; _count: { _all: number } }> = [];
+  let openTaskCount = 0;
+  let overdueTaskCount = 0;
+  let recentTasks: Array<{ id: string; title: string; status: "TODO" | "IN_PROGRESS" | "BLOCKED" | "COMPLETED" | "CANCELLED"; priority: "LOW" | "MEDIUM" | "HIGH" | "URGENT"; dueDate: Date | null; assignee: { name: string } | null }> = [];
+  let activities: Array<{ id: string; description: string; createdAt: Date; actor: { name: string } | null }> = [];
+  let teamMembers: Array<{ user: { id: string; name: string; email: string } }> = [];
+
+  try {
+    [taskStatusCounts, openTaskCount, overdueTaskCount, recentTasks, activities, teamMembers] = await Promise.all([
+      prisma.task.groupBy({
+        by: ["status"],
+        where: { organizationId, projectId: project.id },
+        _count: { _all: true },
+      }),
+      prisma.task.count({ where: { organizationId, projectId: project.id, status: { in: activeTaskStatuses } } }),
+      prisma.task.count({
+        where: {
+          organizationId,
+          projectId: project.id,
+          status: { notIn: ["COMPLETED", "CANCELLED"] },
+          dueDate: { lt: overdueBefore },
+        },
+      }),
+      prisma.task.findMany({
+        where: { organizationId, projectId: project.id, status: { not: "CANCELLED" } },
+        orderBy: [{ dueDate: { sort: "asc", nulls: "last" } }, { updatedAt: "desc" }],
+        take: 5,
+        select: {
+          id: true,
+          title: true,
+          status: true,
+          priority: true,
+          dueDate: true,
+          assignee: { select: { name: true } },
+        },
+      }),
+      prisma.activity.findMany({
+        where: { organizationId, projectId: project.id },
+        orderBy: { createdAt: "desc" },
+        take: 8,
+        select: {
+          id: true,
+          description: true,
+          createdAt: true,
+          actor: { select: { name: true } },
+        },
+      }),
+      prisma.organizationMember.findMany({
+        where: { organizationId },
+        orderBy: { user: { name: "asc" } },
+        select: { user: { select: { id: true, name: true, email: true } } },
+      }),
+    ]);
+  } catch (error) {
+    console.error("Project overview failed to load.", { projectId, error });
+    throw error;
+  }
 
   const progress = getTaskProgress(Object.fromEntries(taskStatusCounts.map(({ status, _count }) => [status, _count._all])));
   const { total: eligibleTaskCount, completed: completedTaskCount } = progress;
@@ -208,7 +221,7 @@ export default async function ProjectOverviewPage({ params }: PageProps<"/projec
                     <span aria-hidden="true" className="mt-1.5 size-2 shrink-0 rounded-full bg-[var(--accent)]/70" />
                     <div className="min-w-0">
                       <p className="text-sm leading-5 text-[var(--foreground)]">{activity.description}</p>
-                      <p className="mt-1 text-[11px] text-[var(--muted)]">{activity.actor.name} · {activity.createdAt.toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}</p>
+                      <p className="mt-1 text-[11px] text-[var(--muted)]">{activity.actor?.name ?? "System"} · {activity.createdAt.toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}</p>
                     </div>
                   </li>
                 ))}

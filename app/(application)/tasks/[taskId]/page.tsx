@@ -17,29 +17,35 @@ export default async function TaskDetailPage({ params }: PageProps<"/tasks/[task
   const { taskId } = await params;
   const { organization } = await requireOrganization();
 
-  const task = await prisma.task.findFirst({
-    where: { id: taskId, organizationId: organization.id },
-    select: {
-      id: true,
-      title: true,
-      description: true,
-      status: true,
-      priority: true,
-      dueDate: true,
-      completedAt: true,
-      createdAt: true,
-      updatedAt: true,
-      assignee: { select: { id: true, name: true, email: true } },
-      createdBy: { select: { id: true, name: true } },
-      project: { select: { id: true, name: true, client: { select: { id: true, name: true, company: true, email: true, phone: true } } } },
-      activities: {
-        where: { organizationId: organization.id },
-        orderBy: { createdAt: "desc" },
-        take: 20,
-        select: { id: true, description: true, createdAt: true, actor: { select: { name: true } } },
+  let task;
+  try {
+    task = await prisma.task.findFirst({
+      where: { id: taskId, organizationId: organization.id },
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        status: true,
+        priority: true,
+        dueDate: true,
+        completedAt: true,
+        createdAt: true,
+        updatedAt: true,
+        assignee: { select: { id: true, name: true, email: true } },
+        createdBy: { select: { id: true, name: true } },
+        project: { select: { id: true, name: true, client: { select: { id: true, name: true, company: true, email: true, phone: true } } } },
+        activities: {
+          where: { organizationId: organization.id },
+          orderBy: { createdAt: "desc" },
+          take: 20,
+          select: { id: true, description: true, createdAt: true, actor: { select: { name: true } } },
+        },
       },
-    },
-  });
+    });
+  } catch (error) {
+    console.error("Task detail failed to load.", { taskId, error });
+    throw error;
+  }
 
   if (!task) notFound();
 

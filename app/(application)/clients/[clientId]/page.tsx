@@ -13,37 +13,43 @@ import { activeTaskStatuses } from "@/lib/tasks/options";
 export default async function ClientDetailPage({ params }: PageProps<"/clients/[clientId]">) {
   const { clientId } = await params;
   const { organization } = await requireOrganization();
-  const client = await prisma.client.findFirst({
-    where: { id: clientId, organizationId: organization.id },
-    include: {
-      lead: { select: { id: true, name: true, company: true } },
-      activities: {
-        where: { organizationId: organization.id },
-        orderBy: { createdAt: "desc" },
-        take: 20,
-        include: { actor: { select: { name: true } } },
-      },
-      projects: {
-        orderBy: { updatedAt: "desc" },
-        select: {
-          id: true,
-          name: true,
-          status: true,
-          priority: true,
-          dueDate: true,
-          updatedAt: true,
-          _count: {
-            select: {
-              tasks: {
-                where: { organizationId: organization.id, status: { in: activeTaskStatuses } },
+  let client;
+  try {
+    client = await prisma.client.findFirst({
+      where: { id: clientId, organizationId: organization.id },
+      include: {
+        lead: { select: { id: true, name: true, company: true } },
+        activities: {
+          where: { organizationId: organization.id },
+          orderBy: { createdAt: "desc" },
+          take: 20,
+          include: { actor: { select: { name: true } } },
+        },
+        projects: {
+          orderBy: { updatedAt: "desc" },
+          select: {
+            id: true,
+            name: true,
+            status: true,
+            priority: true,
+            dueDate: true,
+            updatedAt: true,
+            _count: {
+              select: {
+                tasks: {
+                  where: { organizationId: organization.id, status: { in: activeTaskStatuses } },
+                },
               },
             },
           },
         },
+        _count: { select: { activities: { where: { organizationId: organization.id } } } },
       },
-      _count: { select: { activities: { where: { organizationId: organization.id } } } },
-    },
-  });
+    });
+  } catch (error) {
+    console.error("Client detail failed to load.", { clientId, error });
+    throw error;
+  }
 
   if (!client) notFound();
   const latestActivity = client.activities[0];

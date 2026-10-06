@@ -48,10 +48,12 @@ export function ProjectDocumentsWorkspace({
   projectId,
   projectName,
   documents,
+  loadError,
 }: {
   projectId: string;
   projectName: string;
   documents: ProjectDocumentSummary[];
+  loadError?: boolean;
 }) {
   const [uploadState, uploadAction, uploadPending] = useActionState(saveProjectDocument, {});
   const router = useRouter();
@@ -154,6 +156,12 @@ export function ProjectDocumentsWorkspace({
           {statusMessage}
         </div>
       )}
+
+      {loadError ? (
+        <div role="alert" className="rounded-xl border border-[var(--danger-border)]/25 bg-[var(--danger-surface)] px-4 py-3 text-sm text-[var(--danger)]">
+          We couldn&apos;t load this project&apos;s documents. Refresh and try again.
+        </div>
+      ) : null}
 
       <section className="rounded-[10px] border border-[var(--line)] bg-[var(--panel)] p-4 sm:p-5">
         <div className="flex flex-col gap-5">

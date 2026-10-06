@@ -60,7 +60,10 @@ export const requireCurrentOrganization = cache(async () => {
   const authUser = await requireUser();
   const state = await resolveApplicationEntryState(authUser);
 
-  if (state.kind === "NO_WORKSPACE" || state.kind === "INVITATION_AVAILABLE") {
+  if (state.kind === "NO_WORKSPACE") {
+    redirect("/no-workspace");
+  }
+  if (state.kind === "INVITATION_AVAILABLE") {
     redirect("/onboarding");
   }
   if (state.kind !== "READY") {

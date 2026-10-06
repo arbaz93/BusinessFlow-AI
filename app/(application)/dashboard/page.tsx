@@ -17,7 +17,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { requireOrganization } from "@/lib/auth/dal";
 import { prisma } from "@/lib/db/prisma";
-import { projectPriorityLabels, projectStatusLabels, projectStatusTone } from "@/lib/projects/options";
+import { projectPriorityLabels, projectStatusLabels, projectStatusTone, type ProjectPriority, type ProjectStatus } from "@/lib/projects/options";
 import { activeProjectStatuses, DUE_SOON_DAYS, endOfToday, getProjectTimelineState, projectTimelineLabels, startOfToday, type TimelineState } from "@/lib/projects/timeline";
 import { taskPriorityLabels, taskPriorityTone, taskStatusLabels, taskStatusTone } from "@/lib/tasks/options";
 import { getDashboardTaskData } from "@/lib/tasks/dashboard-data";
@@ -100,62 +100,105 @@ export default async function DashboardPage() {
   const { profile, organization } = await requireOrganization();
   const now = new Date();
 
-  const [leadCount, clientCount, activeProjectCount, activeProjects, attentionProjects, recentActivity, taskData] = await Promise.all([
-    prisma.lead.count({ where: { organizationId: organization.id } }),
-    prisma.client.count({ where: { organizationId: organization.id, status: "ACTIVE" } }),
-    prisma.project.count({ where: { organizationId: organization.id, status: { in: activeProjectStatuses } } }),
-    prisma.project.findMany({
-      where: { organizationId: organization.id, status: { in: activeProjectStatuses } },
-      orderBy: [{ dueDate: { sort: "asc", nulls: "last" } }, { updatedAt: "desc" }],
-      take: 4,
-      select: {
-        id: true,
-        name: true,
-        status: true,
-        priority: true,
-        startDate: true,
-        dueDate: true,
-        client: { select: { name: true, company: true } },
-      },
-    }),
-    prisma.project.findMany({
-      where: {
-        organizationId: organization.id,
-        status: { in: activeProjectStatuses },
-        dueDate: { lte: endOfToday(new Date(startOfToday(now).getTime() + DUE_SOON_DAYS * 86_400_000)) },
-      },
-      orderBy: [{ dueDate: "asc" }, { priority: "desc" }],
-      take: 5,
-      select: {
-        id: true,
-        name: true,
-        status: true,
-        priority: true,
-        startDate: true,
-        dueDate: true,
-        client: { select: { name: true, company: true } },
-      },
-    }),
-    prisma.activity.findMany({
-      where: { organizationId: organization.id },
-      orderBy: { createdAt: "desc" },
-      take: 6,
-      select: {
-        id: true,
-        type: true,
-        description: true,
-        createdAt: true,
-        actor: { select: { name: true } },
-        project: { select: { id: true } },
-        client: { select: { id: true, name: true, company: true } },
-        task: { select: { id: true } },
-      },
-    }).catch((error: unknown) => {
-      console.error("Dashboard recent activity query failed.", error);
-      return [];
-    }),
-    getDashboardTaskData(organization.id, now),
-  ]);
+  let dashboardFailed = false;
+  let leadCount = 0;
+  let clientCount = 0;
+  let activeProjectCount = 0;
+  let activeProjects: Array<{
+    id: string;
+    name: string;
+    status: ProjectStatus;
+    priority: ProjectPriority;
+    startDate: Date | null;
+    dueDate: Date | null;
+    client: { name: string; company: string | null };
+  }> = [];
+  let attentionProjects: Array<{
+    id: string;
+    name: string;
+    status: ProjectStatus;
+    priority: ProjectPriority;
+    startDate: Date | null;
+    dueDate: Date | null;
+    client: { name: string; company: string | null };
+  }> = [];
+  let recentActivity: Array<{
+    id: string;
+    type: string;
+    description: string;
+    createdAt: Date;
+    actor: { name: string };
+    project: { id: string } | null;
+    client: { id: string; name: string; company: string | null } | null;
+    task: { id: string } | null;
+  }> = [];
+  let taskData: Awaited<ReturnType<typeof getDashboardTaskData>> = { status: "error" };
+
+  try {
+    const dashboardData = await Promise.all([
+      prisma.lead.count({ where: { organizationId: organization.id } }),
+      prisma.client.count({ where: { organizationId: organization.id, status: "ACTIVE" } }),
+      prisma.project.count({ where: { organizationId: organization.id, status: { in: activeProjectStatuses } } }),
+      prisma.project.findMany({
+        where: { organizationId: organization.id, status: { in: activeProjectStatuses } },
+        orderBy: [{ dueDate: { sort: "asc", nulls: "last" } }, { updatedAt: "desc" }],
+        take: 4,
+        select: {
+          id: true,
+          name: true,
+          status: true,
+          priority: true,
+          startDate: true,
+          dueDate: true,
+          client: { select: { name: true, company: true } },
+        },
+      }),
+      prisma.project.findMany({
+        where: {
+          organizationId: organization.id,
+          status: { in: activeProjectStatuses },
+          dueDate: { lte: endOfToday(new Date(startOfToday(now).getTime() + DUE_SOON_DAYS * 86_400_000)) },
+        },
+        orderBy: [{ dueDate: "asc" }, { priority: "desc" }],
+        take: 5,
+        select: {
+          id: true,
+          name: true,
+          status: true,
+          priority: true,
+          startDate: true,
+          dueDate: true,
+          client: { select: { name: true, company: true } },
+        },
+      }),
+      prisma.activity.findMany({
+        where: { organizationId: organization.id },
+        orderBy: { createdAt: "desc" },
+        take: 6,
+        select: {
+          id: true,
+          type: true,
+          description: true,
+          createdAt: true,
+          actor: { select: { name: true } },
+          project: { select: { id: true } },
+          client: { select: { id: true, name: true, company: true } },
+          task: { select: { id: true } },
+        },
+      }).catch((error: unknown) => {
+        console.error("Dashboard recent activity query failed.", error);
+        return [];
+      }),
+      getDashboardTaskData(organization.id, now),
+    ]);
+
+    [leadCount, clientCount, activeProjectCount, activeProjects, attentionProjects, recentActivity, taskData] = dashboardData;
+  } catch (error) {
+    console.error("Dashboard workspace query failed.", error);
+    dashboardFailed = true;
+    taskData = { status: "error" };
+  }
+
   const projectAIStates = await Promise.all(activeProjects.map(async (project) => {
     try {
       return { projectId: project.id, state: await getProjectAIAnalysisState(project.id) };
@@ -177,6 +220,11 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-6 pb-10">
+      {dashboardFailed ? (
+        <div role="alert" className="rounded-xl border border-[var(--danger-border)]/25 bg-[var(--danger-surface)] px-4 py-3 text-sm text-[var(--danger)]">
+          We couldn&apos;t load some workspace data. Try refreshing the page or check your connection.
+        </div>
+      ) : null}
       <section className="flex flex-col gap-5 pt-2 sm:gap-6 lg:flex-row lg:items-end lg:justify-between lg:pt-5">
         <div className="min-w-0">
           <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--accent)]">Workspace overview</p>

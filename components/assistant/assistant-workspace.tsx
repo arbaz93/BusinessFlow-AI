@@ -10,10 +10,16 @@ import {
   createAssistantConversation,
   deleteAssistantConversation,
   submitAssistantMessage,
-} from "@/app/actions/ai-assistant";import { AssistantMessageContent } from "@/components/assistant/assistant-message-content";
+} from "@/app/actions/ai-assistant";
+import { AssistantMessageContent } from "@/components/assistant/assistant-message-content";
 import { TaskProposalCard } from "@/components/assistant/task-proposal-card";
 import { Textarea } from "@/components/ui/textarea";
-import type { AssistantConversationDetail, AssistantConversationListItem, AssistantConversationMessage, TaskProposal } from "@/lib/assistant/types";
+import type {
+  AssistantConversationDetail,
+  AssistantConversationListItem,
+  AssistantConversationMessage,
+  TaskProposal,
+} from "@/lib/assistant/types";
 import type { AssistantTeamMember } from "@/lib/assistant/team";
 import { ASSISTANT_MESSAGE_MAX_LENGTH } from "@/lib/assistant/schemas";
 
@@ -73,7 +79,12 @@ function ConversationLinks({
           <button
             type="button"
             aria-label={`Delete conversation: ${conversation.title}`}
-            onClick={() => onDelete(conversation)}
+            onClick={() => {
+              if (!window.confirm(`Delete "${conversation.title}"? This removes the conversation and its messages from this workspace.`)) {
+                return;
+              }
+              onDelete(conversation);
+            }}
             className="grid size-9 shrink-0 place-items-center rounded-md text-[var(--foreground)]/35 opacity-100 transition-colors hover:bg-[var(--surface)] hover:text-[var(--foreground)]/85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff] sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100"
           >
             <Trash2 size={14} aria-hidden="true" />
@@ -205,7 +216,7 @@ function ConversationPanel({
         setRetryRequest(null);
         setError(null);
     } catch {
-      setError("We couldn't generate a response. Please try again.");
+      setError("We couldn't generate a response. Your message is still available to retry.");
       setRetryRequest(request);
     } finally {
       sendingRef.current = false;
@@ -546,7 +557,12 @@ export function AssistantWorkspace({ conversations, initialConversation, pending
             {initialConversation && (
               <button
                 type="button"
-                onClick={() => requestDelete(initialConversation)}
+                onClick={() => {
+                  if (!window.confirm(`Delete "${initialConversation.title}"? This removes the conversation and its messages from this workspace.`)) {
+                    return;
+                  }
+                  requestDelete(initialConversation);
+                }}
                 aria-label="Delete this conversation"
                 className="inline-flex min-h-8 shrink-0 items-center gap-1.5 rounded px-2 text-xs text-[var(--foreground)]/40 hover:bg-[var(--surface)] hover:text-[var(--foreground)]/75 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff] md:hidden"
               >
