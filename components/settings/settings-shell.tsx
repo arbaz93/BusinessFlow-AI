@@ -5,7 +5,6 @@ import { Dialog } from "radix-ui";
 import { Menu, X } from "lucide-react";
 import { usePathname } from "next/navigation";
 
-import { ThemeToggle } from "@/components/theme-toggle";
 import { SettingsSidebar } from "@/components/settings/settings-sidebar";
 
 const settingsPageTitles: Record<string, string> = {
@@ -50,7 +49,6 @@ export function SettingsShell({
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <ThemeToggle />
           <button
             type="button"
             aria-label="Open settings navigation"
@@ -74,9 +72,9 @@ export function SettingsShell({
 
       <Dialog.Root open={drawerOpen} onOpenChange={setDrawerOpen}>
         <Dialog.Portal>
-          <Dialog.Overlay className="fixed inset-0 z-40 bg-[var(--background)]/70 md:hidden" />
+          <Dialog.Overlay className="fixed inset-0 z-40 pt-8  md:hidden" />
           <Dialog.Content
-            className="fixed inset-y-0 left-0 z-50 h-dvh w-72 max-w-[calc(100vw-1.5rem)] overflow-y-auto outline-none md:hidden"
+            className="fixed inset-y-0 left-0 z-50 h-dvh bg-[var(--background)]/95 px-4 pt-8 w-72 max-w-[calc(100vw-1.5rem)] overflow-y-auto outline-none md:hidden"
             style={{
               paddingTop: "max(1.25rem, env(safe-area-inset-top))",
               paddingBottom: "max(1.5rem, env(safe-area-inset-bottom))",
@@ -84,7 +82,7 @@ export function SettingsShell({
           >
             <Dialog.Title className="sr-only">Settings navigation</Dialog.Title>
             <div className="flex items-center justify-between pb-4">
-              <span className="text-sm font-semibold text-[var(--foreground)]">Settings</span>
+              <span className="text-lg font-semibold text-[var(--foreground)]">Settings</span>
               <Dialog.Close asChild>
                 <button
                   type="button"

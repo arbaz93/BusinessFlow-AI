@@ -233,9 +233,9 @@ export function ProjectsWorkspace({
                   <span>Due</span>
                   <span>Updated</span>
                 </div>
-                <div className="divide-y divide-[var(--line)] min-w-[800px] sm:min-w-0">
+                <div className="divide-y divide-[var(--line)] sm:min-w-0">
                   {visibleProjects.map((project) => (
-                    <Link key={project.id} href={`/projects/${project.id}`} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-2 px-3.5 py-3.5 transition-colors hover:bg-[var(--surface)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#a49bff] sm:px-4 lg:grid-cols-[minmax(200px,1.5fr)_minmax(140px,1fr)_110px_110px] xl:grid-cols-[minmax(200px,1.5fr)_minmax(150px,0.9fr)_minmax(130px,0.75fr)_110px_110px_110px] xl:gap-4">
+                    <Link key={project.id} href={`/projects/${project.id}`} className="grid grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-x-3 gap-y-2 px-3.5 py-3.5 transition-colors hover:bg-[var(--surface)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#a49bff] sm:px-4 lg:grid-cols-[minmax(200px,1.5fr)_minmax(140px,1fr)_110px_110px] xl:grid-cols-[minmax(200px,1.5fr)_minmax(150px,0.9fr)_minmax(130px,0.75fr)_110px_110px_110px] xl:gap-4">
                       <span className="flex min-w-0 items-center gap-3">
                         <span className="grid size-9 shrink-0 place-items-center rounded-lg border border-[var(--accent)]/20 bg-[var(--accent)]/10 text-[11px] font-semibold text-[var(--accent-muted)]"><FolderKanban size={16} /></span>
                         <span className="min-w-0">

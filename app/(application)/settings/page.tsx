@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { LucideIcon } from "lucide-react";
-import { Building2, DeleteIcon, Lock, User } from "lucide-react";
+import { Building2, DeleteIcon, Lock, User, Users2 } from "lucide-react";
 
 type SettingCard = {
   href: string;
@@ -16,6 +16,12 @@ const cards: SettingCard[] = [
     label: "Workspace",
     description: "Name, business type, and workspace identity.",
     icon: Building2,
+  },
+    {
+    href: "/settings/members",
+    label: "Members",
+    description: "Manage your workspace membership and permissions.",
+    icon: Users2,
   },
   {
     href: "/settings/profile",

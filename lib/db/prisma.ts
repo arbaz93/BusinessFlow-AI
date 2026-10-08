@@ -1,18 +1,19 @@
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "@/app/generated/prisma/client";
+import { getServerEnv } from "@/lib/env";
 
 const globalForPrisma = globalThis as unknown as {
   prisma?: PrismaClient;
 };
 
 function createPrismaClient() {
-  const connectionString = process.env.DATABASE_URL;
+  const { DATABASE_URL } = getServerEnv();
 
-  if (!connectionString) {
+  if (!DATABASE_URL) {
     throw new Error("DATABASE_URL is required before creating a Prisma client.");
   }
 
-  const adapter = new PrismaPg({ connectionString });
+  const adapter = new PrismaPg({ connectionString: DATABASE_URL });
   return new PrismaClient({ adapter });
 }
 

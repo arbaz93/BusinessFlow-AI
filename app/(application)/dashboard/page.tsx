@@ -22,7 +22,7 @@ import { activeProjectStatuses, DUE_SOON_DAYS, endOfToday, getProjectTimelineSta
 import { taskPriorityLabels, taskPriorityTone, taskStatusLabels, taskStatusTone } from "@/lib/tasks/options";
 import { getDashboardTaskData } from "@/lib/tasks/dashboard-data";
 import { formatTaskDueDate } from "@/lib/tasks/timeline";
-import { getProjectAIAnalysisState } from "@/lib/project-ai/persistence";
+import { getProjectAIAnalysisStatesBatch } from "@/lib/project-ai/persistence";
 
 const timelineAttentionTone: Record<TimelineState, string> = {
   not_started: "border-[var(--line)] bg-[var(--surface)] text-[var(--muted)]",
@@ -199,17 +199,12 @@ export default async function DashboardPage() {
     taskData = { status: "error" };
   }
 
-  const projectAIStates = await Promise.all(activeProjects.map(async (project) => {
-    try {
-      return { projectId: project.id, state: await getProjectAIAnalysisState(project.id) };
-    } catch (error) {
-      console.error("Dashboard project AI state query failed.", {
-        projectId: project.id,
-        errorName: error instanceof Error ? error.name : "UnknownError",
-      });
-      return { projectId: project.id, state: null };
-    }
-  }));
+  const projectAIStates = activeProjects.length
+    ? await getProjectAIAnalysisStatesBatch(
+        activeProjects.map((p) => p.id),
+        organization.id,
+      )
+    : new Map();
 
   const firstName = profile.name.trim().split(/\s+/)[0] || null;
   const greeting = getGreeting();
@@ -558,11 +553,10 @@ export default async function DashboardPage() {
             </Link>
           </div>
 
-            {projectAIStates.length ? (
+            {projectAIStates.size ? (
               <ul className="space-y-2">
-                {projectAIStates.map(({ projectId, state }) => {
-                  const project = activeProjects.find((item) => item.id === projectId);
-                  if (!project) return null;
+                {activeProjects.map((project) => {
+                  const state = projectAIStates.get(project.id);
                   const statusLabel = !state
                     ? "AI status unavailable"
                     : state.status === "COMPLETED" && state.analysisIsCurrent
@@ -580,9 +574,9 @@ export default async function DashboardPage() {
                                 : "Analysis needs attention";
 
                   return (
-                    <li key={projectId}>
+                    <li key={project.id}>
                       <Link
-                        href={`/projects/${projectId}/ai`}
+                        href={`/projects/${project.id}/ai`}
                         className="flex min-h-12 items-center justify-between gap-3 rounded-lg border border-[var(--line)] bg-[var(--surface)] px-3 py-2 transition-colors hover:border-[var(--line-strong)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8b5cf6]"
                       >
                         <span className="min-w-0">

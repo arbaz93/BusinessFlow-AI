@@ -91,12 +91,12 @@ export function ClientsWorkspace({ clients, deletionComplete, loadError }: { cli
                 <div className="hidden min-w-[900px] grid-cols-[minmax(200px,1.35fr)_minmax(150px,1fr)_minmax(160px,1fr)_112px_145px_118px] gap-4 border-b border-[var(--line)] bg-[var(--surface)] px-4 py-3 text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--muted)] xl:grid">
                   <span>Client</span><span>Company</span><span>Email</span><span>Status</span><span>Last Activity</span><span>Created</span>
                 </div>
-                <div className="divide-y divide-[var(--line)] min-w-[900px] sm:min-w-0">
+                <div className="divide-y divide-[var(--line)]  sm:min-w-0">
                   {visibleClients.map((client) => (
-                    <Link key={client.id} href={`/clients/${client.id}`} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-2 px-3.5 py-3.5 transition-colors hover:bg-[var(--surface)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#a49bff] sm:px-4 lg:grid-cols-[minmax(200px,1.4fr)_minmax(160px,1fr)_112px_145px] xl:grid-cols-[minmax(200px,1.35fr)_minmax(150px,1fr)_minmax(160px,1fr)_112px_145px_118px] xl:gap-4">
-                      <span className="flex min-w-0 items-center gap-3">
-                        <span className="grid size-9 shrink-0 place-items-center rounded-lg border border-[#3b82f6]/20 bg-[var(--info-surface)] text-[11px] font-semibold text-[var(--info-line)]">{initials(client.name)}</span>
-                        <span className="min-w-0">
+                    <Link key={client.id} href={`/clients/${client.id}`} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-2 px-3.5 py-3.5 transition-colors hover:bg-[var(--surface)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#a49bff] sm:px-4 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] lg:grid-cols-[minmax(200px,1.4fr)_minmax(160px,1fr)_112px_145px] xl:grid-cols-[minmax(200px,1.35fr)_minmax(150px,1fr)_minmax(160px,1fr)_112px_145px_118px] xl:gap-4">
+                      <span className="flex w-min items-center gap-3">
+                        <span className="grid size-10 shrink-0 place-items-center rounded-lg border border-[var(--accent)]/20 bg-[var(--accent)]/10 text-xs font-semibold text-[var(--accent-muted)]">{initials(client.name)}</span>
+                        <span>
                           <span className="block truncate text-sm font-semibold text-[var(--foreground)]">{client.name}</span>
                           <span className="mt-0.5 block truncate text-xs text-[var(--muted)] xl:hidden">{client.company || client.email || "Individual client"}</span>
                         </span>

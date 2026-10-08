@@ -89,7 +89,9 @@ export function WorkspaceNavigation({
                     compact ? "justify-center px-0" : "gap-3 px-3"
                   } ${
                     active
-                      ? "bg-[var(--panel)] text-[var(--foreground)] before:-mr-px before:h-5 before:w-0.5 before:rounded-full before:bg-[#a49bff]"
+                      ? `bg-[var(--panel)] text-[var(--foreground)] before:-mr-px before:h-5 before:w-0.5 before:rounded-full${
+                          compact ? "" : " before:bg-[#a49bff]"
+                        }`
                       : "text-[var(--muted)] hover:bg-[var(--surface)] hover:text-[var(--foreground)]"
                   }`}
                 >

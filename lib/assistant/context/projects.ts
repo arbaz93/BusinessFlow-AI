@@ -73,15 +73,15 @@ export async function getAssistantProjectDetail(
       return null;
     }
 
-    const [taskCount, completedTaskCount, openTaskCount] = await Promise.all([
-      prisma.task.count({ where: { organizationId, projectId: project.id } }),
-      prisma.task.count({
-        where: { organizationId, projectId: project.id, status: "COMPLETED" },
-      }),
-      prisma.task.count({
-        where: { organizationId, projectId: project.id, status: { in: ["TODO", "IN_PROGRESS", "BLOCKED"] } },
-      }),
-    ]);
+    const statusCounts = await prisma.task.groupBy({
+      by: ["status"],
+      where: { organizationId, projectId: project.id },
+      _count: { _all: true },
+    });
+    const countByStatus = Object.fromEntries(statusCounts.map((g) => [g.status, g._count._all]));
+    const taskCount = Object.values(countByStatus).reduce((sum, n) => sum + n, 0);
+    const completedTaskCount = countByStatus.COMPLETED ?? 0;
+    const openTaskCount = (countByStatus.TODO ?? 0) + (countByStatus.IN_PROGRESS ?? 0) + (countByStatus.BLOCKED ?? 0);
 
     return {
       projectId: project.id,

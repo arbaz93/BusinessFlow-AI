@@ -17,7 +17,7 @@ export function ProjectWorkspaceTabs({ projectId }: { projectId: string }) {
 
   return (
     <nav aria-label="Project workspace tabs" className="border-b border-[var(--line)]">
-      <div className="-mb-px flex gap-1 overflow-x-auto">
+      <div className="-mb-px flex gap-1 flex-wrap">
         {tabs.map(({ suffix, label, icon: Icon }) => {
           const href = `${baseHref}${suffix}`;
           const active = suffix ? pathname === href || pathname.startsWith(`${href}/`) : pathname === href;

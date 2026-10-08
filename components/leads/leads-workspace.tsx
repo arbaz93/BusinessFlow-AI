@@ -109,7 +109,7 @@ export function LeadsWorkspace({
               className="h-10 border-[var(--line)] bg-[var(--surface)] pl-9 text-sm text-[var(--foreground)] placeholder:text-[var(--muted)] focus-visible:border-[#a49bff] focus-visible:ring-[#a49bff]/20 dark:bg-[var(--surface)]"
             />
           </div>
-          <div className="flex max-w-full gap-1 overflow-x-auto pb-0.5" role="group" aria-label="Filter leads by status">
+          <div className="flex max-w-full flex-wrap gap-1 pb-0.5" role="group" aria-label="Filter leads by status">
             {filters.map((filter) => {
               const count = filter.value === "ALL" ? leads.length : leads.filter((lead) => lead.status === filter.value).length;
               const active = statusFilter === filter.value;

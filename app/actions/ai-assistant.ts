@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { Prisma } from "@/app/generated/prisma/client";
 import { requireOrganization } from "@/lib/auth/dal";
 import { prisma } from "@/lib/db/prisma";
-import { env } from "@/lib/env";
+import { getServerEnv } from "@/lib/env";
 import { createAssistantConversationTitle } from "@/lib/assistant/context";
 import { generateAssistantResponse } from "@/lib/assistant/generate-response";
 import { resolveAssistantContext } from "@/lib/assistant/context/resolver";
@@ -337,9 +337,10 @@ export async function submitAssistantMessage(rawInput: unknown): Promise<Assista
       contextResult.context.project
     ) {
       const project = contextResult.context.project;
+      const { GEMINI_API_KEY, GEMINI_MODEL } = getServerEnv();
       const draft = await generateTaskProposalDraft(
-        env.GEMINI_API_KEY ?? "",
-        env.GEMINI_MODEL,
+        GEMINI_API_KEY ?? "",
+        GEMINI_MODEL,
         content,
         contextResult.context,
         serverDate,
@@ -750,7 +751,8 @@ export async function getAssistantPendingProposals(conversationId: string): Prom
 }
 
 export async function cancelAssistantTaskProposal(previousState: ProposalFormState | undefined, formData: FormData): Promise<ProposalFormState> {
-  const { organization } = await requireOrganization();  const proposalId = formData.get("proposalId");
+  const { organization } = await requireOrganization();
+  const proposalId = formData.get("proposalId");
   if (typeof proposalId !== "string" || !proposalId.trim()) {
     return { success: false, error: "Missing proposal reference." };
   }

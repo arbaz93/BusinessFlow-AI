@@ -2,6 +2,7 @@ import "server-only";
 
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 import { getSupabaseAdminClient } from "@/lib/supabase/admin";
+import { getPublicEnv, getServerEnv } from "@/lib/env";
 
 export type InvitationEmailResult =
   | { status: "sent" }
@@ -20,11 +21,10 @@ export async function sendInvitationEmail(
   email: string,
   redirectTo: string,
 ): Promise<InvitationEmailResult> {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const publishableKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const { NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY } = getPublicEnv();
+  const { SUPABASE_SERVICE_ROLE_KEY } = getServerEnv();
 
-  if (!supabaseUrl || !publishableKey || !serviceRoleKey) {
+  if (!NEXT_PUBLIC_SUPABASE_URL || !NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || !SUPABASE_SERVICE_ROLE_KEY) {
     return { status: "unavailable" };
   }
 
@@ -44,7 +44,7 @@ export async function sendInvitationEmail(
       return { status: "failed" };
     }
 
-    const client = createSupabaseClient(supabaseUrl, publishableKey, {
+    const client = createSupabaseClient(NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY, {
       auth: { persistSession: false, autoRefreshToken: false },
     });
     const { error: signInError } = await client.auth.signInWithOtp({

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { LucideIcon } from "lucide-react";
-import { Building2, Lock, Trash2, User } from "lucide-react";
+import { Building2, Lock, Trash2, User, Users2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 type SettingsNavItem = {
@@ -23,7 +23,7 @@ const navigationGroups: SettingsNavGroup[] = [
     label: "General",
     items: [
       { href: "/settings/workspace", label: "Workspace", icon: Building2 },
-      { href: "/settings/members", label: "Members", icon: User },
+      { href: "/settings/members", label: "Members", icon: Users2 },
       { href: "/settings/profile", label: "Profile", icon: User },
     ],
   },

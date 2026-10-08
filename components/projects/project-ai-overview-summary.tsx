@@ -1,9 +1,8 @@
 "use client";
 
-import { useActionState } from "react";
 import Link from "next/link";
 import { AlertTriangle, ArrowUpRight, FileText, LoaderCircle, Sparkles } from "lucide-react";
-import { analyzeProjectBriefAction } from "@/app/actions/project-ai";
+import { useProjectAIAnalysisRequest } from "@/components/projects/use-project-ai-analysis-request";
 import type { ProjectAIAnalysisState } from "@/lib/project-ai/persistence";
 import { getProjectAIOverviewData } from "@/lib/project-ai/overview";
 
@@ -19,7 +18,7 @@ function ViewAIIntelligenceLink({
   return (
     <Link
       href={`/projects/${projectId}/ai${anchor}`}
-      className="inline-flex min-h-8 items-center gap-1 rounded-sm text-xs font-medium text-[var(--accent-muted)] hover:text-[var(--foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff]"
+      className="inline-flex min-h-8 items-center gap-1 rounded-sm text-xs font-medium text-[var(--accent-muted)] hover:text-[var(--foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-muted)]"
     >
       {children} <ArrowUpRight size={13} aria-hidden="true" />
     </Link>
@@ -30,7 +29,7 @@ function DocumentLink({ projectId, children = "View Document" }: { projectId: st
   return (
     <Link
       href={`/projects/${projectId}/documents`}
-      className="inline-flex min-h-8 items-center gap-1 rounded-sm text-xs font-medium text-[var(--foreground)]/60 hover:text-[var(--foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff]"
+      className="inline-flex min-h-8 items-center gap-1 rounded-sm text-xs font-medium text-[var(--foreground)]/60 hover:text-[var(--foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-muted)]"
     >
       <FileText size={13} aria-hidden="true" />
       {children}
@@ -47,7 +46,12 @@ function AnalyzeProjectForm({
   initialState: ProjectAIAnalysisState;
   label: string;
 }) {
-  const [state, formAction, isPending] = useActionState(analyzeProjectBriefAction, initialState);
+  const state = initialState;
+  const { isPending, isProcessing, requestError, startAnalysis } = useProjectAIAnalysisRequest({
+    projectId,
+    routePath: `/projects/${projectId}`,
+    status: state.status,
+  });
   const currentAnalysis = state.status === "COMPLETED" && state.analysis && state.analysisIsCurrent
     ? state.analysis
     : null;
@@ -55,8 +59,6 @@ function AnalyzeProjectForm({
   const isStale = state.status === "STALE";
   const sourceUnavailable = state.status === "SOURCE_MISSING";
   const noBrief = state.status === "NO_BRIEF" || (!state.primaryBrief && state.status !== "SOURCE_MISSING");
-  const isProcessing = isPending || state.status === "PROCESSING";
-
   if (noBrief) {
     return (
       <div className="mt-4">
@@ -76,11 +78,12 @@ function AnalyzeProjectForm({
   if (isProcessing) {
     return (
       <div className="mt-4 space-y-3">
-        <p role="status" aria-live="polite" className="flex items-center gap-2 text-sm text-[#d2ccff]">
+        <p role="status" aria-live="polite" className="flex items-center gap-2 text-sm text-[var(--accent-muted)]">
           <LoaderCircle size={15} className="animate-spin" aria-hidden="true" />
           Analyzing Project Brief...
         </p>
         <p className="text-xs text-[var(--foreground)]/50">Your previous analysis, Tasks, and Documents remain available while analysis runs.</p>
+        {requestError && <p role="alert" className="text-xs text-[var(--danger)]">{requestError}</p>}
         <ViewAIIntelligenceLink projectId={projectId}>Open AI Intelligence</ViewAIIntelligenceLink>
       </div>
     );
@@ -89,12 +92,12 @@ function AnalyzeProjectForm({
   if (sourceUnavailable) {
     return (
       <div className="mt-4">
-        <p role="status" className="text-sm font-medium text-[#fbbf24]">AI analysis source unavailable</p>
+        <p role="status" className="text-sm font-medium text-[var(--warning)]">AI analysis source unavailable</p>
         <p className="mt-1 text-xs leading-5 text-[var(--foreground)]/55">The brief used for this analysis is no longer available.</p>
         <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1">
           <DocumentLink projectId={projectId}>Go to Documents</DocumentLink>
           {state.primaryBrief && (
-            <form action={formAction}>
+            <form onSubmit={startAnalysis}>
               <input type="hidden" name="projectId" value={projectId} />
               <button type="submit" disabled={isPending} className="inline-flex min-h-8 items-center gap-1 text-xs font-medium text-[var(--accent-muted)] hover:text-[var(--foreground)] disabled:opacity-60">
                 {isPending && <LoaderCircle size={13} className="animate-spin" aria-hidden="true" />}
@@ -102,6 +105,7 @@ function AnalyzeProjectForm({
               </button>
             </form>
           )}
+          {requestError && <p role="alert" className="text-xs text-[var(--danger)]">{requestError}</p>}
           {state.analysis && <ViewAIIntelligenceLink projectId={projectId} anchor="#saved-analysis">View Previous Analysis</ViewAIIntelligenceLink>}
           {state.primaryBrief && (
             <p className="mt-2 text-[11px] leading-5 text-[var(--foreground)]/45">
@@ -116,10 +120,10 @@ function AnalyzeProjectForm({
   if (isStale) {
     return (
       <div className="mt-4 space-y-3">
-        <div role="status" aria-live="polite" className="flex items-start gap-2 rounded-md border border-[#f59e0b]/20 bg-[#f59e0b]/[0.04] p-3">
-          <AlertTriangle size={15} className="mt-0.5 shrink-0 text-[#fbbf24]" aria-hidden="true" />
+        <div role="status" aria-live="polite" className="flex items-start gap-2 rounded-md border border-[var(--warning-border)]/25 bg-[var(--warning-surface)]/20 p-3">
+          <AlertTriangle size={15} className="mt-0.5 shrink-0 text-[var(--warning)]" aria-hidden="true" />
           <div>
-            <p className="text-sm font-medium text-[#fbbf24]">AI analysis needs updating</p>
+            <p className="text-sm font-medium text-[var(--warning)]">AI analysis needs updating</p>
             <p className="mt-1 text-xs leading-5 text-[var(--foreground)]/55">
               {state.analysisStaleReason === "SOURCE_UPDATED"
                 ? "The primary Project Brief was updated after this analysis was created."
@@ -134,13 +138,14 @@ function AnalyzeProjectForm({
           </div>
         </div>
         <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-          <form action={formAction}>
+          <form onSubmit={startAnalysis}>
             <input type="hidden" name="projectId" value={projectId} />
-            <button type="submit" disabled={isPending} className="inline-flex min-h-9 items-center gap-2 rounded-md bg-[#a49bff] px-3 text-xs font-medium text-[#101018] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#c4b5fd] disabled:opacity-60">
+            <button type="submit" disabled={isPending} className="inline-flex min-h-9 items-center gap-2 rounded-md bg-[var(--accent-muted)] px-3 text-xs font-medium text-[var(--background)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-muted)] disabled:opacity-60">
               {isPending && <LoaderCircle size={13} className="animate-spin" aria-hidden="true" />}
               {isPending ? "Analyzing..." : "Analyze Updated Brief"}
             </button>
           </form>
+          {requestError && <p role="alert" className="text-xs text-[var(--danger)]">{requestError}</p>}
           <DocumentLink projectId={projectId}>View Current Brief</DocumentLink>
           <ViewAIIntelligenceLink projectId={projectId} anchor="#saved-analysis">View Previous Analysis</ViewAIIntelligenceLink>
         </div>
@@ -154,20 +159,21 @@ function AnalyzeProjectForm({
   if (state.status === "FAILED") {
     return (
       <div className="mt-4 space-y-3">
-        <p role="alert" className="text-sm text-[#fbbf24]">
+        <p role="alert" className="text-sm text-[var(--danger)]">
           {state.errorMessage ?? "AI analysis could not be completed. Please try again."}
         </p>
         {state.analysis && (
           <p className="text-xs text-[var(--foreground)]/45">The latest attempt failed. Your previous successful analysis remains available.</p>
         )}
         <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-          <form action={formAction}>
+          <form onSubmit={startAnalysis}>
             <input type="hidden" name="projectId" value={projectId} />
-            <button type="submit" disabled={isPending} className="inline-flex min-h-9 items-center gap-2 rounded-md bg-[#a49bff] px-3 text-xs font-medium text-[#101018] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#c4b5fd] disabled:opacity-60">
+            <button type="submit" disabled={isPending} className="inline-flex min-h-9 items-center gap-2 rounded-md bg-[var(--accent-muted)] px-3 text-xs font-medium text-[var(--background)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-muted)] disabled:opacity-60">
               {isPending && <LoaderCircle size={13} className="animate-spin" aria-hidden="true" />}
               {isPending ? "Analyzing..." : "Try Again"}
             </button>
           </form>
+          {requestError && <p role="alert" className="text-xs text-[var(--danger)]">{requestError}</p>}
           {state.analysis && <ViewAIIntelligenceLink projectId={projectId} anchor="#saved-analysis">View Previous Analysis</ViewAIIntelligenceLink>}
         </div>
       </div>
@@ -181,16 +187,17 @@ function AnalyzeProjectForm({
         <p className="text-xs leading-5 text-[var(--foreground)]/50">Analyze the primary brief to identify requirements, risks, and suggested work.</p>
         <p className="text-[11px] text-[var(--foreground)]/45">Primary brief: {state.primaryBrief?.originalName}</p>
         <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-          <form action={formAction}>
+          <form onSubmit={startAnalysis}>
             <input type="hidden" name="projectId" value={projectId} />
-            <button type="submit" disabled={isPending} className="inline-flex min-h-9 items-center gap-2 rounded-md bg-[#a49bff] px-3 text-xs font-medium text-[#101018] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#c4b5fd] disabled:opacity-60">
+            <button type="submit" disabled={isPending} className="inline-flex min-h-9 items-center gap-2 rounded-md bg-[var(--accent-muted)] px-3 text-xs font-medium text-[var(--background)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-muted)] disabled:opacity-60">
               {isPending && <LoaderCircle size={13} className="animate-spin" aria-hidden="true" />}
               {isPending ? "Analyzing..." : label}
             </button>
           </form>
+          {requestError && <p role="alert" className="text-xs text-[var(--danger)]">{requestError}</p>}
           <DocumentLink projectId={projectId} />
         </div>
-        {state.errorMessage && <p role="alert" className="text-xs text-[#fca5a5]">{state.errorMessage}</p>}
+        {state.errorMessage && <p role="alert" className="text-xs text-[var(--danger)]">{state.errorMessage}</p>}
       </div>
     );
   }
@@ -227,7 +234,7 @@ function AnalyzeProjectForm({
       {(overview.highRiskCount > 0 || overview.missingInformationCount > 0 || overview.pendingSuggestionCount > 0) && (
         <div className="space-y-2 border-t border-[var(--line)] pt-3">
           {overview.highRiskCount > 0 && (
-            <p className="text-xs text-[#fbbf24]">
+            <p className="text-xs text-[var(--warning)]">
               <span className="font-medium">{riskLabel}</span> <span className="text-[var(--foreground)]/45">· AI-identified; review before acting.</span>
             </p>
           )}
@@ -275,7 +282,7 @@ export function ProjectAIOverviewSummary({
   return (
     <section className="rounded-[10px] border border-[var(--line)] bg-[var(--panel)] p-4 sm:p-5" aria-labelledby="project-ai-intelligence">
       <div className="flex items-start gap-3">
-        <span className="grid size-8 shrink-0 place-items-center rounded-md border border-[#a49bff]/20 bg-[#a49bff]/[0.06] text-[var(--accent-muted)]">
+        <span className="grid size-8 shrink-0 place-items-center rounded-md border border-[var(--accent-muted)]/20 bg-[var(--accent-muted)]/[0.06] text-[var(--accent-muted)]">
           <Sparkles size={15} aria-hidden="true" />
         </span>
         <div className="min-w-0 flex-1">

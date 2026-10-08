@@ -37,15 +37,19 @@ cp .env.local.example .env.local
 
 Configure these values before using authentication or database-backed routes:
 
-- `DATABASE_URL`: PostgreSQL connection string used by the application runtime
-- `DIRECT_URL`: PostgreSQL connection used by Prisma CLI migrations
+- `DATABASE_URL`: PostgreSQL connection string used by the application runtime (session pooler, port 6543)
+- `DIRECT_URL`: PostgreSQL connection used by Prisma CLI migrations (direct, port 5432)
 - `NEXT_PUBLIC_SITE_URL`: canonical application URL used for authentication confirmation links (for example, `http://localhost:3000`)
 - `NEXT_PUBLIC_SUPABASE_URL`: Supabase project URL
 - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`: Supabase publishable key
 - `SUPABASE_SERVICE_ROLE_KEY`: Supabase service-role key required for private document uploads and signed URLs
+- `GEMINI_API_KEY`: Google Gemini API key for AI Project Intelligence and Assistant
+- `GEMINI_MODEL`: Gemini model name (default: `gemini-2.5-flash`)
 - `WORKSPACE_INVITATION_EXPIRY_DAYS`: optional invitation link lifetime from 1 to 90 days (defaults to 7)
 
 Do not commit `.env.local` or any credentials. In Supabase Auth settings, enable email/password sign-in and allow `${NEXT_PUBLIC_SITE_URL}/auth/callback` and `${NEXT_PUBLIC_SITE_URL}/auth/callback/invitations/**` as redirect URLs. Invitation email is submitted through Supabase Auth when the server-side service-role key is configured and Supabase email delivery is available; otherwise owners can copy and share the generated invitation link. Set `NEXT_PUBLIC_SITE_URL` to your app origin (for example, `http://localhost:3000` locally or `https://your-domain.example` in production). For project documents, create a private storage bucket named `project-documents` in Supabase and keep the bucket private.
+
+See [DEPLOYMENT.md](DEPLOYMENT.md) for complete production deployment instructions.
 
 ## Development
 
@@ -62,11 +66,73 @@ Prisma is configured for PostgreSQL in `prisma/schema.prisma`. It defines applic
 After setting both database URLs, apply the initial schema and generate the client:
 
 ```bash
-npx prisma generate
-npx prisma migrate deploy
+npm run db:generate
+npm run db:migrate:deploy
 ```
 
-For local schema changes, use `npx prisma migrate dev --name <migration-name>`.
+For local schema changes, use `npm run db:migrate:dev -- --name <migration-name>`.
+
+### Migration Commands
+
+| Command | Purpose | Environment |
+|---------|---------|-------------|
+| `npm run db:migrate:dev -- --name <name>` | Create + apply migration | Development |
+| `npm run db:migrate:deploy` | Apply reviewed migrations | Production/CI |
+| `npm run db:migrate:status` | Check applied/pending migrations | Any |
+| `npm run db:migrate:diff` | Check schema/migration drift | Development |
+| `npm run db:validate` | Validate Prisma schema syntax | Any |
+| `npm run db:health` | Full health check (connectivity, migrations, tenant integrity, Prisma) | Any |
+
+### Development Seed Data
+
+BusinessFlow includes a deterministic seed script that populates a local development database with realistic demo data across all business modules (Leads, Clients, Projects, Tasks, Documents, AI analysis, Activity, and Assistant conversations).
+
+**Production safety:** The seed script performs a multi-layer environment check and will refuse to run against production databases. It checks `NODE_ENV`, Vercel environment metadata, and database URL heuristics. Production deployments never invoke the seed script automatically.
+
+#### Running the Seed
+
+```bash
+npm run db:seed
+```
+
+This creates a demo workspace named "Demo Workspace" with:
+
+- 6 Leads across all statuses (NEW, CONTACTED, QUALIFIED, PROPOSAL_SENT, WON, LOST)
+- 3 Clients (2 ACTIVE, 1 INACTIVE)
+- 5 Projects covering all statuses (PLANNING, IN_PROGRESS, ON_HOLD, COMPLETED, CANCELLED)
+- 6 Tasks covering different states (overdue, in-progress, blocked, completed, no due date, upcoming)
+- 3 Documents (Project Briefs and design assets)
+- 1 AI analysis with feedback
+- 10 Activity records following the canonical Activity system
+- 1 AI Assistant conversation with 4 messages
+
+**Demo Auth users:** The seed script creates application-level User records with synthetic `authUserId` values. To use the demo workspace, you must manually create matching Supabase Auth users in the Supabase Dashboard:
+
+- **Owner:** `demo-owner@example.test` / `DemoPass123!` (authUserId: `demo_owner_auth_uid`)
+- **Member:** `demo-member@example.test` / `DemoPass123!` (authUserId: `demo_member_auth_uid`)
+
+**Important:** Demo data is clearly synthetic and uses `.example.test` domains. It is never committed with real customer data.
+
+#### Resetting the Development Database
+
+To wipe all data and re-seed from scratch:
+
+```bash
+npm run db:reset-dev
+```
+
+This is a **destructive** operation that only runs against local databases. It will refuse to run against any remote Supabase project.
+
+#### Environment Separation
+
+- **Development:** Local database — seed is allowed
+- **Test:** Test database/fixtures — seed is allowed, test fixtures are separate from demo data
+- **Preview/Staging:** Seed is not invoked automatically during Vercel deployment
+- **Production:** Seed is blocked by environment guards; production build never runs seed
+
+#### Test Fixtures vs Demo Data
+
+Automated tests use isolated in-memory fixtures and mocked data (see `tests/`). They do NOT depend on the demo seed data. Demo data is only for manual development and UI exploration.
 
 ## Project documents
 
@@ -104,6 +170,17 @@ npm run build
 - `public/`: static assets
 
 Auth helpers live in `lib/auth/`, Supabase clients in `lib/supabase/`, and protected application routes under `app/(application)/`.
+
+## Migration & Recovery
+
+See [docs/operations/recovery-runbook.md](docs/operations/recovery-runbook.md) for comprehensive migration and recovery procedures including:
+- Migration process and safety guidelines
+- Failed migration response
+- Database restoration procedures
+- Storage and Auth recovery considerations
+- Tenant integrity verification
+- Post-recovery smoke checks
+- Supabase backup/recovery capabilities
 
 ## Current Boundary
 

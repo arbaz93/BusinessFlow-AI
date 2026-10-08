@@ -16,11 +16,11 @@ function renderInline(text: string, keyPrefix: string) {
 
 export function AssistantMessageContent({ content }: { content: string }) {
   return (
-    <div className="space-y-3 break-words text-sm leading-7 text-[var(--muted)] [overflow-wrap:anywhere]">
+    <div className="space-y-3 break-words text-sm leading-7 text-[var(--foreground)]/85 [overflow-wrap:anywhere]">
       {parseAssistantMarkdown(content).map((block, index) => {
         if (block.type === "heading") {
           const className = block.level === 1
-            ? "text-lg font-semibold text-[var(--foreground)]"
+            ? "text-base font-semibold text-[var(--foreground)]"
             : block.level === 2
               ? "text-base font-semibold text-[var(--foreground)]"
               : "text-sm font-semibold text-[var(--foreground)]";
@@ -29,9 +29,9 @@ export function AssistantMessageContent({ content }: { content: string }) {
         if (block.type === "unordered-list" || block.type === "ordered-list") {
           const List = block.type === "unordered-list" ? "ul" : "ol";
           return (
-            <List key={index} className={`space-y-1 pl-6 ${block.type === "unordered-list" ? "list-disc" : "list-decimal"}`}>
+            <List key={index} className={`space-y-1 pl-5 ${block.type === "unordered-list" ? "list-disc" : "list-decimal"}`}>
               {block.items.map((item, itemIndex) => (
-                <li key={itemIndex} className="pl-1">{renderInline(item, `list-${index}-${itemIndex}`)}</li>
+                <li key={itemIndex} className="pl-1 leading-6 text-[var(--foreground)]/90">{renderInline(item, `list-${index}-${itemIndex}`)}</li>
               ))}
             </List>
           );
@@ -40,12 +40,11 @@ export function AssistantMessageContent({ content }: { content: string }) {
           return <pre key={index} className="max-w-full overflow-x-auto rounded-md border border-[var(--line)] bg-[var(--surface)] p-3 font-mono text-xs leading-5 text-[var(--foreground)]"><code>{block.text}</code></pre>;
         }
         return (
-          <p key={index} className="whitespace-pre-wrap">
+          <p key={index} className="whitespace-pre-wrap leading-7 text-[var(--foreground)]/85">
             {block.lines.map((line, lineIndex) => (
               <Fragment key={lineIndex}>
                 {lineIndex > 0 && <br />}
-                {renderInline(line, `paragraph-${index}-${lineIndex}`)}
-              </Fragment>
+                {renderInline(line, `paragraph-${index}-${lineIndex}`)}</Fragment>
             ))}
           </p>
         );
@@ -53,4 +52,3 @@ export function AssistantMessageContent({ content }: { content: string }) {
     </div>
   );
 }
-

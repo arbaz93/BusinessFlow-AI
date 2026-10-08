@@ -1,12 +1,12 @@
 import "server-only";
 
-import { env } from "@/lib/env";
 import { extractProjectBriefContent, getPrimaryProjectBriefForAnalysis } from "@/lib/project-ai/brief-content";
 import { getGeminiCandidateText, mapGeminiError, normalizeGeminiJsonResponse } from "@/lib/project-ai/response";
 import { projectIntelligenceProviderSchema, type AnalyzeProjectBriefResult } from "@/lib/project-ai/schemas";
 import { getProjectWorkspace } from "@/lib/projects/workspace";
 import { buildProjectIntelligencePrompt } from "@/lib/project-ai/prompt";
 import { requestGeminiAnalysis } from "@/lib/project-ai/gemini-provider";
+import { getServerEnv } from "@/lib/env";
 
 export async function analyzeProjectBrief(projectId: string, expectedDocumentId?: string): Promise<AnalyzeProjectBriefResult> {
   const { project } = await getProjectWorkspace(projectId);
@@ -20,9 +20,8 @@ export async function analyzeProjectBrief(projectId: string, expectedDocumentId?
     };
   }
 
-  const apiKey = env.GEMINI_API_KEY;
-  const modelName = env.GEMINI_MODEL;
-  if (!apiKey || !/^gemini-[A-Za-z0-9.-]+$/.test(modelName)) {
+  const { GEMINI_API_KEY, GEMINI_MODEL } = getServerEnv();
+  if (!GEMINI_API_KEY || !/^gemini-[A-Za-z0-9.-]+$/.test(GEMINI_MODEL)) {
     return {
       success: false,
       code: "AI_NOT_CONFIGURED",
@@ -57,8 +56,8 @@ export async function analyzeProjectBrief(projectId: string, expectedDocumentId?
   let response: Response;
   try {
     response = await requestGeminiAnalysis(
-      apiKey,
-      modelName,
+      GEMINI_API_KEY,
+      GEMINI_MODEL,
       buildProjectIntelligencePrompt({
         projectName: project.name,
         clientName: project.client.company || project.client.name,
@@ -71,7 +70,7 @@ export async function analyzeProjectBrief(projectId: string, expectedDocumentId?
     console.error("Gemini project analysis request failed.", {
       projectId,
       documentId: extraction.sourceDocumentId,
-      model: modelName,
+      model: GEMINI_MODEL,
       errorCode: timedOut ? "AI_TIMEOUT" : "AI_PROVIDER_UNAVAILABLE",
       errorName: error instanceof Error ? error.name : "UnknownError",
       durationMs: Date.now() - startedAt,
@@ -92,7 +91,7 @@ export async function analyzeProjectBrief(projectId: string, expectedDocumentId?
     console.error("Gemini project analysis failed.", {
       projectId,
       documentId: extraction.sourceDocumentId,
-      model: modelName,
+      model: GEMINI_MODEL,
       status: response.status,
       code: errorEntry.code,
       durationMs: Date.now() - startedAt,
@@ -115,7 +114,7 @@ export async function analyzeProjectBrief(projectId: string, expectedDocumentId?
       console.error("Gemini response body could not be read.", {
         projectId,
         documentId: extraction.sourceDocumentId,
-        model: modelName,
+        model: GEMINI_MODEL,
         errorCode: timedOut ? "AI_TIMEOUT" : "AI_INVALID_RESPONSE",
         errorName: error instanceof Error ? error.name : "UnknownError",
         durationMs: Date.now() - startedAt,
@@ -147,7 +146,7 @@ export async function analyzeProjectBrief(projectId: string, expectedDocumentId?
       sourceDocumentId: extraction.sourceDocumentId,
       sourceDocumentName: extraction.sourceDocumentName,
       sourceDocumentUpdatedAt: extraction.sourceDocumentUpdatedAt,
-      model: modelName,
+      model: GEMINI_MODEL,
       sourceMetadata: {
         truncated: extraction.truncated,
         originalCharacterCount: extraction.originalCharacterCount,
@@ -158,7 +157,7 @@ export async function analyzeProjectBrief(projectId: string, expectedDocumentId?
     console.error("Gemini project analysis validation failed.", {
       projectId,
       documentId: extraction.sourceDocumentId,
-      model: modelName,
+      model: GEMINI_MODEL,
       durationMs: Date.now() - startedAt,
       truncated: extraction.truncated,
       characterCount: extraction.finalCharacterCount,

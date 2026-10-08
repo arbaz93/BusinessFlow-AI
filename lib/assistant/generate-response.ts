@@ -1,6 +1,5 @@
 import "server-only";
 
-import { env } from "@/lib/env";
 import { buildRecentAssistantContext, type AssistantContextMessage } from "@/lib/assistant/context";
 import {
   getAssistantErrorMessage,
@@ -14,6 +13,7 @@ import { ASSISTANT_RESPONSE_MAX_LENGTH } from "@/lib/assistant/schemas";
 import { requestGeminiAssistant } from "@/lib/project-ai/gemini-provider";
 import { buildAssistantSystemInstruction } from "@/lib/assistant/memory-context";
 import type { ResolvedAssistantContext } from "@/lib/assistant/context/types";
+import { getServerEnv } from "@/lib/env";
 
 export { buildAssistantSystemInstruction as buildSystemInstruction };
 
@@ -26,9 +26,8 @@ export async function generateAssistantResponse(
   diagnosticContext: { organizationId: string; conversationId: string; userId: string },
   options?: { trustedContext?: ResolvedAssistantContext; memorySummary?: string | null },
 ): Promise<GenerateAssistantResponseResult> {
-  const apiKey = env.GEMINI_API_KEY;
-  const modelName = env.GEMINI_MODEL;
-  if (!isAssistantConfigurationValid(apiKey, modelName)) {
+  const { GEMINI_API_KEY, GEMINI_MODEL } = getServerEnv();
+  if (!isAssistantConfigurationValid(GEMINI_API_KEY, GEMINI_MODEL)) {
     return { success: false, code: "AI_NOT_CONFIGURED", error: getAssistantErrorMessage("AI_NOT_CONFIGURED") };
   }
 
@@ -36,19 +35,19 @@ export async function generateAssistantResponse(
   const startedAt = Date.now();
   try {
     const response = await requestGeminiAssistant(
-      apiKey,
-      modelName,
+      GEMINI_API_KEY,
+      GEMINI_MODEL,
        buildAssistantSystemInstruction(options?.trustedContext, options?.memorySummary),
-      context.map((message) => ({
-        role: message.role === "ASSISTANT" ? "model" : "user",
-        parts: [{ text: message.content }],
-      })),
+    context.map((message) => ({
+      role: message.role === "ASSISTANT" ? "model" : "user",
+      parts: [{ text: message.content }],
+    })),
     );
     if (!response.ok) {
       const code = mapAssistantProviderStatus(response.status);
       console.error("AI Assistant provider request failed.", {
         ...diagnosticContext,
-        model: modelName,
+        model: GEMINI_MODEL,
         status: response.status,
         errorCode: code,
         durationMs: Date.now() - startedAt,
@@ -63,7 +62,7 @@ export async function generateAssistantResponse(
       const code = mapAssistantProviderException(error) === "AI_TIMEOUT" ? "AI_TIMEOUT" : "AI_INVALID_RESPONSE";
       console.error("AI Assistant provider response could not be read.", {
         ...diagnosticContext,
-        model: modelName,
+        model: GEMINI_MODEL,
         errorCode: code,
         errorName: error instanceof Error ? error.name : "UnknownError",
         durationMs: Date.now() - startedAt,
@@ -75,7 +74,7 @@ export async function generateAssistantResponse(
     if (!content || content.length > ASSISTANT_RESPONSE_MAX_LENGTH) {
       console.error("AI Assistant provider response failed validation.", {
         ...diagnosticContext,
-        model: modelName,
+        model: GEMINI_MODEL,
         errorCode: "AI_INVALID_RESPONSE",
         durationMs: Date.now() - startedAt,
       });
@@ -91,7 +90,7 @@ export async function generateAssistantResponse(
     const code: AssistantProviderErrorCode = mapAssistantProviderException(error);
     console.error("AI Assistant provider request could not be completed.", {
       ...diagnosticContext,
-      model: modelName,
+      model: GEMINI_MODEL,
       errorCode: code,
       errorName: error instanceof Error ? error.name : "UnknownError",
       durationMs: Date.now() - startedAt,

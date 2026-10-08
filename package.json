@@ -2,15 +2,27 @@
   "name": "businessflow-ai",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "prisma generate && next build",
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "test": "node --test --import ./tests/helpers/register.mjs \"tests/**/*.test.ts\"",
     "audit:storage": "node --import ./tests/helpers/register.mjs scripts/audit-project-document-storage.ts",
-    "db:generate": "prisma generate"
+    "db:generate": "prisma generate",
+    "db:migrate:dev": "prisma migrate dev",
+    "db:migrate:deploy": "prisma migrate deploy",
+    "db:migrate:status": "prisma migrate status",
+    "db:migrate:diff": "prisma migrate diff",
+    "db:validate": "prisma validate",
+    "db:seed": "node --import ./tests/helpers/register.mjs prisma/seed/main.ts",
+    "db:reset-dev": "node --import ./tests/helpers/register.mjs prisma/seed/reset.ts",
+    "db:health": "node --import ./tests/helpers/register.mjs scripts/db-health.ts",
+    "validate:env": "node -e \"require('./lib/env.ts'); console.log('Environment validation passed')\"",
+    "prisma:validate": "prisma validate",
+    "prebuild": "prisma generate"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.10.0",
@@ -43,5 +55,9 @@
     "prisma": "^7.10.0",
     "tailwindcss": "^4",
     "typescript": "^5"
+  },
+  "engines": {
+    "node": ">=20.9.0",
+    "npm": ">=10.0.0"
   }
 }

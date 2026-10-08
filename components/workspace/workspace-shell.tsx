@@ -13,6 +13,7 @@ import {
   LogOut,
   Menu,
   Settings2,
+  SparkleIcon,
   Sparkles,
   X,
 } from "lucide-react";
@@ -102,19 +103,19 @@ function WorkspaceSwitcher({
             type="button"
             aria-label={`Switch workspace, current workspace: ${organizationName}`}
             disabled={workspaces.length < 2}
-            className={`flex h-11 w-full items-center gap-2 rounded-lg border border-[var(--line)] bg-[var(--panel)] px-2 text-left outline-none transition-colors focus-visible:ring-2 focus-visible:ring-[#8b83f5] disabled:cursor-default ${
-              compact ? "justify-center" : "hover:bg-[var(--elevated)]"
+            className={`flex h-11 w-full items-center gap-2 rounded-lg border border-border bg-panel px-2 text-left outline-none transition-colors focus-visible:ring-2 focus-visible:ring-[#8b83f5] disabled:cursor-default ${
+              compact ? "justify-center" : "hover:bg-elevated"
             }`}
           >
-            <span className="grid size-8 shrink-0 place-items-center rounded-md bg-[var(--surface)] text-[var(--muted)]">
+            <span className="grid size-8 shrink-0 place-items-center rounded-md bg-surface text-muted">
               <Building2 size={16} />
             </span>
             {!compact && (
               <span className="flex min-w-0 flex-1 flex-col">
-                <span className="block text-[10px] font-semibold uppercase tracking-widest text-[var(--muted-foreground)]">
+                <span className="block text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
                   Workspace
                 </span>
-                <span className="truncate text-[13px] font-medium text-[var(--foreground)]">
+                <span className="truncate text-[13px] font-medium text-foreground">
                   {organizationName}
                 </span>
               </span>
@@ -122,7 +123,7 @@ function WorkspaceSwitcher({
             {workspaces.length > 1 && (
               <ChevronDown
                 size={15}
-                className={`shrink-0 text-[var(--muted-foreground)] ${compact ? "sr-only" : ""}`}
+                className={`shrink-0 text-muted-foreground ${compact ? "sr-only" : ""}`}
                 aria-hidden="true"
               />
             )}
@@ -263,7 +264,7 @@ function SidebarContents({
             compact ? "justify-center" : ""
           }`}
         >
-          <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-[var(--accent)] text-[var(--foreground)]">
+          <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-accent text-[#f4f4f5]">
             <Sparkles size={17} />
           </span>
           {!compact && <span className="truncate text-base font-semibold">BusinessFlow AI</span>}
@@ -318,6 +319,7 @@ export function WorkspaceShell({
 }: WorkspaceShellProps) {
   const pathname = usePathname();
   const { section, label } = getNavigationContext(pathname);
+  const isAssistantRoute = pathname === "/assistant";
   const [tabletExpanded, setTabletExpanded] = useState(false);
   const [mobileNavigationOpen, setMobileNavigationOpen] = useState(false);
 
@@ -326,7 +328,7 @@ export function WorkspaceShell({
       open={mobileNavigationOpen}
       onOpenChange={setMobileNavigationOpen}
     >
-      <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)]">
+      <div className={`${isAssistantRoute ? "h-dvh overflow-hidden" : "min-h-screen"} bg-[var(--background)] text-[var(--foreground)]`}>
         <a href="#main-content" className="skip-link">
           Skip to main content
         </a>
@@ -384,11 +386,11 @@ export function WorkspaceShell({
         </Dialog.Portal>
 
         <div
-          className={`transition-[padding] duration-200 motion-reduce:transition-none ${
+          className={`${isAssistantRoute ? "flex h-full min-h-0 flex-col overflow-hidden" : ""} transition-[padding] duration-200 motion-reduce:transition-none ${
             tabletExpanded ? "md:pl-62" : "md:pl-18"
           } xl:pl-62`}
         >
-          <header className="flex h-14 items-center justify-between gap-3 border-b border-[var(--line)] px-3 sm:px-5 xl:px-7">
+          <header className="flex h-14 shrink-0 items-center justify-between gap-3 border-b border-[var(--line)] px-3 sm:px-5 xl:px-7">
             <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3">
               <Dialog.Trigger asChild>
                 <button
@@ -415,10 +417,10 @@ export function WorkspaceShell({
                 )}
               </button>
               <div className="flex min-w-0 items-center gap-2 md:hidden">
-                <span className="font-medium text-[var(--muted-foreground)]">
-                  BusinessFlow AI
+                <span className="max-sm:hidden font-medium text-[var(--muted-foreground)]">
+                 BusinessFlow AI
                 </span>
-                <span className="px-2 text-[var(--muted-foreground)]">/</span>
+                <span className="max-sm:hidden px-2 text-[var(--muted-foreground)]">/</span>
                 <span className="font-medium text-[var(--foreground)]">{label}</span>
               </div>
               <p className="hidden min-w-0 truncate text-sm text-[var(--muted)] md:block">
@@ -427,12 +429,19 @@ export function WorkspaceShell({
                 <span className="font-medium text-[var(--foreground)]">{label}</span>
               </p>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center flex-nowrap gap-3">
               <ThemeToggle />
               <GlobalSearch />
             </div>
           </header>
-          <main id="main-content" className="mx-auto w-full max-w-375 px-4 py-6 sm:px-6 sm:py-8 xl:px-10">
+          <main
+            id="main-content"
+            className={`mx-auto w-full max-w-375 ${
+              isAssistantRoute
+                ? "flex min-h-0 flex-1 flex-col overflow-hidden px-3 py-3 sm:px-6 sm:py-4 xl:px-10"
+                : "px-4 py-6 sm:px-6 sm:py-8 xl:px-10"
+            }`}
+          >
             {children}
           </main>
         </div>

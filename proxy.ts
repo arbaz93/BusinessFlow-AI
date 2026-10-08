@@ -1,9 +1,10 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { resolveApplicationEntryState } from "@/lib/auth/lifecycle";
+import { getPublicEnv } from "@/lib/env";
 
 const protectedRoutes = ["/dashboard", "/leads", "/clients", "/projects", "/assistant", "/settings", "/onboarding", "/no-workspace"];
-const authRoutes = ["/login", "/signup"];
+const authRoutes = ["/login", "/signup", "/forgot-password"];
 
 function matchesRoute(pathname: string, routes: string[]) {
   return routes.some((route) => pathname === route || pathname.startsWith(`${route}/`));
@@ -18,12 +19,14 @@ function copySessionResponse(source: NextResponse, destination: NextResponse) {
 }
 
 export async function proxy(request: NextRequest) {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
-  if (!url || !key) return NextResponse.next({ request });
+  const { NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY } = getPublicEnv();
+
+  if (!NEXT_PUBLIC_SUPABASE_URL || !NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY) {
+    return NextResponse.next({ request });
+  }
 
   let response = NextResponse.next({ request });
-  const supabase = createServerClient(url, key, {
+  const supabase = createServerClient(NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY, {
     cookies: {
       getAll: () => request.cookies.getAll(),
       setAll(cookiesToSet) {
@@ -78,6 +81,10 @@ export const config = {
     "/login/:path*",
     "/signup",
     "/signup/:path*",
+    "/forgot-password",
+    "/forgot-password/:path*",
+    "/update-password",
+    "/update-password/:path*",
     "/auth/callback/:path*",
   ],
 };

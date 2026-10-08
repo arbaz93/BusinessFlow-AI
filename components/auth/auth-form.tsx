@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useActionState, useState } from "react";
-import { login, signup } from "@/app/actions/auth";
+import { login, resendConfirmation, signup } from "@/app/actions/auth";
 import { AuthShell } from "@/components/auth/auth-shell";
 import { Alert } from "@/components/ui/alert";
 import { buttonVariants } from "@/components/ui/button";
@@ -17,6 +17,13 @@ type AuthFormProps = {
   returnTo?: string;
 };
 
+type ActionState = {
+  error?: string;
+  message?: string;
+  actionLabel?: string;
+  actionHref?: string;
+};
+
 const noticeMessages: Record<string, string> = {
   confirmation: "That confirmation link could not be used. Try signing in or request a new link.",
   setup: "Your account is confirmed, but we couldn't finish setting it up. Please sign in again.",
@@ -25,7 +32,8 @@ const noticeMessages: Record<string, string> = {
 
 export function AuthForm({ mode, notice, returnTo }: AuthFormProps) {
   const isSignup = mode === "signup";
-  const [state, action, pending] = useActionState(isSignup ? signup : login, {});
+  const [state, action, pending] = useActionState(isSignup ? signup : login, {} as ActionState);
+  const [resendState, resendAction, resendPending] = useActionState(resendConfirmation, {} as ActionState);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -37,12 +45,20 @@ export function AuthForm({ mode, notice, returnTo }: AuthFormProps) {
   const submitDisabled =
     pending ||
     Boolean(successMessage) ||
+    Boolean(state.actionLabel) ||
     (isSignup
       ? !name.trim() || !email.trim() || password.length < 8 || !confirmPassword.trim() || passwordMismatch
       : !email.trim() || !password);
 
   const error = state.error ?? (notice ? noticeMessages[notice] : undefined);
   const alternateAuthPath = getAuthPathForReturnTo(returnTo, isSignup ? "login" : "signup");
+
+  const showResendForm =
+    state.actionLabel === "Resend confirmation" ||
+    state.actionLabel === "Resend confirmation email";
+
+  const resendError = resendState.error;
+  const resendMessage = resendState.message;
 
   return (
     <AuthShell
@@ -132,9 +148,42 @@ export function AuthForm({ mode, notice, returnTo }: AuthFormProps) {
             </button>
           </form>
 
+          {state.actionLabel && state.actionHref && !showResendForm ? (
+            <div className="mt-4">
+              <Link
+                className={cn(buttonVariants({ size: "lg", variant: "outline" }), "w-full")}
+                href={state.actionHref}
+              >
+                {state.actionLabel}
+              </Link>
+            </div>
+          ) : null}
+
+          {showResendForm && email ? (
+            <form action={resendAction} className="mt-4 space-y-3">
+              <input type="hidden" name="email" value={email} />
+              <button
+                aria-busy={resendPending}
+                className={cn(buttonVariants({ size: "lg", variant: "outline" }), "w-full")}
+                disabled={resendPending}
+                type="submit"
+              >
+                {resendPending ? "Sending..." : "Resend confirmation email"}
+              </button>
+              {resendError ? (
+                <Alert aria-live="assertive" role="alert">{resendError}</Alert>
+              ) : null}
+              {resendMessage ? (
+                <Alert aria-live="polite" role="status" tone="success">
+                  {resendMessage}
+                </Alert>
+              ) : null}
+            </form>
+          ) : null}
+
           <div className="mt-6 space-y-3 border-t border-[var(--line)] pt-6 text-sm text-[var(--muted)]">
             <p>
-              {isSignup ? "Already have an account? " : "Don’t have an account? "}
+              {isSignup ? "Already have an account? " : "Don't have an account? "}
               <Link
                 className="font-medium text-[var(--accent)] underline underline-offset-4 transition-colors hover:text-[var(--ink)]"
                 href={alternateAuthPath}
@@ -142,7 +191,16 @@ export function AuthForm({ mode, notice, returnTo }: AuthFormProps) {
                 {isSignup ? "Log in" : "Sign up"}
               </Link>
             </p>
-            {!isSignup && <p>Forgot password?</p>}
+            {!isSignup && (
+              <p>
+                <Link
+                  className="font-medium text-[var(--accent)] underline underline-offset-4 transition-colors hover:text-[var(--ink)]"
+                  href="/forgot-password"
+                >
+                  Forgot password?
+                </Link>
+              </p>
+            )}
             {isSignup && (
               <p className="text-xs leading-5">
                 By creating an account, you agree to our Terms and Privacy Policy.

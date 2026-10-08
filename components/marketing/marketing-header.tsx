@@ -22,7 +22,7 @@ export function MarketingHeader() {
     <header className="border-b border-[var(--line)] bg-[var(--background)]/80 backdrop-blur-sm sticky top-0 z-50">
       <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-6 py-4 lg:px-10">
         <Link href="/" className="flex items-center gap-3" aria-label="BusinessFlow AI home">
-          <span className="grid size-9 place-items-center rounded-lg bg-white text-sm font-bold text-[var(--background)]"><Sparkle /></span>
+          <span className="grid size-9 place-items-center rounded-lg bg-foreground text-sm font-bold text-background"><Sparkle /></span>
           <span className="text-base font-semibold tracking-tight text-[var(--foreground)]">
             BusinessFlow <span className="text-[var(--accent)]">AI</span>
           </span>

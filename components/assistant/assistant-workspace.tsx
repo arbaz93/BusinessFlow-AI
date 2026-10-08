@@ -40,6 +40,8 @@ function formatConversationDate(value: string) {
   }).format(new Date(value));
 }
 
+const assistantFocusRing = "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background)]";
+
 function conversationHref(conversationId: string) {
   return `/assistant?conversationId=${encodeURIComponent(conversationId)}`;
 }
@@ -67,8 +69,10 @@ function ConversationLinks({
             href={conversationHref(conversation.id)}
             onClick={onSelect}
             aria-current={selectedId === conversation.id ? "page" : undefined}
-            className={`min-h-12 min-w-0 flex-1 rounded-md px-3 py-2 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff] ${
-              selectedId === conversation.id ? "bg-[var(--surface)] text-[var(--foreground)]" : "text-[var(--foreground)]/65 hover:bg-[var(--surface)] hover:text-[var(--foreground)]/90"
+            className={`min-h-12 min-w-0 flex-1 rounded-xl border px-3 py-2.5 text-left transition-colors ${assistantFocusRing} ${
+              selectedId === conversation.id
+                ? "border-[var(--accent)]/30 bg-[var(--surface)] text-[var(--foreground)] shadow-[0_0_0_1px_rgba(139,92,246,0.06)]"
+                : "border-transparent text-[var(--foreground)]/65 hover:border-[var(--line)] hover:bg-[var(--surface)] hover:text-[var(--foreground)]/90"
             }`}
           >
             <span className="block truncate text-xs font-medium">{conversation.title}</span>
@@ -85,7 +89,7 @@ function ConversationLinks({
               }
               onDelete(conversation);
             }}
-            className="grid size-9 shrink-0 place-items-center rounded-md text-[var(--foreground)]/35 opacity-100 transition-colors hover:bg-[var(--surface)] hover:text-[var(--foreground)]/85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff] sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100"
+            className={`grid size-9 shrink-0 place-items-center rounded-lg text-[var(--foreground)]/35 opacity-100 transition-colors hover:bg-[var(--surface)] hover:text-[var(--foreground)]/85 ${assistantFocusRing} sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100`}
           >
             <Trash2 size={14} aria-hidden="true" />
           </button>
@@ -258,16 +262,16 @@ function ConversationPanel({
       <div
         ref={scrollRef}
         onScroll={handleScroll}
-        className="min-h-0 flex-1 space-y-6 overflow-y-auto overscroll-contain px-4 py-5 sm:px-6 sm:py-6"
+        className="min-h-0 flex-1 space-y-6 overflow-y-auto overscroll-contain px-3 py-4 sm:px-5 sm:py-5"
         aria-label="Conversation messages"
       >
          {messages.length === 0 ? (
            <div className="mx-auto flex min-h-full max-w-md flex-col items-center justify-center py-8 text-center">
-             <span className="grid size-11 place-items-center rounded-xl border border-[var(--line)] bg-[var(--surface)] text-[var(--accent-muted)]">
-               <MessageSquareText size={19} aria-hidden="true" />
+             <span className="grid size-12 place-items-center rounded-2xl border border-[var(--line)] bg-[var(--surface)] text-[var(--accent-muted)] shadow-[0_10px_30px_rgba(15,23,42,0.08)]">
+               <MessageSquareText size={20} aria-hidden="true" />
              </span>
              <h2 className="mt-4 text-lg font-semibold text-[var(--foreground)]/90">Start a conversation</h2>
-             <p className="mt-2 text-sm leading-6 text-[var(--foreground)]/50">
+             <p className="mt-2 text-sm leading-6 text-[var(--foreground)]/55">
                Ask about your Projects, Tasks, Clients, Documents, AI Intelligence, and recent Activity. Reference a project by name to scope your question.
              </p>
              <ul className="mt-5 flex flex-wrap justify-center gap-2">
@@ -277,7 +281,7 @@ function ConversationPanel({
                      type="button"
                      disabled={sending}
                      onClick={() => void send({ requestId: crypto.randomUUID(), content: prompt })}
-                     className="inline-flex items-center justify-center rounded-md border border-[var(--line)] bg-[var(--surface)] px-3 py-1.5 text-[11px] font-medium text-[var(--foreground)]/75 hover:border-[var(--line-strong)] hover:bg-[var(--surface)] hover:text-[var(--foreground)]/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff] disabled:cursor-not-allowed disabled:opacity-50"
+                     className={`inline-flex items-center justify-center rounded-full border border-[var(--line)] bg-[var(--surface)] px-3 py-1.5 text-[11px] font-medium text-[var(--foreground)]/75 transition-colors hover:border-[var(--line-strong)] hover:bg-[var(--panel)] hover:text-[var(--foreground)]/90 ${assistantFocusRing} disabled:cursor-not-allowed disabled:opacity-50`}
                    >
                      {prompt}
                    </button>
@@ -297,16 +301,20 @@ function ConversationPanel({
                   className={`flex min-w-0 flex-col ${isUser ? "items-end" : "items-start"}`}
                 >
                   {isUser ? (
-                    <p className="max-w-[92%] whitespace-pre-wrap break-words rounded-xl border border-[var(--line)] bg-[var(--surface)] px-4 py-3 text-sm leading-6 text-[var(--foreground)]/85 [overflow-wrap:anywhere] sm:max-w-[82%]">
+                    <p className="max-w-[92%] whitespace-pre-wrap break-words rounded-2xl border border-[var(--line)] bg-[var(--surface)] px-4 py-3 text-sm leading-6 text-[var(--foreground)]/85 shadow-[0_1px_0_rgba(15,23,42,0.04)] [overflow-wrap:anywhere] sm:max-w-[82%]">
                       {message.content}
                     </p>
                   ) : (
                     <div className="w-full min-w-0">
                       <div className="mb-2 flex items-center gap-2 text-[11px] font-medium text-[var(--foreground)]/45">
-                        <Sparkles size={13} className="text-[var(--accent-muted)]" aria-hidden="true" />
+                        <span className="inline-flex size-5 items-center justify-center rounded-md border border-[var(--accent)]/25 bg-[var(--accent)]/8 text-[var(--accent-muted)]">
+                          <Sparkles size={11} aria-hidden="true" />
+                        </span>
                         BusinessFlow AI
                       </div>
-                      <AssistantMessageContent content={message.content} />
+                      <div className="rounded-2xl border border-[var(--line)] bg-[var(--panel)] px-4 py-3 shadow-[0_1px_0_rgba(15,23,42,0.04)]">
+                        <AssistantMessageContent content={message.content} />
+                      </div>
                       {proposalsByMessage[message.id] && (
                         <TaskProposalCard
                           key={proposalsByMessage[message.id].proposalId}
@@ -346,7 +354,7 @@ function ConversationPanel({
                       <button
                         type="button"
                         onClick={() => void copyMessage(message)}
-                        className="mt-2 inline-flex min-h-8 items-center gap-1.5 rounded px-2 text-[11px] text-[var(--foreground)]/40 hover:bg-[var(--surface)] hover:text-[var(--foreground)]/75 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff]"
+                        className={`mt-2 inline-flex min-h-8 items-center gap-1.5 rounded-md px-2 text-[11px] text-[var(--foreground)]/45 transition-colors hover:bg-[var(--surface)] hover:text-[var(--foreground)]/75 ${assistantFocusRing}`}
                       >
                         {copiedId === message.id ? <Check size={12} aria-hidden="true" /> : <Copy size={12} aria-hidden="true" />}
                         {copiedId === message.id ? "Copied" : "Copy"}
@@ -357,7 +365,7 @@ function ConversationPanel({
                     <button
                       type="button"
                       onClick={() => void send(retryRequest!)}
-                      className="mt-2 inline-flex min-h-8 items-center gap-1.5 rounded px-2 text-xs font-medium text-[var(--accent-muted)] hover:bg-[var(--surface)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff]"
+                      className={`mt-2 inline-flex min-h-8 items-center gap-1.5 rounded-md px-2 text-xs font-medium text-[var(--accent-muted)] transition-colors hover:bg-[var(--surface)] ${assistantFocusRing}`}
                     >
                       Retry response <ArrowUpRight size={12} aria-hidden="true" />
                     </button>
@@ -376,24 +384,24 @@ function ConversationPanel({
         )}
       </div>
 
-      <div className="shrink-0 border-t border-[var(--line)] bg-[#151517] p-3 sm:p-4">
+      <div className="shrink-0 border-t border-[var(--line)] bg-[var(--panel)]/80 p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:p-4">
         <div className="mx-auto max-w-3xl">
           {error && (
-            <div role="alert" className="mb-3 flex flex-wrap items-center justify-between gap-2 rounded-md border border-[#ef4444]/15 bg-[#ef4444]/[0.04] px-3 py-2">
-              <p className="text-xs leading-5 text-[#fca5a5]">{error}</p>
+      <div role="alert" className="mb-3 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-[var(--danger)]/25 bg-[var(--danger)]/8 px-3 py-2">
+        <p className="text-xs leading-5 text-[var(--danger)]">{error}</p>
               {retryRequest && (
                 <button
                   type="button"
                   disabled={sending}
                   onClick={() => void send(retryRequest)}
-                  className="inline-flex min-h-8 shrink-0 items-center rounded px-2 text-xs font-medium text-[#fca5a5] underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#fca5a5] disabled:opacity-50"
+            className={`inline-flex min-h-8 shrink-0 items-center rounded-md px-2 text-xs font-medium text-[var(--danger)] underline-offset-4 hover:underline ${assistantFocusRing} disabled:opacity-50`}
                 >
                   Try again
                 </button>
               )}
             </div>
           )}
-          <form onSubmit={handleSubmit} className="flex items-end gap-2 rounded-lg border border-[var(--line)] bg-[var(--surface)] p-2 focus-within:border-[#a49bff]/45 focus-within:ring-2 focus-within:ring-[#a49bff]/15">
+          <form onSubmit={handleSubmit} className="flex items-end gap-2 rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.02)] focus-within:border-[var(--accent)]/40 focus-within:ring-2 focus-within:ring-[var(--accent)]/10">
             <label className="sr-only" htmlFor={`assistant-composer-${conversation.id}`}>Message BusinessFlow AI</label>
             <Textarea
               id={`assistant-composer-${conversation.id}`}
@@ -404,14 +412,14 @@ function ConversationPanel({
               rows={2}
               disabled={sending}
               placeholder="Ask BusinessFlow AI…"
-              className="max-h-40 min-h-12 resize-y border-0 bg-transparent text-sm leading-6 text-[var(--foreground)]/85 shadow-none placeholder:text-[var(--foreground)]/35 focus-visible:border-0 focus-visible:ring-0 disabled:opacity-60"
+              className="max-h-40 min-h-12 resize-y overflow-y-auto border-0 bg-transparent text-sm leading-6 text-[var(--foreground)]/85 shadow-none placeholder:text-[var(--foreground)]/35 focus-visible:border-0 focus-visible:ring-0 disabled:opacity-60"
             />
             <button
               type="submit"
               disabled={sending || !draft.trim()}
               aria-label="Send message"
               title={draft.length > ASSISTANT_MESSAGE_MAX_LENGTH ? `Messages are limited to ${ASSISTANT_MESSAGE_MAX_LENGTH.toLocaleString()} characters` : undefined}
-              className="grid size-10 shrink-0 place-items-center rounded-md bg-[#a49bff] text-[#111113] transition-colors hover:bg-[#b3a8ff] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#c4b5fd] disabled:cursor-not-allowed disabled:opacity-45"
+        className={`grid size-10 shrink-0 place-items-center rounded-xl bg-[var(--accent)] text-[var(--accent-foreground)] shadow-[0_8px_20px_rgba(139,92,246,0.25)] transition-colors hover:bg-[var(--accent)]/90 ${assistantFocusRing} disabled:cursor-not-allowed disabled:opacity-45`}
             >
               {sending ? <LoaderCircle size={16} className="animate-spin" aria-hidden="true" /> : <Send size={16} aria-hidden="true" />}
             </button>
@@ -468,10 +476,10 @@ export function AssistantWorkspace({ conversations, initialConversation, pending
   }
 
   return (
-    <div className="mx-auto flex min-h-[calc(100dvh-10rem)] max-w-7xl flex-col gap-4">
-      <header className="flex flex-wrap items-center justify-between gap-3">
+    <div className="mx-auto flex min-h-0 w-full max-w-7xl flex-1 flex-col gap-3 overflow-hidden px-2 pb-1 pt-1 sm:gap-4 sm:px-4">
+      <header className="flex shrink-0 flex-wrap items-center justify-between gap-3 rounded-2xl border border-[var(--line)] bg-[var(--surface)]/80 px-4 py-3 shadow-[0_10px_30px_rgba(15,23,42,0.05)] backdrop-blur-sm sm:py-4">
         <div className="min-w-0">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--info-line)]">Intelligence</p>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent-muted)]">Intelligence</p>
           <h1 className="mt-1 text-2xl font-semibold tracking-[-0.03em] text-[var(--foreground)]">AI Assistant</h1>
             <p className="mt-1 text-xs text-[var(--foreground)]/45">
               Read-only workspace context. Reference a project by name to scope your question.
@@ -480,7 +488,7 @@ export function AssistantWorkspace({ conversations, initialConversation, pending
         <div className="flex shrink-0 items-center gap-2">
           <Dialog.Root open={mobileListOpen} onOpenChange={setMobileListOpen}>
             <Dialog.Trigger asChild>
-              <button type="button" className="inline-flex min-h-9 items-center gap-2 rounded-md border border-[var(--line)] bg-[var(--surface)] px-3 text-xs font-medium text-[var(--foreground)]/70 hover:bg-[var(--surface)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff] md:hidden">
+              <button type="button" className={`inline-flex min-h-9 items-center gap-2 rounded-lg border border-[var(--line)] bg-[var(--surface)] px-3 text-xs font-medium text-[var(--foreground)]/70 transition-colors hover:bg-[var(--panel)] ${assistantFocusRing} md:hidden`}>
                 <MessageSquareText size={14} aria-hidden="true" />
                 Conversations
               </button>
@@ -491,7 +499,7 @@ export function AssistantWorkspace({ conversations, initialConversation, pending
                 <div className="flex items-center justify-between gap-3 border-b border-[var(--line)] pb-3">
                   <Dialog.Title className="text-sm font-semibold">Conversations</Dialog.Title>
                   <Dialog.Close asChild>
-                    <button type="button" aria-label="Close conversations" className="grid size-9 place-items-center rounded-md text-[var(--foreground)]/55 hover:bg-[var(--surface)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff]">
+                    <button type="button" aria-label="Close conversations" className={`grid size-9 place-items-center rounded-lg text-[var(--foreground)]/55 hover:bg-[var(--surface)] ${assistantFocusRing}`}>
                       <X size={16} aria-hidden="true" />
                     </button>
                   </Dialog.Close>
@@ -514,7 +522,7 @@ export function AssistantWorkspace({ conversations, initialConversation, pending
             type="button"
             onClick={handleNewConversation}
             disabled={createPending}
-            className="inline-flex min-h-9 items-center gap-2 rounded-md bg-[#a49bff] px-3 text-xs font-semibold text-[#111113] transition-colors hover:bg-[#b3a8ff] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#c4b5fd] disabled:cursor-wait disabled:opacity-60"
+            className={`inline-flex min-h-9 items-center gap-2 rounded-lg bg-[var(--accent)] px-3 text-xs font-semibold text-[var(--accent-foreground)] transition-colors hover:bg-[var(--accent)]/90 ${assistantFocusRing} disabled:cursor-wait disabled:opacity-60`}
           >
             {createPending ? <LoaderCircle size={14} className="animate-spin" aria-hidden="true" /> : <Plus size={14} aria-hidden="true" />}
             New conversation
@@ -522,10 +530,10 @@ export function AssistantWorkspace({ conversations, initialConversation, pending
         </div>
       </header>
 
-      {workspaceError && !deleteTarget && <p role="alert" className="text-sm text-[#fca5a5]">{workspaceError}</p>}
+      {workspaceError && !deleteTarget && <p role="alert" className="shrink-0 text-sm text-[var(--danger)]">{workspaceError}</p>}
 
-      <div className="flex min-h-[34rem] flex-1 overflow-hidden rounded-lg border border-[var(--line)] bg-[var(--panel)] md:min-h-[36rem]">
-        <aside className="hidden w-64 shrink-0 flex-col border-r border-[var(--line)] bg-[#151517] md:flex">
+      <div className="flex min-h-0 flex-1 overflow-hidden rounded-2xl border border-[var(--line)] bg-[var(--panel)] shadow-[0_16px_40px_rgba(15,23,42,0.08)]">
+        <aside className="hidden min-h-0 w-64 shrink-0 flex-col border-r border-[var(--line)] bg-elevated md:flex">
           <div className="flex items-center justify-between border-b border-[var(--line)] px-3 py-3">
             <h2 className="text-xs font-semibold text-[var(--foreground)]/65">Your conversations</h2>
             <span className="text-[10px] text-[var(--foreground)]/35">{conversations.length}</span>
@@ -539,7 +547,7 @@ export function AssistantWorkspace({ conversations, initialConversation, pending
           </div>
         </aside>
 
-        <main className="flex min-w-0 flex-1 flex-col">
+        <main className="flex min-h-0 min-w-0 flex-1 flex-col">
           <div className="flex min-h-12 items-center justify-between gap-3 border-b border-[var(--line)] px-4 py-2 sm:px-5">
             <div className="flex min-w-0 items-center gap-2">
               <h2 className="min-w-0 truncate text-sm font-medium text-[var(--foreground)]/80">
@@ -548,7 +556,7 @@ export function AssistantWorkspace({ conversations, initialConversation, pending
               {initialConversation?.contextProjectLabel && (
                 <span
                   title={initialConversation.contextProjectLabel}
-                  className="inline-flex min-w-0 items-center gap-1.5 rounded-full border border-[#a49bff]/25 bg-[#a49bff]/10 px-2 py-0.5 text-[10px] font-medium text-[var(--accent-muted)]"
+                  className="inline-flex min-w-0 items-center gap-1.5 rounded-full border border-[var(--accent)]/25 bg-[var(--accent)]/8 px-2 py-0.5 text-[10px] font-medium text-[var(--accent-muted)]"
                 >
                   <span className="truncate">Anchored to {initialConversation.contextProjectLabel}</span>
                 </span>
@@ -564,7 +572,7 @@ export function AssistantWorkspace({ conversations, initialConversation, pending
                   requestDelete(initialConversation);
                 }}
                 aria-label="Delete this conversation"
-                className="inline-flex min-h-8 shrink-0 items-center gap-1.5 rounded px-2 text-xs text-[var(--foreground)]/40 hover:bg-[var(--surface)] hover:text-[var(--foreground)]/75 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff] md:hidden"
+                className={`inline-flex min-h-8 shrink-0 items-center gap-1.5 rounded-md px-2 text-xs text-[var(--foreground)]/40 transition-colors hover:bg-[var(--surface)] hover:text-[var(--foreground)]/75 ${assistantFocusRing} md:hidden`}
               >
                 <Trash2 size={13} aria-hidden="true" />
                 Delete
@@ -595,7 +603,7 @@ export function AssistantWorkspace({ conversations, initialConversation, pending
                 type="button"
                 onClick={handleNewConversation}
                 disabled={createPending}
-                className="mt-5 inline-flex min-h-10 items-center gap-2 rounded-md bg-[#a49bff] px-4 text-sm font-medium text-[#111113] hover:bg-[#b3a8ff] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#c4b5fd] disabled:opacity-60"
+                className={`mt-5 inline-flex min-h-10 items-center gap-2 rounded-lg bg-[var(--accent)] px-4 text-sm font-medium text-[var(--accent-foreground)] transition-colors hover:bg-[var(--accent)]/90 ${assistantFocusRing} disabled:opacity-60`}
               >
                 {createPending ? <LoaderCircle size={15} className="animate-spin" aria-hidden="true" /> : <Plus size={15} aria-hidden="true" />}
                 Start a conversation
@@ -625,18 +633,18 @@ export function AssistantWorkspace({ conversations, initialConversation, pending
                 </Dialog.Description>
               </div>
               <Dialog.Close asChild>
-                <button type="button" disabled={deletePending} aria-label="Close dialog" className="grid size-9 shrink-0 place-items-center rounded-lg text-[var(--foreground)]/55 hover:bg-[var(--surface)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff] disabled:opacity-50">
+                <button type="button" disabled={deletePending} aria-label="Close dialog" className={`grid size-9 shrink-0 place-items-center rounded-lg text-[var(--foreground)]/55 hover:bg-[var(--surface)] ${assistantFocusRing} disabled:opacity-50`}>
                   <X size={17} aria-hidden="true" />
                 </button>
               </Dialog.Close>
             </div>
             {deleteTarget && <p className="mt-4 truncate rounded-md border border-[var(--line)] bg-[var(--surface)] px-3 py-2 text-sm text-[var(--foreground)]/75">{deleteTarget.title}</p>}
-            {workspaceError && <p role="alert" className="mt-3 text-sm text-[#fca5a5]">{workspaceError}</p>}
+            {workspaceError && <p role="alert" className="mt-3 text-sm text-[var(--danger)]">{workspaceError}</p>}
             <div className="mt-5 flex flex-col-reverse gap-2 border-t border-[var(--line)] pt-4 sm:flex-row sm:justify-end">
               <Dialog.Close asChild>
-                <button type="button" disabled={deletePending} className="min-h-10 rounded-md px-4 text-sm text-[var(--foreground)]/65 hover:bg-[var(--surface)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff] disabled:opacity-50">Cancel</button>
+                <button type="button" disabled={deletePending} className={`min-h-10 rounded-md px-4 text-sm text-[var(--foreground)]/65 hover:bg-[var(--surface)] ${assistantFocusRing} disabled:opacity-50`}>Cancel</button>
               </Dialog.Close>
-              <button type="button" onClick={handleDeleteConversation} disabled={deletePending || !deleteTarget} className="inline-flex min-h-10 items-center justify-center gap-2 rounded-md bg-[#b91c1c] px-4 text-sm font-semibold text-[var(--foreground)] hover:bg-[#dc2626] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#fca5a5] disabled:cursor-wait disabled:opacity-55">
+              <button type="button" onClick={handleDeleteConversation} disabled={deletePending || !deleteTarget} className="inline-flex min-h-10 items-center justify-center gap-2 rounded-lg bg-[var(--danger)] px-4 text-sm font-semibold text-[var(--accent-foreground)] hover:bg-[var(--danger)]/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--danger)]/35 disabled:cursor-wait disabled:opacity-55">
                 {deletePending && <LoaderCircle size={14} className="animate-spin" aria-hidden="true" />}
                 Delete conversation
               </button>

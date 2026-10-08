@@ -177,7 +177,7 @@ export function ProjectDocumentsWorkspace({
             </div>
           </div>
 
-          <form action={uploadAction} className="grid gap-3 lg:grid-cols-[minmax(160px,1fr)_minmax(180px,0.7fr)_minmax(160px,1fr)_auto]">
+          <form action={uploadAction} className="flex flex-col gap-3 ">
             <input type="hidden" name="projectId" value={projectId} />
             <label className="space-y-1.5 text-sm text-[var(--foreground)]/70">
               <span>Document name</span>

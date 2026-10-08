@@ -3,6 +3,7 @@ import "server-only";
 import { NextResponse } from "next/server";
 import { resolveApplicationEntryState } from "@/lib/auth/lifecycle";
 import { isInvitationToken } from "@/lib/members/invitation-tokens";
+import { classifySupabaseError } from "@/lib/auth/errors";
 import { createClient } from "@/lib/supabase/server";
 
 export async function completeAuthCallback(request: Request, invitationToken?: string) {
@@ -11,6 +12,7 @@ export async function completeAuthCallback(request: Request, invitationToken?: s
     ? invitationToken
     : undefined;
   const code = searchParams.get("code");
+  const type = searchParams.get("type");
 
   if (!code) {
     const target = safeInvitationToken
@@ -20,19 +22,33 @@ export async function completeAuthCallback(request: Request, invitationToken?: s
   }
 
   const supabase = await createClient();
-  const { error } = await supabase.auth.exchangeCodeForSession(code);
+  const { data, error } = await supabase.auth.exchangeCodeForSession(code);
   if (error) {
+    const category = classifySupabaseError(error.code, error.status, error.message);
+    const notice =
+      category === "CALLBACK_ERROR" || category === "CONFIRMATION_EXPIRED"
+        ? "confirmation"
+        : category === "EMAIL_NOT_CONFIRMED"
+          ? "confirmation"
+          : undefined;
     const target = safeInvitationToken
       ? `/invitations/${safeInvitationToken}`
-      : "/login?notice=confirmation";
+      : notice
+        ? `/login?notice=${notice}`
+        : "/login";
     return NextResponse.redirect(new URL(target, origin));
   }
 
-  const { data } = await supabase.auth.getUser();
-  if (!data.user) return NextResponse.redirect(new URL("/login", origin));
+  const authUser = data.user ?? (await supabase.auth.getUser()).data.user;
+  if (!authUser) return NextResponse.redirect(new URL("/login", origin));
+
+  // Password recovery flow — redirect to update-password page
+  if (type === "recovery") {
+    return NextResponse.redirect(new URL("/update-password", origin));
+  }
 
   try {
-    const state = await resolveApplicationEntryState(data.user, safeInvitationToken);
+    const state = await resolveApplicationEntryState(authUser, safeInvitationToken);
     const target =
       state.kind === "READY"
         ? "/dashboard"
