@@ -4,12 +4,14 @@ import { useState, type ReactNode } from "react";
 import { Dialog } from "radix-ui";
 import { Menu, X } from "lucide-react";
 import { usePathname } from "next/navigation";
+
 import { SettingsSidebar } from "@/components/settings/settings-sidebar";
 
 const settingsPageTitles: Record<string, string> = {
   "/settings": "Settings",
   "/settings/profile": "Profile",
   "/settings/workspace": "Workspace",
+  "/settings/members": "Members",
   "/settings/security": "Security",
   "/settings/delete-account": "Delete Account",
 };
@@ -35,22 +37,27 @@ export function SettingsShell({
 
   return (
     <div className="flex flex-col gap-6">
+      <a href="#main-content" className="skip-link">
+        Skip to main content
+      </a>
       <header className="flex items-center justify-between gap-3">
         <div className="min-w-0">
-          <h1 className="text-[22px] font-semibold tracking-[-0.03em] text-[#f4f4f5]">{title}</h1>
-          <p className="mt-1 text-sm text-[#a1a1aa]">
+          <h1 className="text-[22px] font-semibold tracking-[-0.03em] text-[var(--foreground)]">{title}</h1>
+          <p className="mt-1 text-sm text-[var(--muted)]">
             <span>Workspace: </span>
-            <span className="font-medium text-white/80">{organizationName}</span>
+            <span className="font-medium text-[var(--foreground)]">{organizationName}</span>
           </p>
         </div>
-        <button
-          type="button"
-          aria-label="Open settings navigation"
-          onClick={() => setDrawerOpen(true)}
-          className="grid size-9 shrink-0 place-items-center rounded-lg text-white/65 transition-colors hover:bg-white/6 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff] md:hidden"
-        >
-          <Menu size={18} />
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            aria-label="Open settings navigation"
+            onClick={() => setDrawerOpen(true)}
+            className="grid size-9 shrink-0 place-items-center rounded-lg text-[var(--muted)] transition-colors hover:bg-[var(--surface)] hover:text-[var(--foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff] md:hidden"
+          >
+            <Menu size={18} />
+          </button>
+        </div>
       </header>
 
       <div className="flex gap-6">
@@ -60,14 +67,14 @@ export function SettingsShell({
           </div>
         </aside>
 
-        <main className="flex-1 min-w-0 space-y-6">{children}</main>
+        <main id="main-content" className="flex-1 min-w-0 space-y-6">{children}</main>
       </div>
 
       <Dialog.Root open={drawerOpen} onOpenChange={setDrawerOpen}>
         <Dialog.Portal>
-          <Dialog.Overlay className="fixed inset-0 z-40 bg-black/65 md:hidden" />
+          <Dialog.Overlay className="fixed inset-0 z-40 pt-8  md:hidden" />
           <Dialog.Content
-            className="fixed inset-y-0 left-0 z-50 h-dvh w-72 max-w-[calc(100vw-1.5rem)] overflow-y-auto outline-none md:hidden"
+            className="fixed inset-y-0 left-0 z-50 h-dvh bg-[var(--background)]/95 px-4 pt-8 w-72 max-w-[calc(100vw-1.5rem)] overflow-y-auto outline-none md:hidden"
             style={{
               paddingTop: "max(1.25rem, env(safe-area-inset-top))",
               paddingBottom: "max(1.5rem, env(safe-area-inset-bottom))",
@@ -75,12 +82,12 @@ export function SettingsShell({
           >
             <Dialog.Title className="sr-only">Settings navigation</Dialog.Title>
             <div className="flex items-center justify-between pb-4">
-              <span className="text-sm font-semibold text-white/80">Settings</span>
+              <span className="text-lg font-semibold text-[var(--foreground)]">Settings</span>
               <Dialog.Close asChild>
                 <button
                   type="button"
                   aria-label="Close navigation"
-                  className="grid size-8 place-items-center rounded-lg text-white/55 transition-colors hover:bg-white/[0.07] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff]"
+                  className="grid size-8 place-items-center rounded-lg text-[var(--muted)] transition-colors hover:bg-[var(--surface)] hover:text-[var(--foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff]"
                   onClick={() => setDrawerOpen(false)}
                 >
                   <X size={17} />

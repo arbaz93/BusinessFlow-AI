@@ -16,8 +16,8 @@ export function ProjectWorkspaceTabs({ projectId }: { projectId: string }) {
   const baseHref = `/projects/${projectId}`;
 
   return (
-    <nav aria-label="Project workspace tabs" className="border-b border-white/10">
-      <div className="-mb-px flex gap-1 overflow-x-auto">
+    <nav aria-label="Project workspace tabs" className="border-b border-[var(--line)]">
+      <div className="-mb-px flex gap-1 flex-wrap">
         {tabs.map(({ suffix, label, icon: Icon }) => {
           const href = `${baseHref}${suffix}`;
           const active = suffix ? pathname === href || pathname.startsWith(`${href}/`) : pathname === href;
@@ -29,8 +29,8 @@ export function ProjectWorkspaceTabs({ projectId }: { projectId: string }) {
               aria-current={active ? "page" : undefined}
               className={`inline-flex min-h-11 shrink-0 items-center gap-2 border-b-2 px-3 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#a49bff] ${
                 active
-                  ? "border-[#a49bff] text-white"
-                  : "border-transparent text-white/50 hover:border-white/20 hover:text-white/80"
+                  ? "border-[#a49bff] text-[var(--foreground)]"
+                  : "border-transparent text-[var(--foreground)]/50 hover:border-[var(--line-strong)] hover:text-[var(--foreground)]/80"
               }`}
             >
               <Icon size={16} aria-hidden="true" />

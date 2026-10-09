@@ -10,6 +10,10 @@ import {
   setPrimaryProjectBrief,
 } from "@/app/actions/project-documents";
 import { Input } from "@/components/ui/input";
+import {
+  PROJECT_DOCUMENT_ACCEPT_ATTRIBUTE,
+  PROJECT_DOCUMENT_UPLOAD_HINT,
+} from "@/lib/project-documents/files";
 import { projectDocumentTypeLabels, projectDocumentTypeTone, projectDocumentTypeValues, type ProjectDocumentType } from "@/lib/project-documents/options";
 
 type ProjectDocumentSummary = {
@@ -19,7 +23,7 @@ type ProjectDocumentSummary = {
   documentType: ProjectDocumentType;
   mimeType: string | null;
   sizeBytes: number | null;
-  storagePath: string | null;
+  hasFile: boolean;
   isPrimary: boolean;
   createdAt: string;
 };
@@ -44,10 +48,12 @@ export function ProjectDocumentsWorkspace({
   projectId,
   projectName,
   documents,
+  loadError,
 }: {
   projectId: string;
   projectName: string;
   documents: ProjectDocumentSummary[];
+  loadError?: boolean;
 }) {
   const [uploadState, uploadAction, uploadPending] = useActionState(saveProjectDocument, {});
   const router = useRouter();
@@ -136,12 +142,12 @@ export function ProjectDocumentsWorkspace({
     <div className="space-y-5">
       <section className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#93c5fd]">Project resources</p>
-          <h2 className="mt-1 text-2xl font-semibold tracking-[-0.03em] text-[#f4f4f5]">Documents</h2>
-          <p className="mt-1 text-sm text-white/50">Keep project briefs, client assets, references, and other project files organized.</p>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--info-line)]">Project resources</p>
+          <h2 className="mt-1 text-2xl font-semibold tracking-[-0.03em] text-[var(--foreground)]">Documents</h2>
+          <p className="mt-1 text-sm text-[var(--foreground)]/50">Keep project briefs, client assets, references, and other project files organized.</p>
         </div>
-        <div className="flex items-center gap-2 text-sm text-white/60">
-          <span className="rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-xs text-white/70">{documents.length} files</span>
+        <div className="flex items-center gap-2 text-sm text-[var(--foreground)]/60">
+          <span className="rounded-full border border-[var(--line)] bg-[var(--surface)] px-2.5 py-1 text-xs text-[var(--foreground)]/70">{documents.length} files</span>
         </div>
       </section>
 
@@ -151,41 +157,48 @@ export function ProjectDocumentsWorkspace({
         </div>
       )}
 
-      <section className="rounded-[10px] border border-white/10 bg-[#18181b] p-4 sm:p-5">
+      {loadError ? (
+        <div role="alert" className="rounded-xl border border-[var(--danger-border)]/25 bg-[var(--danger-surface)] px-4 py-3 text-sm text-[var(--danger)]">
+          We couldn&apos;t load this project&apos;s documents. Refresh and try again.
+        </div>
+      ) : null}
+
+      <section className="rounded-[10px] border border-[var(--line)] bg-[var(--panel)] p-4 sm:p-5">
         <div className="flex flex-col gap-5">
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-2">
-              <span className="grid size-8 place-items-center rounded-md border border-[#a49bff]/30 bg-[#a49bff]/10 text-[#c4b5fd]">
+              <span className="grid size-8 place-items-center rounded-md border border-[#a49bff]/30 bg-[#a49bff]/10 text-[var(--accent-muted)]">
                 <UploadCloud size={16} />
               </span>
               <div>
-                <h3 className="text-[15px] font-semibold text-[#f4f4f5]">Upload Document</h3>
-                <p className="text-xs text-white/45">Add a file to {projectName}.</p>
+                <h3 className="text-[15px] font-semibold text-[var(--foreground)]">Upload Document</h3>
+                <p className="text-xs text-[var(--foreground)]/45">Add a file to {projectName}.</p>
               </div>
             </div>
           </div>
 
-          <form action={uploadAction} className="grid gap-3 lg:grid-cols-[minmax(160px,1fr)_minmax(180px,0.7fr)_minmax(160px,1fr)_auto]">
+          <form action={uploadAction} className="flex flex-col gap-3 ">
             <input type="hidden" name="projectId" value={projectId} />
-            <label className="space-y-1.5 text-sm text-white/70">
+            <label className="space-y-1.5 text-sm text-[var(--foreground)]/70">
               <span>Document name</span>
-              <Input name="name" placeholder="Project brief v2" className="border-white/10 bg-[#111113] text-white placeholder:text-white/30" required />
+              <Input name="name" placeholder="Project brief v2" className="border-[var(--line)] bg-[var(--surface)] text-[var(--foreground)] placeholder:text-[var(--foreground)]/30" required />
             </label>
-            <label className="space-y-1.5 text-sm text-white/70">
+            <label className="space-y-1.5 text-sm text-[var(--foreground)]/70">
               <span>Document type</span>
-              <select name="documentType" defaultValue="PROJECT_BRIEF" className="h-10 w-full rounded-md border border-white/10 bg-[#111113] px-3 text-sm text-white outline-none focus:border-[#a49bff] focus:ring-2 focus:ring-[#a49bff]/20">
+              <select name="documentType" defaultValue="PROJECT_BRIEF" className="h-10 w-full rounded-md border border-[var(--line)] bg-[var(--surface)] px-3 text-sm text-[var(--foreground)] outline-none focus:border-[#a49bff] focus:ring-2 focus:ring-[#a49bff]/20">
                 {projectDocumentTypeValues.map((type) => (
                   <option key={type} value={type}>{projectDocumentTypeLabels[type]}</option>
                 ))}
               </select>
             </label>
-            <label className="space-y-1.5 text-sm text-white/70">
+            <label className="space-y-1.5 text-sm text-[var(--foreground)]/70">
               <span>File</span>
-              <input type="file" name="file" className="flex h-10 w-full cursor-pointer rounded-md border border-dashed border-white/15 bg-[#111113] px-3 py-[5px] text-sm text-white/70 file:mr-3 file:rounded-md file:border-0 file:bg-white/5 file:px-2 file:py-1 file:text-white/80" required />
+              <input type="file" name="file" accept={PROJECT_DOCUMENT_ACCEPT_ATTRIBUTE} className="flex h-10 w-full cursor-pointer rounded-md border border-dashed border-[var(--line)] bg-[var(--surface)] px-3 py-[5px] text-sm text-[var(--foreground)]/70 file:mr-3 file:rounded-md file:border-0 file:bg-white/5 file:px-2 file:py-1 file:text-[var(--foreground)]/80" required />
+              <span className="text-xs text-[var(--foreground)]/45">{PROJECT_DOCUMENT_UPLOAD_HINT}</span>
             </label>
             <div className="flex items-end">
-              <label className="inline-flex items-center gap-2 rounded-md border border-white/10 bg-white/[0.03] px-3 py-2 text-sm text-white/70">
-                <input type="checkbox" name="isPrimary" value="true" className="h-4 w-4 rounded border-white/10 bg-[#111113] text-[#a49bff] focus:ring-[#a49bff]" />
+              <label className="inline-flex items-center gap-2 rounded-md border border-[var(--line)] bg-[var(--surface)] px-3 py-2 text-sm text-[var(--foreground)]/70">
+                <input type="checkbox" name="isPrimary" value="true" className="h-4 w-4 rounded border-[var(--line)] bg-[var(--surface)] text-[var(--accent-muted)] focus:ring-[#a49bff]" />
                 Primary brief
               </label>
             </div>
@@ -195,12 +208,12 @@ export function ProjectDocumentsWorkspace({
               </button>
             </div>
             {uploadState.error && (
-              <p role="alert" className="lg:col-span-4 rounded-md border border-[#ef4444]/20 bg-[#ef4444]/[0.08] px-3 py-2 text-sm text-[#fca5a5]">
+              <p role="alert" className="lg:col-span-4 rounded-md border border-[var(--danger-border)]/20 bg-[var(--danger)]/[0.08] px-3 py-2 text-sm text-[#fca5a5]">
                 {uploadState.error}
               </p>
             )}
             {uploadState.success && (
-              <p role="status" className="lg:col-span-4 rounded-md border border-[#22c55e]/20 bg-[#22c55e]/[0.08] px-3 py-2 text-sm text-[#86efac]">
+              <p role="status" className="lg:col-span-4 rounded-md border border-[var(--success-border)]/20 bg-[var(--success-surface)] px-3 py-2 text-sm text-[var(--success-line)]">
                 Document uploaded successfully.
               </p>
             )}
@@ -208,13 +221,13 @@ export function ProjectDocumentsWorkspace({
         </div>
       </section>
 
-      <section className="rounded-[10px] border border-white/10 bg-[#18181b] p-3 sm:p-4" aria-label="Document filters">
+      <section className="rounded-[10px] border border-[var(--line)] bg-[var(--panel)] p-3 sm:p-4" aria-label="Document filters">
         <div className="grid gap-2 md:grid-cols-[minmax(200px,1fr)_minmax(170px,220px)]">
           <div className="relative">
-            <Search size={15} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-white/35" />
-            <Input value={search} onChange={(event) => setSearch(event.currentTarget.value)} aria-label="Search project documents" placeholder="Search files…" className="h-10 border-white/10 bg-[#111113] pl-9 text-sm text-white placeholder:text-white/35 dark:bg-[#111113]" />
+            <Search size={15} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[var(--foreground)]/35" />
+            <Input value={search} onChange={(event) => setSearch(event.currentTarget.value)} aria-label="Search project documents" placeholder="Search files…" className="h-10 border-[var(--line)] bg-[var(--surface)] pl-9 text-sm text-[var(--foreground)] placeholder:text-[var(--foreground)]/35 dark:bg-[var(--surface)]" />
           </div>
-          <select value={documentTypeFilter} onChange={(event) => setDocumentTypeFilter(event.currentTarget.value as ProjectDocumentType | "ALL")} className="h-10 rounded-md border border-white/10 bg-[#111113] px-3 text-sm text-white outline-none focus:border-[#a49bff] focus:ring-2 focus:ring-[#a49bff]/20">
+          <select value={documentTypeFilter} onChange={(event) => setDocumentTypeFilter(event.currentTarget.value as ProjectDocumentType | "ALL")} className="h-10 rounded-md border border-[var(--line)] bg-[var(--surface)] px-3 text-sm text-[var(--foreground)] outline-none focus:border-[#a49bff] focus:ring-2 focus:ring-[#a49bff]/20">
             <option value="ALL">All document types</option>
             {projectDocumentTypeValues.map((type) => (
               <option key={type} value={type}>{projectDocumentTypeLabels[type]}</option>
@@ -226,49 +239,49 @@ export function ProjectDocumentsWorkspace({
       {visibleDocuments.length ? (
         <ul className="space-y-3">
           {visibleDocuments.map((document) => (
-            <li key={document.id} className="rounded-[10px] border border-white/10 bg-[#18181b] p-4 sm:p-5">
+            <li key={document.id} className="rounded-[10px] border border-[var(--line)] bg-[var(--panel)] p-4 sm:p-5">
               <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
                     <span className={`inline-flex rounded-full border px-2 py-0.5 text-[10px] font-medium ${projectDocumentTypeTone[document.documentType]}`}>{projectDocumentTypeLabels[document.documentType]}</span>
-                    {document.isPrimary && <span className="inline-flex rounded-full border border-[#a49bff]/25 bg-[#a49bff]/10 px-2 py-0.5 text-[10px] font-medium text-[#c4b5fd]">Primary brief</span>}
+                    {document.isPrimary && <span className="inline-flex rounded-full border border-[#a49bff]/25 bg-[#a49bff]/10 px-2 py-0.5 text-[10px] font-medium text-[var(--accent-muted)]">Primary brief</span>}
                   </div>
                   <div className="mt-2 flex items-center gap-2">
-                    <span className="grid size-8 place-items-center rounded-md border border-white/10 bg-white/[0.03] text-white/60">
+                    <span className="grid size-8 place-items-center rounded-md border border-[var(--line)] bg-[var(--surface)] text-[var(--foreground)]/60">
                       <FileText size={15} />
                     </span>
                     <div className="min-w-0">
-                      <p className="truncate text-base font-medium text-[#f4f4f5]">{document.name}</p>
-                      <p className="text-xs text-white/45">{document.originalName} · {formatFileSize(document.sizeBytes)} · {formatDocumentDate(document.createdAt)}</p>
+                      <p className="truncate text-base font-medium text-[var(--foreground)]">{document.name}</p>
+                      <p className="text-xs text-[var(--foreground)]/45">{document.originalName} · {formatFileSize(document.sizeBytes)} · {formatDocumentDate(document.createdAt)}</p>
                     </div>
                   </div>
                 </div>
 
                 <div className="flex flex-wrap items-center gap-2">
-                  {document.storagePath ? (
+                  {document.hasFile ? (
                     <button
                       type="button"
                       onClick={() => handleDocumentAccess(document.id, "view")}
                       disabled={pendingActionId === document.id}
-                      className="inline-flex h-9 items-center rounded-md border border-white/10 bg-white/[0.04] px-3 text-sm text-white/80 hover:bg-white/[0.06] disabled:cursor-not-allowed disabled:opacity-60"
+                      className="inline-flex h-9 items-center rounded-md border border-[var(--line)] bg-[var(--surface)] px-3 text-sm text-[var(--foreground)]/80 hover:bg-[var(--surface)] disabled:cursor-not-allowed disabled:opacity-60"
                     >
                       {pendingActionId === document.id ? "Opening…" : "Open"}
                     </button>
                   ) : (
-                    <span className="inline-flex h-9 items-center rounded-md border border-white/10 bg-white/[0.03] px-3 text-sm text-white/45">File unavailable</span>
+                    <span className="inline-flex h-9 items-center rounded-md border border-[var(--line)] bg-[var(--surface)] px-3 text-sm text-[var(--foreground)]/45">File unavailable</span>
                   )}
 
-                  {document.storagePath ? (
+                  {document.hasFile ? (
                     <button
                       type="button"
                       onClick={() => handleDocumentAccess(document.id, "download")}
                       disabled={pendingActionId === document.id}
-                      className="inline-flex h-9 items-center rounded-md border border-white/10 bg-white/[0.04] px-3 text-sm text-white/80 hover:bg-white/[0.06] disabled:cursor-not-allowed disabled:opacity-60"
+                      className="inline-flex h-9 items-center rounded-md border border-[var(--line)] bg-[var(--surface)] px-3 text-sm text-[var(--foreground)]/80 hover:bg-[var(--surface)] disabled:cursor-not-allowed disabled:opacity-60"
                     >
                       {pendingActionId === document.id ? "Preparing…" : "Download"}
                     </button>
                   ) : (
-                    <span className="inline-flex h-9 items-center rounded-md border border-white/10 bg-white/[0.03] px-3 text-sm text-white/45">Unavailable</span>
+                    <span className="inline-flex h-9 items-center rounded-md border border-[var(--line)] bg-[var(--surface)] px-3 text-sm text-[var(--foreground)]/45">Unavailable</span>
                   )}
 
                   {document.documentType === "PROJECT_BRIEF" && !document.isPrimary && (
@@ -283,7 +296,7 @@ export function ProjectDocumentsWorkspace({
                       <button
                         type="submit"
                         disabled={pendingActionId === document.id}
-                        className="inline-flex h-9 items-center rounded-md border border-[#a49bff]/25 bg-[#a49bff]/10 px-3 text-sm text-[#c4b5fd] hover:bg-[#a49bff]/15 disabled:cursor-wait disabled:opacity-60"
+                        className="inline-flex h-9 items-center rounded-md border border-[#a49bff]/25 bg-[#a49bff]/10 px-3 text-sm text-[var(--accent-muted)] hover:bg-[#a49bff]/15 disabled:cursor-wait disabled:opacity-60"
                       >
                         {pendingActionId === document.id ? "Updating…" : "Set as primary"}
                       </button>
@@ -313,7 +326,7 @@ export function ProjectDocumentsWorkspace({
           ))}
         </ul>
       ) : (
-        <div className="rounded-[10px] border border-dashed border-white/10 bg-[#18181b] p-8 text-center text-sm text-white/45">
+        <div className="rounded-[10px] border border-dashed border-[var(--line)] bg-[var(--panel)] p-8 text-center text-sm text-[var(--foreground)]/45">
           No documents match the current filter.
         </div>
       )}

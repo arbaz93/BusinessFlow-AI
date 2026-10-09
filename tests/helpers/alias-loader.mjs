@@ -4,6 +4,10 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 
 const projectRoot = path.resolve(fileURLToPath(new URL("../..", import.meta.url)));
 
+const serverOnlyEmptyModule = pathToFileURL(
+  path.join(projectRoot, "node_modules", "server-only", "empty.js"),
+).href;
+
 function resolveFile(target) {
   if (existsSync(target) && statSync(target).isFile()) return target;
   for (const extension of [".ts", ".tsx", ".mjs", ".js"]) {
@@ -19,8 +23,19 @@ function resolveFile(target) {
 
 /** Maps the `@/...` path alias used throughout the app onto the repository root. */
 export function resolve(specifier, context, nextResolve) {
+  if (specifier === "server-only") {
+    return nextResolve(serverOnlyEmptyModule, context);
+  }
   if (specifier.startsWith("@/")) {
     const resolved = resolveFile(path.join(projectRoot, specifier.slice(2)));
+    if (resolved) return nextResolve(pathToFileURL(resolved).href, context);
+  }
+  if (
+    context.parentURL &&
+    (specifier.startsWith("./") || specifier.startsWith("../"))
+  ) {
+    const parentPath = fileURLToPath(context.parentURL);
+    const resolved = resolveFile(path.resolve(path.dirname(parentPath), specifier));
     if (resolved) return nextResolve(pathToFileURL(resolved).href, context);
   }
   return nextResolve(specifier, context);

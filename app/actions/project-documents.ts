@@ -1,17 +1,26 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { createClient as createSupabaseClient } from "@supabase/supabase-js";
+import { getSupabaseAdminClient } from "@/lib/supabase/admin";
 import { requireOrganization } from "@/lib/auth/dal";
 import { prisma } from "@/lib/db/prisma";
+import {
+  buildProjectDocumentStoragePath,
+  isProjectDocumentStoragePath,
+  readProjectDocumentFileHead,
+  verifyProjectDocumentFileContent,
+  validateProjectDocumentUploadFile,
+} from "@/lib/project-documents/files";
 import {
   projectDocumentInputSchema,
   projectDocumentIdSchema,
   type ProjectDocumentFormState,
 } from "@/lib/project-documents/schemas";
+import { checkRateLimit, getClientIdentifier, UPLOAD_RATE_LIMIT_CONFIG } from "@/lib/security/rate-limiter";
 
 const PROJECT_DOCUMENT_BUCKET = "project-documents";
 const PROJECT_DOCUMENT_SIGNED_URL_TTL_SECONDS = 600;
+const BUCKET_CHECK_TTL_MS = 5 * 60 * 1000;
 
 class ProjectDocumentUploadError extends Error {
   constructor(message: string) {
@@ -25,6 +34,12 @@ function getStorageErrorCode(error: unknown) {
     return error.code;
   }
   return undefined;
+}
+
+function getStorageErrorStatus(error: unknown) {
+  if (typeof error !== "object" || error === null) return undefined;
+  const value = "status" in error ? error.status : "statusCode" in error ? error.statusCode : undefined;
+  return typeof value === "number" || typeof value === "string" ? String(value) : undefined;
 }
 
 function getPrismaErrorCode(error: unknown) {
@@ -45,6 +60,14 @@ function getPrismaErrorTarget(error: unknown) {
   return undefined;
 }
 
+function logStorageError(operation: string, error: unknown) {
+  console.error(operation, {
+    statusCode: getStorageErrorStatus(error),
+    code: getStorageErrorCode(error),
+    errorName: error instanceof Error ? error.name : "UnknownError",
+  });
+}
+
 function revalidateProjectDocumentViews(projectId: string) {
   revalidatePath("/dashboard");
   revalidatePath(`/projects/${projectId}/documents`);
@@ -53,31 +76,28 @@ function revalidateProjectDocumentViews(projectId: string) {
 }
 
 function getSupabaseStorageClient() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-  if (!supabaseUrl || !serviceRoleKey) {
-    throw new Error(
+  try {
+    return getSupabaseAdminClient();
+  } catch {
+    throw new ProjectDocumentUploadError(
       "Document storage is not configured. Set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in the server environment, then restart the app.",
     );
   }
-
-  return createSupabaseClient(supabaseUrl, serviceRoleKey, {
-    auth: { persistSession: false, autoRefreshToken: false },
-  });
 }
 
+let bucketCheckState: { checkedAt: number } | null = null;
+
 async function ensurePrivateProjectDocumentBucket() {
-  const supabase = getSupabaseStorageClient();
-  const storage = supabase.storage;
+  if (bucketCheckState && Date.now() - bucketCheckState.checkedAt < BUCKET_CHECK_TTL_MS) {
+    return getSupabaseStorageClient().storage;
+  }
+
+  const storage = getSupabaseStorageClient().storage;
   const bucketResult = await storage.getBucket(PROJECT_DOCUMENT_BUCKET);
 
   if (bucketResult.error) {
-    if (bucketResult.error.statusCode !== "404") {
-      console.error("Project document bucket lookup failed.", {
-        statusCode: bucketResult.error.statusCode,
-        code: getStorageErrorCode(bucketResult.error),
-      });
+    if (getStorageErrorStatus(bucketResult.error) !== "404") {
+      logStorageError("Project document bucket lookup failed.", bucketResult.error);
       throw new ProjectDocumentUploadError(
         "Supabase could not access document storage. Verify the server-side service-role key and Supabase project URL.",
       );
@@ -87,10 +107,7 @@ async function ensurePrivateProjectDocumentBucket() {
     if (createResult.error) {
       const retryResult = await storage.getBucket(PROJECT_DOCUMENT_BUCKET);
       if (retryResult.error) {
-        console.error("Private project document bucket creation failed.", {
-          statusCode: createResult.error.statusCode,
-          code: getStorageErrorCode(createResult.error),
-        });
+        logStorageError("Private project document bucket creation failed.", createResult.error);
         throw new ProjectDocumentUploadError(
           "The private project-documents storage bucket could not be created. Check the service-role key and Supabase Storage availability.",
         );
@@ -102,32 +119,35 @@ async function ensurePrivateProjectDocumentBucket() {
     );
   }
 
+  bucketCheckState = { checkedAt: Date.now() };
   return storage;
 }
 
-async function uploadToProjectStorage(file: File, projectId: string, organizationId: string, documentId: string) {
-  const sanitizedName = file.name.replace(/[^a-zA-Z0-9._-]+/g, "_");
-  const storagePath = `organizations/${organizationId}/projects/${projectId}/documents/${documentId}/${sanitizedName}`;
+async function uploadToProjectStorage(
+  file: File,
+  scope: { organizationId: string; projectId: string; documentId: string },
+  storageName: string,
+  mimeType: string,
+) {
+  const storagePath = buildProjectDocumentStoragePath(scope, storageName);
   const storage = await ensurePrivateProjectDocumentBucket();
 
   const { error } = await storage.from(PROJECT_DOCUMENT_BUCKET).upload(storagePath, file, {
-    contentType: file.type || "application/octet-stream",
+    contentType: mimeType,
     upsert: false,
     cacheControl: "3600",
   });
 
   if (error) {
     const code = getStorageErrorCode(error);
-    console.error("Project document upload failed.", {
-      statusCode: error.statusCode,
-      code,
-    });
-    if (error.statusCode === "401" || error.statusCode === "403") {
+    const statusCode = getStorageErrorStatus(error);
+    logStorageError("Project document upload failed.", error);
+    if (statusCode === "401" || statusCode === "403") {
       throw new ProjectDocumentUploadError(
         "Supabase rejected access to document storage. Verify that SUPABASE_SERVICE_ROLE_KEY is the server-side service-role or secret key for this Supabase project.",
       );
     }
-    if (error.statusCode === "413" || code === "FileSizeLimitExceeded") {
+    if (statusCode === "413" || code === "FileSizeLimitExceeded") {
       throw new ProjectDocumentUploadError("This file exceeds the upload size limit configured in Supabase Storage.");
     }
     if (code === "Duplicate" || code === "ResourceAlreadyExists") {
@@ -148,13 +168,12 @@ async function cleanupProjectDocumentStorageObject(storagePath: string | null) {
     const supabase = getSupabaseStorageClient();
     const { error } = await supabase.storage.from(PROJECT_DOCUMENT_BUCKET).remove([storagePath]);
     if (error) {
-      console.error("Project document storage cleanup failed.", {
-        statusCode: error.statusCode,
-        code: getStorageErrorCode(error),
-      });
+      logStorageError("Project document storage cleanup failed.", error);
     }
   } catch (error) {
-    console.error("Project document storage cleanup failed.", error);
+    console.error("Project document storage cleanup failed.", {
+      errorName: error instanceof Error ? error.name : "UnknownError",
+    });
   }
 }
 
@@ -165,13 +184,11 @@ async function deleteProjectDocumentStorageObject(storagePath: string | null) {
   const { error } = await supabase.storage.from(PROJECT_DOCUMENT_BUCKET).remove([storagePath]);
   if (error) {
     const code = getStorageErrorCode(error);
-    if (error.statusCode === "404" || code === "NoSuchKey" || code === "NotFound") {
+    const statusCode = getStorageErrorStatus(error);
+    if (statusCode === "404" || code === "NoSuchKey" || code === "NotFound") {
       return;
     }
-    console.error("Project document storage deletion failed.", {
-      statusCode: error.statusCode,
-      code,
-    });
+    logStorageError("Project document storage deletion failed.", error);
     throw new Error("The document file could not be deleted. Verify Supabase Storage access and try again.");
   }
 }
@@ -181,6 +198,11 @@ export async function saveProjectDocument(
   formData: FormData,
 ): Promise<ProjectDocumentFormState> {
   const { organization, profile } = await requireOrganization();
+  const clientIp = await getClientIdentifier();
+  const rateLimit = await checkRateLimit(clientIp, UPLOAD_RATE_LIMIT_CONFIG);
+  if (!rateLimit.allowed) {
+    return { error: "Too many upload requests. Please try again later." };
+  }
   const file = formData.get("file");
   const parsed = projectDocumentInputSchema.safeParse({
     projectId: formData.get("projectId"),
@@ -195,6 +217,16 @@ export async function saveProjectDocument(
 
   if (!(file instanceof File) || file.size === 0) {
     return { error: "Choose a document to upload." };
+  }
+
+  const validation = validateProjectDocumentUploadFile({
+    name: file.name,
+    size: file.size,
+    type: file.type,
+  });
+
+  if (!validation.ok) {
+    return { error: validation.error };
   }
 
   let projectId: string | null = null;
@@ -212,9 +244,26 @@ export async function saveProjectDocument(
     }
     projectId = project.id;
 
+    failureStage = "file content validation";
+    const head = await readProjectDocumentFileHead(file);
+    if (!verifyProjectDocumentFileContent(head, validation.extension)) {
+      return { error: "The file content does not match its file type. Check the file and try again." };
+    }
+
     const documentId = crypto.randomUUID();
+    const storageScope = {
+      organizationId: organization.id,
+      projectId: project.id,
+      documentId,
+    };
+
     failureStage = "storage upload";
-    const upload = await uploadToProjectStorage(file, project.id, organization.id, documentId);
+    const upload = await uploadToProjectStorage(
+      file,
+      storageScope,
+      validation.storageName,
+      validation.mimeType,
+    );
     storagePath = upload.storagePath;
 
     failureStage = "database save";
@@ -228,7 +277,6 @@ export async function saveProjectDocument(
       }
 
       failureStage = "document metadata insert";
-      failureStage = "document metadata insert";
       const document = await transaction.projectDocument.create({
         data: {
           id: documentId,
@@ -236,9 +284,9 @@ export async function saveProjectDocument(
           projectId: project.id,
           uploadedById: profile.id,
           name: parsed.data.name,
-          originalName: file.name,
+          originalName: validation.originalName,
           documentType: parsed.data.documentType,
-          mimeType: file.type || null,
+          mimeType: validation.mimeType,
           sizeBytes: file.size,
           storagePath,
           storageUrl: null,
@@ -264,17 +312,12 @@ export async function saveProjectDocument(
     return { success: true };
   } catch (error) {
     await cleanupProjectDocumentStorageObject(storagePath);
+    const prismaCode = getPrismaErrorCode(error);
     console.error("Project document save failed.", {
       stage: failureStage,
       errorName: error instanceof Error ? error.name : "UnknownError",
-      prismaCode: getPrismaErrorCode(error),
+      prismaCode,
       prismaTarget: getPrismaErrorTarget(error),
-      statusCode: typeof error === "object" && error !== null && "statusCode" in error
-        ? String(error.statusCode)
-        : undefined,
-      code: typeof error === "object" && error !== null && "code" in error
-        ? String(error.code)
-        : undefined,
       projectId,
     });
 
@@ -283,6 +326,11 @@ export async function saveProjectDocument(
     }
     if (error instanceof Error && error.message.startsWith("Document storage is not configured")) {
       return { error: error.message };
+    }
+    if (prismaCode === "P2002") {
+      return {
+        error: "The primary Project Brief changed while this document was uploading. Refresh the page and try again.",
+      };
     }
     if (failureStage === "upload activity insert") {
       return {
@@ -332,6 +380,20 @@ export async function getProjectDocumentAccessUrl(
       return { error: "The file is no longer available." };
     }
 
+    if (
+      !isProjectDocumentStoragePath(document.storagePath, {
+        organizationId: organization.id,
+        projectId: parsedProjectId.data,
+        documentId: parsedId.data,
+      })
+    ) {
+      console.error("Project document storage path failed validation.", {
+        documentId: parsedId.data,
+        projectId: parsedProjectId.data,
+      });
+      return { error: "The file is no longer available." };
+    }
+
     const project = await prisma.project.findFirst({
       where: { id: parsedProjectId.data, organizationId: organization.id },
       select: { id: true },
@@ -349,13 +411,15 @@ export async function getProjectDocumentAccessUrl(
     );
 
     if (error || !data?.signedUrl) {
-      console.error("Project document signed URL generation failed.", error);
+      logStorageError("Project document signed URL generation failed.", error);
       return { error: "This document could not be opened." };
     }
 
     return { url: data.signedUrl };
   } catch (error) {
-    console.error("Project document access failed.", error);
+    console.error("Project document access failed.", {
+      errorName: error instanceof Error ? error.name : "UnknownError",
+    });
     return { error: "This document could not be opened." };
   }
 }
@@ -388,8 +452,21 @@ export async function deleteProjectDocument(formData: FormData): Promise<Project
       return { error: "This document is unavailable in your workspace." };
     }
 
+    const storagePathIsValid = isProjectDocumentStoragePath(document.storagePath, {
+      organizationId: organization.id,
+      projectId: parsedProjectId.data,
+      documentId: document.id,
+    });
+
     failureStage = "storage deletion";
-    await deleteProjectDocumentStorageObject(document.storagePath);
+    if (storagePathIsValid) {
+      await deleteProjectDocumentStorageObject(document.storagePath);
+    } else if (document.storagePath) {
+      console.error("Project document storage path failed validation during deletion.", {
+        documentId: document.id,
+        projectId: parsedProjectId.data,
+      });
+    }
 
     failureStage = "document metadata deletion";
     await prisma.$transaction(async (transaction) => {
@@ -415,12 +492,6 @@ export async function deleteProjectDocument(formData: FormData): Promise<Project
       errorName: error instanceof Error ? error.name : "UnknownError",
       prismaCode: getPrismaErrorCode(error),
       prismaTarget: getPrismaErrorTarget(error),
-      statusCode: typeof error === "object" && error !== null && "statusCode" in error
-        ? String(error.statusCode)
-        : undefined,
-      code: typeof error === "object" && error !== null && "code" in error
-        ? String(error.code)
-        : undefined,
       projectId: parsedProjectId.data,
     });
     if (failureStage === "document lookup") {
@@ -508,13 +579,19 @@ export async function setPrimaryProjectBrief(formData: FormData): Promise<Projec
     revalidateProjectDocumentViews(parsedProjectId.data);
     return { success: true };
   } catch (error) {
+    const prismaCode = getPrismaErrorCode(error);
     console.error("Primary project brief update failed.", {
       stage: failureStage,
       errorName: error instanceof Error ? error.name : "UnknownError",
-      prismaCode: getPrismaErrorCode(error),
+      prismaCode,
       prismaTarget: getPrismaErrorTarget(error),
       projectId: parsedProjectId.data,
     });
+    if (prismaCode === "P2002") {
+      return {
+        error: "Another Project Brief became primary at the same time. Refresh the page and choose again.",
+      };
+    }
     return {
       error: failureStage === "primary activity insert"
         ? "The primary brief could not be recorded. No changes were saved; please try again."

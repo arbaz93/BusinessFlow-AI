@@ -9,8 +9,14 @@ datasource db {
 
 enum OrganizationRole {
   OWNER
-  ADMIN
   MEMBER
+}
+
+enum InvitationStatus {
+  PENDING
+  ACCEPTED
+  CANCELLED
+  EXPIRED
 }
 
 enum LeadStatus {
@@ -129,6 +135,7 @@ model User {
   createdAt       DateTime             @default(now())
   updatedAt       DateTime             @updatedAt
   memberships     OrganizationMember[]
+  invitations    OrganizationInvitation[] @relation("InvitationInvitedBy")
   activities      Activity[]
   createdLeads    Lead[]
   createdProjects Project[]
@@ -150,6 +157,7 @@ model Organization {
   createdAt    DateTime             @default(now())
   updatedAt    DateTime             @updatedAt
   memberships  OrganizationMember[]
+  invitations  OrganizationInvitation[]
   leads        Lead[]
   clients      Client[]
   projects     Project[]
@@ -175,6 +183,26 @@ model OrganizationMember {
   @@unique([organizationId, userId])
   @@index([userId])
   @@index([organizationId])
+}
+
+model OrganizationInvitation {
+  id             String           @id @default(cuid())
+  organizationId String
+  email          String
+  role           OrganizationRole @default(MEMBER)
+  invitedById    String
+  status         InvitationStatus @default(PENDING)
+  tokenHash      String?          @unique
+  expiresAt      DateTime?
+  acceptedAt     DateTime?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  organization   Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  invitedBy      User             @relation("InvitationInvitedBy", fields: [invitedById], references: [id], onDelete: Restrict)
+
+  @@unique([organizationId, email])
+  @@index([organizationId, status])
+  @@index([email])
 }
 
 model Lead {

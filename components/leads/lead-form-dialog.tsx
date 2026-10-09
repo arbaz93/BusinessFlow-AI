@@ -21,7 +21,7 @@ export function LeadFormDialog({ lead }: { lead?: LeadDraft }) {
         <button
           type="button"
           className={lead
-            ? "inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-white/10 bg-[#18181b] px-3 text-sm font-medium text-white/80 transition-colors hover:bg-white/[0.06] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff]"
+            ? "inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-[var(--line)] bg-[var(--panel)] px-3 text-sm font-medium text-[var(--foreground)] transition-colors hover:bg-[var(--surface)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff]"
             : "inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-[#7067e8] px-4 text-sm font-medium text-white transition-colors hover:bg-[#8178f0] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff]"}
         >
           {lead ? <Pencil size={15} /> : <Plus size={16} />}
@@ -70,25 +70,25 @@ function LeadForm({ lead, onClose }: { lead?: LeadDraft; onClose: () => void }) 
     return state.fieldErrors?.[name]?.[0];
   }
 
-  const inputClass = "h-10 border-white/10 bg-[#111113] text-sm text-white placeholder:text-white/30 focus-visible:border-[#a49bff] focus-visible:ring-[#a49bff]/20 dark:bg-[#111113]";
-  const selectClass = "h-10 w-full rounded-md border border-white/10 bg-[#111113] px-3 text-sm text-white outline-none focus-visible:border-[#a49bff] focus-visible:ring-[3px] focus-visible:ring-[#a49bff]/20";
-  const labelClass = "mb-1.5 block text-xs font-medium text-white/70";
+  const inputClass = "h-10 border-[var(--line)] bg-[var(--surface)] text-sm text-[var(--foreground)] placeholder:text-[var(--muted)] focus-visible:border-[#a49bff] focus-visible:ring-[#a49bff]/20";
+  const selectClass = "h-10 w-full rounded-md border border-[var(--line)] bg-[var(--surface)] px-3 text-sm text-[var(--foreground)] outline-none focus-visible:border-[#a49bff] focus-visible:ring-[3px] focus-visible:ring-[#a49bff]/20";
+  const labelClass = "mb-1.5 block text-xs font-medium text-[var(--muted)]";
 
   return (
     <Dialog.Portal>
       <Dialog.Overlay className="fixed inset-0 z-50 bg-black/70 backdrop-blur-[2px]" />
-      <Dialog.Content className="fixed left-1/2 top-1/2 z-50 max-h-[90dvh] w-[calc(100vw-2rem)] max-w-[560px] -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-xl border border-white/10 bg-[#18181b] p-5 text-white shadow-2xl outline-none sm:p-6">
+      <Dialog.Content className="fixed left-1/2 top-1/2 z-50 max-h-[90dvh] w-[calc(100vw-2rem)] max-w-[560px] -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-xl border border-[var(--line)] bg-[var(--panel)] p-5 text-[var(--foreground)] shadow-2xl outline-none sm:p-6">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <Dialog.Title className="text-lg font-semibold tracking-[-0.02em] text-[#f4f4f5]">
+            <Dialog.Title className="text-lg font-semibold tracking-[-0.02em] text-[var(--foreground)]">
               {lead ? "Edit lead" : "Create a lead"}
             </Dialog.Title>
-            <Dialog.Description className="mt-1 text-sm text-white/50">
+            <Dialog.Description className="mt-1 text-sm text-[var(--foreground)]/50">
               Keep the essentials together so your next step is clear.
             </Dialog.Description>
           </div>
           <Dialog.Close asChild>
-            <button type="button" aria-label="Close dialog" className="grid size-9 shrink-0 place-items-center rounded-lg text-white/55 transition-colors hover:bg-white/[0.07] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff]">
+            <button type="button" aria-label="Close dialog" className="grid size-9 shrink-0 place-items-center rounded-lg text-[var(--foreground)]/55 transition-colors hover:bg-[var(--surface)] hover:text-[var(--foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff]">
               <X size={17} />
             </button>
           </Dialog.Close>
@@ -108,7 +108,7 @@ function LeadForm({ lead, onClose }: { lead?: LeadDraft; onClose: () => void }) 
           {lead && <input type="hidden" name="leadId" value={lead.id} />}
           {lead && <input type="hidden" name="expectedUpdatedAt" value={lead.updatedAt} />}
           <div className="grid gap-4 sm:grid-cols-2">
-            <h3 className="text-xs font-semibold uppercase tracking-[0.12em] text-white/45 sm:col-span-2">Contact information</h3>
+            <h3 className="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--foreground)]/45 sm:col-span-2">Contact information</h3>
             <div className="sm:col-span-2">
               <label htmlFor="lead-name" className={labelClass}>Name <span className="text-[#fca5a5]">*</span></label>
               <Input id="lead-name" name="name" autoComplete="name" required maxLength={100} value={values.name} onChange={(event) => setValues({ ...values, name: event.currentTarget.value })} aria-invalid={Boolean(fieldError("name"))} aria-describedby={fieldError("name") ? "lead-name-error" : undefined} className={inputClass} />
@@ -130,7 +130,7 @@ function LeadForm({ lead, onClose }: { lead?: LeadDraft; onClose: () => void }) 
               {fieldError("phone") && <p id="lead-phone-error" className="mt-1 text-xs text-[#fca5a5]">{fieldError("phone")}</p>}
             </div>
 
-            <h3 className="mt-2 border-t border-white/[0.07] pt-4 text-xs font-semibold uppercase tracking-[0.12em] text-white/45 sm:col-span-2">Lead details</h3>
+            <h3 className="mt-2 border-t border-[var(--line)] pt-4 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--foreground)]/45 sm:col-span-2">Lead details</h3>
             <div>
               <label htmlFor="lead-source" className={labelClass}>Source <span className="text-[#fca5a5]">*</span></label>
               <select id="lead-source" name="source" required value={values.source} onChange={(event) => {
@@ -169,18 +169,18 @@ function LeadForm({ lead, onClose }: { lead?: LeadDraft; onClose: () => void }) 
             </div>
             <div className="sm:col-span-2">
               <label htmlFor="lead-notes" className={labelClass}>Notes</label>
-              <Textarea id="lead-notes" name="notes" rows={3} maxLength={2000} placeholder="Add context for the next conversation…" value={values.notes ?? ""} onChange={(event) => setValues({ ...values, notes: event.currentTarget.value })} aria-invalid={Boolean(fieldError("notes"))} aria-describedby={fieldError("notes") ? "lead-notes-error" : undefined} className="min-h-24 resize-y border-white/10 bg-[#111113] text-sm text-white placeholder:text-white/30 focus-visible:border-[#a49bff] focus-visible:ring-[#a49bff]/20 dark:bg-[#111113]" />
+              <Textarea id="lead-notes" name="notes" rows={3} maxLength={2000} placeholder="Add context for the next conversation…" value={values.notes ?? ""} onChange={(event) => setValues({ ...values, notes: event.currentTarget.value })} aria-invalid={Boolean(fieldError("notes"))} aria-describedby={fieldError("notes") ? "lead-notes-error" : undefined} className="min-h-24 resize-y border-[var(--line)] bg-[var(--surface)] text-sm text-[var(--foreground)] placeholder:text-[var(--foreground)]/30 focus-visible:border-[#a49bff] focus-visible:ring-[#a49bff]/20 dark:bg-[var(--surface)]" />
               {fieldError("notes") && <p id="lead-notes-error" className="mt-1 text-xs text-[#fca5a5]">{fieldError("notes")}</p>}
             </div>
           </div>
 
-          {state.error && <p role="alert" className="rounded-lg border border-[#ef4444]/20 bg-[#ef4444]/[0.08] px-3 py-2 text-sm text-[#fca5a5]">{state.error}</p>}
+          {state.error && <p role="alert" className="rounded-lg border border-[var(--danger-border)]/20 bg-[var(--danger)]/[0.08] px-3 py-2 text-sm text-[#fca5a5]">{state.error}</p>}
 
-          <div className="flex flex-col-reverse gap-2 border-t border-white/8 pt-4 sm:flex-row sm:justify-end">
+          <div className="flex flex-col-reverse gap-2 border-t border-[var(--line)] pt-4 sm:flex-row sm:justify-end">
             <Dialog.Close asChild>
-              <button type="button" className="h-10 rounded-lg px-4 text-sm font-medium text-white/65 transition-colors hover:bg-white/[0.05] hover:text-white">Cancel</button>
+              <button type="button" className="h-10 rounded-lg px-4 text-sm font-medium text-[var(--foreground)]/65 transition-colors hover:bg-[var(--surface)] hover:text-[var(--foreground)]">Cancel</button>
             </Dialog.Close>
-            <button type="submit" disabled={pending} className="h-10 rounded-lg bg-[#7067e8] px-4 text-sm font-medium text-white transition-colors hover:bg-[#8178f0] disabled:cursor-not-allowed disabled:opacity-55">
+            <button type="submit" disabled={pending} className="h-10 rounded-lg bg-[#7067e8] px-4 text-sm font-medium text-[var(--foreground)] transition-colors hover:bg-[#8178f0] disabled:cursor-not-allowed disabled:opacity-55">
               {pending ? "Saving…" : lead ? "Save Changes" : "Create Lead"}
             </button>
           </div>

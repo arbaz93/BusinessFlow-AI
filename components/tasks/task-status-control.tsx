@@ -42,7 +42,7 @@ export function TaskStatusControl({ taskId, initialStatus }: { taskId: string; i
         value={status}
         disabled={pending}
         onChange={(event) => handleChange(event.currentTarget.value)}
-        className="h-10 max-w-full rounded-lg border border-white/10 bg-[#18181b] px-2.5 text-sm font-medium text-white/85 outline-none transition-colors hover:border-white/20 focus-visible:ring-2 focus-visible:ring-[#a49bff] disabled:opacity-55"
+        className="h-10 max-w-full rounded-lg border border-[var(--line)] bg-[var(--panel)] px-2.5 text-sm font-medium text-[var(--foreground)] outline-none transition-colors hover:border-[var(--line-strong)] focus-visible:ring-2 focus-visible:ring-[#a49bff] disabled:opacity-55"
       >
         {taskStatusValues.map((item) => (
           <option key={item} value={item}>{taskStatusLabels[item]}</option>

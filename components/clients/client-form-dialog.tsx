@@ -17,7 +17,7 @@ export function ClientFormDialog({ client, label }: { client?: ClientDraft; labe
     <Dialog.Root open={open} onOpenChange={setOpen}>
       <Dialog.Trigger asChild>
         <button type="button" className={client
-          ? "inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-white/10 bg-[#18181b] px-3 text-sm font-medium text-white/80 transition-colors hover:bg-white/[0.06] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff]"
+          ? "inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-[var(--line)] bg-[var(--panel)] px-3 text-sm font-medium text-[var(--foreground)] transition-colors hover:bg-[var(--surface)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff]"
           : "inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-[#7067e8] px-4 text-sm font-medium text-white transition-colors hover:bg-[#8178f0] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff]"}>
           {client ? <Pencil size={15} /> : <Plus size={16} />}
           {client ? "Edit Client" : label ?? "New Client"}
@@ -52,21 +52,21 @@ function ClientForm({ client, onClose }: { client?: ClientDraft; onClose: () => 
     return state.fieldErrors?.[field]?.[0];
   }
 
-  const inputClass = "h-10 border-white/10 bg-[#111113] text-sm text-white placeholder:text-white/30 focus-visible:border-[#a49bff] focus-visible:ring-[#a49bff]/20 dark:bg-[#111113]";
-  const selectClass = "h-10 w-full rounded-md border border-white/10 bg-[#111113] px-3 text-sm text-white outline-none focus-visible:border-[#a49bff] focus-visible:ring-[3px] focus-visible:ring-[#a49bff]/20";
-  const labelClass = "mb-1.5 block text-xs font-medium text-white/70";
+  const inputClass = "h-10 border-[var(--line)] bg-[var(--surface)] text-sm text-[var(--foreground)] placeholder:text-[var(--muted)] focus-visible:border-[#a49bff] focus-visible:ring-[#a49bff]/20 dark:bg-[var(--surface)]";
+  const selectClass = "h-10 w-full rounded-md border border-[var(--line)] bg-[var(--surface)] px-3 text-sm text-[var(--foreground)] outline-none focus-visible:border-[#a49bff] focus-visible:ring-[3px] focus-visible:ring-[#a49bff]/20";
+  const labelClass = "mb-1.5 block text-xs font-medium text-[var(--muted)]";
 
   return (
     <Dialog.Portal>
       <Dialog.Overlay className="fixed inset-0 z-50 bg-black/70 backdrop-blur-[2px]" />
-      <Dialog.Content className="fixed left-1/2 top-1/2 z-50 max-h-[90dvh] w-[calc(100vw-2rem)] max-w-[560px] -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-xl border border-white/10 bg-[#18181b] p-5 text-white shadow-2xl outline-none sm:p-6">
+      <Dialog.Content className="fixed left-1/2 top-1/2 z-50 max-h-[90dvh] w-[calc(100vw-2rem)] max-w-[560px] -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-xl border border-[var(--line)] bg-[var(--panel)] p-5 text-[var(--foreground)] shadow-2xl outline-none sm:p-6">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <Dialog.Title className="text-lg font-semibold tracking-[-0.02em] text-[#f4f4f5]">{client ? "Edit Client" : "New Client"}</Dialog.Title>
-            <Dialog.Description className="mt-1 text-sm text-white/50">{client ? "Update contact details and ongoing client context." : "Add a client relationship to your workspace."}</Dialog.Description>
+            <Dialog.Title className="text-lg font-semibold tracking-[-0.02em] text-[var(--foreground)]">{client ? "Edit Client" : "New Client"}</Dialog.Title>
+            <Dialog.Description className="mt-1 text-sm text-[var(--muted)]">{client ? "Update contact details and ongoing client context." : "Add a client relationship to your workspace."}</Dialog.Description>
           </div>
           <Dialog.Close asChild>
-            <button type="button" aria-label="Close dialog" className="grid size-9 shrink-0 place-items-center rounded-lg text-white/55 transition-colors hover:bg-white/[0.07] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff]"><X size={17} /></button>
+            <button type="button" aria-label="Close dialog" className="grid size-9 shrink-0 place-items-center rounded-lg text-[var(--muted)] transition-colors hover:bg-[var(--surface)] hover:text-[var(--foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff]"><X size={17} /></button>
           </Dialog.Close>
         </div>
 
@@ -80,7 +80,7 @@ function ClientForm({ client, onClose }: { client?: ClientDraft; onClose: () => 
           {client && <input type="hidden" name="clientId" value={client.id} />}
           {client && <input type="hidden" name="expectedUpdatedAt" value={client.updatedAt} />}
           <div className="grid gap-4 sm:grid-cols-2">
-            <h3 className="text-xs font-semibold uppercase tracking-[0.12em] text-white/45 sm:col-span-2">Contact information</h3>
+            <h3 className="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--muted)] sm:col-span-2">Contact information</h3>
             <div className="sm:col-span-2">
               <label htmlFor="client-name" className={labelClass}>Name <span className="text-[#fca5a5]">*</span></label>
               <Input id="client-name" name="name" autoComplete="name" required maxLength={100} value={values.name} onChange={(event) => setValues({ ...values, name: event.currentTarget.value })} aria-invalid={Boolean(fieldError("name"))} aria-describedby={fieldError("name") ? "client-name-error" : undefined} className={inputClass} />
@@ -102,7 +102,7 @@ function ClientForm({ client, onClose }: { client?: ClientDraft; onClose: () => 
               {fieldError("phone") && <p id="client-phone-error" className="mt-1 text-xs text-[#fca5a5]">{fieldError("phone")}</p>}
             </div>
 
-            <h3 className="mt-2 border-t border-white/[0.07] pt-4 text-xs font-semibold uppercase tracking-[0.12em] text-white/45 sm:col-span-2">Client information</h3>
+            <h3 className="mt-2 border-t border-[var(--line)] pt-4 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--muted)] sm:col-span-2">Client information</h3>
             <div>
               <label htmlFor="client-status" className={labelClass}>Status</label>
               <select id="client-status" name="status" value={values.status} onChange={(event) => {
@@ -115,16 +115,16 @@ function ClientForm({ client, onClose }: { client?: ClientDraft; onClose: () => 
             </div>
             <div className="sm:col-span-2">
               <label htmlFor="client-notes" className={labelClass}>Notes</label>
-              <Textarea id="client-notes" name="notes" rows={4} maxLength={5000} placeholder="Ongoing context, preferences, and relationship notes…" value={values.notes} onChange={(event) => setValues({ ...values, notes: event.currentTarget.value })} aria-invalid={Boolean(fieldError("notes"))} aria-describedby={fieldError("notes") ? "client-notes-error" : undefined} className="min-h-24 resize-y border-white/10 bg-[#111113] text-sm text-white placeholder:text-white/30 focus-visible:border-[#a49bff] focus-visible:ring-[#a49bff]/20 dark:bg-[#111113]" />
+              <Textarea id="client-notes" name="notes" rows={4} maxLength={5000} placeholder="Ongoing context, preferences, and relationship notes…" value={values.notes} onChange={(event) => setValues({ ...values, notes: event.currentTarget.value })} aria-invalid={Boolean(fieldError("notes"))} aria-describedby={fieldError("notes") ? "client-notes-error" : undefined} className="min-h-24 resize-y border-[var(--line)] bg-[var(--surface)] text-sm text-[var(--foreground)] placeholder:text-[var(--muted)] focus-visible:border-[#a49bff] focus-visible:ring-[#a49bff]/20 dark:bg-[var(--surface)]" />
               {fieldError("notes") && <p id="client-notes-error" className="mt-1 text-xs text-[#fca5a5]">{fieldError("notes")}</p>}
             </div>
           </div>
 
-          {state.error && <p role="alert" className="rounded-lg border border-[#ef4444]/20 bg-[#ef4444]/[0.08] px-3 py-2 text-sm text-[#fca5a5]">{state.error}</p>}
+          {state.error && <p role="alert" className="rounded-lg border border-[var(--danger-border)]/20 bg-[var(--danger)]/[0.08] px-3 py-2 text-sm text-[#fca5a5]">{state.error}</p>}
 
-          <div className="flex flex-col-reverse gap-2 border-t border-white/8 pt-4 sm:flex-row sm:justify-end">
-            <Dialog.Close asChild><button type="button" className="h-10 rounded-lg px-4 text-sm font-medium text-white/65 transition-colors hover:bg-white/[0.05] hover:text-white">Cancel</button></Dialog.Close>
-            <button type="submit" disabled={pending} className="h-10 rounded-lg bg-[#7067e8] px-4 text-sm font-medium text-white transition-colors hover:bg-[#8178f0] disabled:cursor-not-allowed disabled:opacity-55">{pending ? "Saving…" : client ? "Save Changes" : "Create Client"}</button>
+          <div className="flex flex-col-reverse gap-2 border-t border-[var(--line)] pt-4 sm:flex-row sm:justify-end">
+            <Dialog.Close asChild><button type="button" className="h-10 rounded-lg px-4 text-sm font-medium text-[var(--muted)] transition-colors hover:bg-[var(--surface)] hover:text-[var(--foreground)]">Cancel</button></Dialog.Close>
+            <button type="submit" disabled={pending} className="h-10 rounded-lg bg-[#7067e8] px-4 text-sm font-medium text-[var(--foreground)] transition-colors hover:bg-[#8178f0] disabled:cursor-not-allowed disabled:opacity-55">{pending ? "Saving…" : client ? "Save Changes" : "Create Client"}</button>
           </div>
         </form>
       </Dialog.Content>

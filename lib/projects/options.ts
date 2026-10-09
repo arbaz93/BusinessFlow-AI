@@ -28,16 +28,16 @@ export const projectPriorityLabels: Record<ProjectPriority, string> = {
 };
 
 export const projectStatusTone: Record<ProjectStatus, string> = {
-  PLANNING: "border-white/10 bg-white/[0.04] text-white/70",
-  IN_PROGRESS: "border-[#8b5cf6]/25 bg-[#8b5cf6]/10 text-[#c4b5fd]",
-  ON_HOLD: "border-[#f59e0b]/25 bg-[#f59e0b]/10 text-[#fbbf24]",
-  COMPLETED: "border-[#22c55e]/20 bg-[#22c55e]/10 text-[#86efac]",
-  CANCELLED: "border-[#ef4444]/20 bg-[#ef4444]/10 text-[#fca5a5]",
+  PLANNING: "border-[var(--line)] bg-[var(--panel)] text-[var(--muted)]",
+  IN_PROGRESS: "border-[var(--accent)]/25 bg-[var(--accent)]/10 text-[var(--accent-muted)]",
+  ON_HOLD: "border-[var(--warning)]/25 bg-[var(--warning-surface)] text-[var(--warning-line)]",
+  COMPLETED: "border-[var(--success)]/20 bg-[var(--success-surface)] text-[var(--success-line)]",
+  CANCELLED: "border-[var(--danger)]/20 bg-[var(--danger-surface)] text-[var(--danger-line)]",
 };
 
 export const projectPriorityTone: Record<ProjectPriority, string> = {
-  LOW: "border-white/10 bg-white/[0.04] text-white/65",
-  MEDIUM: "border-[#93c5fd]/20 bg-[#93c5fd]/10 text-[#bfdbfe]",
-  HIGH: "border-[#f59e0b]/25 bg-[#f59e0b]/10 text-[#fbbf24]",
-  URGENT: "border-[#ef4444]/20 bg-[#ef4444]/10 text-[#fca5a5]",
+  LOW: "border-[var(--line)] bg-[var(--panel)] text-[var(--muted)]",
+  MEDIUM: "border-[var(--info)]/20 bg-[var(--info-surface)] text-[var(--info-line)]",
+  HIGH: "border-[var(--warning)]/25 bg-[var(--warning-surface)] text-[var(--warning-line)]",
+  URGENT: "border-[var(--danger)]/20 bg-[var(--danger-surface)] text-[var(--danger-line)]",
 };

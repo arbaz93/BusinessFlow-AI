@@ -71,7 +71,7 @@ export async function getAssistantProjectTaskAggregates(
 ): Promise<AssistantTaskAggregates> {
   const { overdueBefore, upcomingFrom, upcomingThrough } = getTaskDateWindow(now);
 
-  const [open, completed, overdue, blocked, dueSoon] = await Promise.all([
+  const [open, completed, overdue, blocked, dueSoon, cancelled] = await Promise.all([
     prisma.task.count({
       where: { organizationId, projectId, status: { in: ["TODO", "IN_PROGRESS"] } },
     }),
@@ -97,11 +97,10 @@ export async function getAssistantProjectTaskAggregates(
         dueDate: { gte: upcomingFrom, lte: upcomingThrough },
       },
     }),
+    prisma.task.count({
+      where: { organizationId, projectId, status: "CANCELLED" },
+    }),
   ]);
-
-  const cancelled = await prisma.task.count({
-    where: { organizationId, projectId, status: "CANCELLED" },
-  });
 
   return {
     total: open + completed + overdue + blocked + dueSoon + cancelled,
@@ -119,8 +118,12 @@ export async function getAssistantOrgTaskAggregates(
 ): Promise<AssistantTaskAggregates> {
   const { overdueBefore, upcomingFrom, upcomingThrough } = getTaskDateWindow(now);
 
-  const [total, overdue, dueSoon, blocked, open, completed] = await Promise.all([
-    prisma.task.count({ where: { organizationId } }),
+  const [statusCounts, overdue, dueSoon] = await Promise.all([
+    prisma.task.groupBy({
+      by: ["status"],
+      where: { organizationId },
+      _count: { _all: true },
+    }),
     prisma.task.count({
       where: { organizationId, status: { in: activeTaskStatuses }, dueDate: { lt: overdueBefore } },
     }),
@@ -131,12 +134,13 @@ export async function getAssistantOrgTaskAggregates(
         dueDate: { gte: upcomingFrom, lte: upcomingThrough },
       },
     }),
-    prisma.task.count({ where: { organizationId, status: "BLOCKED" } }),
-    prisma.task.count({
-      where: { organizationId, status: { in: ["TODO", "IN_PROGRESS"] } },
-    }),
-    prisma.task.count({ where: { organizationId, status: "COMPLETED" } }),
   ]);
+
+  const countByStatus = Object.fromEntries(statusCounts.map((g) => [g.status, g._count._all]));
+  const total = Object.values(countByStatus).reduce((sum, n) => sum + n, 0);
+  const blocked = countByStatus.BLOCKED ?? 0;
+  const open = (countByStatus.TODO ?? 0) + (countByStatus.IN_PROGRESS ?? 0);
+  const completed = countByStatus.COMPLETED ?? 0;
 
   return {
     total,

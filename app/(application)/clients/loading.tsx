@@ -2,10 +2,10 @@ export default function ClientsLoading() {
   return (
     <div className="animate-pulse space-y-6 pb-10" aria-label="Loading clients" role="status">
       <span className="sr-only">Loading clients…</span>
-      <div className="space-y-3 pt-2 sm:pt-5"><div className="h-3 w-36 rounded bg-white/10" /><div className="h-9 w-44 rounded bg-white/10" /><div className="h-4 w-72 max-w-full rounded bg-white/[0.06]" /></div>
-      <div className="grid gap-3 sm:grid-cols-2">{[0, 1].map((item) => <div key={item} className="h-24 rounded-[10px] border border-white/10 bg-[#18181b]" />)}</div>
-      <div className="h-16 rounded-[10px] border border-white/10 bg-[#18181b]" />
-      <div className="overflow-hidden rounded-[10px] border border-white/10 bg-[#151518]">{[0, 1, 2, 3].map((item) => <div key={item} className="h-[68px] border-b border-white/[0.07] last:border-0" />)}</div>
+      <div className="space-y-3 pt-2 sm:pt-5"><div className="h-3 w-36 rounded bg-[var(--surface)]" /><div className="h-9 w-44 rounded bg-[var(--surface)]" /><div className="h-4 w-72 max-w-full rounded bg-[var(--surface)]" /></div>
+      <div className="grid gap-3 sm:grid-cols-2">{[0, 1].map((item) => <div key={item} className="h-24 rounded-[10px] border border-[var(--line)] bg-[var(--panel)]" />)}</div>
+      <div className="h-16 rounded-[10px] border border-[var(--line)] bg-[var(--panel)]" />
+      <div className="overflow-hidden rounded-[10px] border border-[var(--line)] bg-[var(--surface)]">{[0, 1, 2, 3].map((item) => <div key={item} className="h-[68px] border-b border-[var(--line)] last:border-0" />)}</div>
     </div>
   );
 }

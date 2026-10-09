@@ -1,21 +1,22 @@
 "use client";
 
 import Link from "next/link";
-import { Sparkle, Sparkles } from "lucide-react";
+import { Sparkle } from "lucide-react";
+import { buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
-const footerLinks = {
+const footerNavigation = {
   product: [
-    { name: "Product", href: "#product" },
-    { name: "Features", href: "#features" },
-    { name: "How It Works", href: "#how-it-works" },
-    { name: "FAQ", href: "#faq" },
+    { name: "Features", href: "/features" },
+    { name: "How It Works", href: "/how-it-works" },
   ],
-  account: [
-    { name: "Get Started", href: "/signup" },
-    { name: "Sign In", href: "/login" },
+  solutions: [
+    { name: "Use Cases", href: "/solutions" },
+    { name: "Security", href: "/security" },
   ],
   legal: [
-    // Only include if routes exist - currently omitted
+    { name: "Privacy", href: "/privacy" },
+    { name: "Terms", href: "/terms" },
   ],
 };
 
@@ -28,25 +29,24 @@ export function MarketingFooter() {
         <div className="grid gap-8 lg:grid-cols-[1fr_auto_auto_auto]">
           <div className="lg:col-span-1 max-w-xs">
             <Link href="/" className="flex items-center gap-3" aria-label="BusinessFlow AI home">
-              <span className="grid size-9 place-items-center rounded-lg bg-white text-sm font-bold text-[var(--background)]"><Sparkle /></span>
+              <span className="grid size-9 place-items-center rounded-lg bg-foreground text-sm font-bold text-background"><Sparkle /></span>
               <span className="text-base font-semibold tracking-tight text-[var(--foreground)]">
                 BusinessFlow <span className="text-[var(--accent)]">AI</span>
               </span>
             </Link>
             <p className="mt-4 text-sm leading-6 text-[var(--muted)]">
-              Connected operations for agencies and small service businesses.
-              From first lead to final delivery — one workspace.
+              Business operations, organized around the work that actually gets done.
             </p>
           </div>
 
           <nav aria-label="Product">
             <h3 className="text-sm font-semibold uppercase tracking-[0.18em] text-[var(--foreground)]">Product</h3>
             <ul className="mt-4 space-y-3" role="list">
-              {footerLinks.product.map((link) => (
+              {footerNavigation.product.map((link) => (
                 <li key={link.name}>
                   <Link
                     href={link.href}
-                    className="text-sm text-[var(--muted)] transition-colors hover:text-[var(--foreground)]"
+                    className="text-sm text-[var(--muted)] transition-colors hover:text-[var(--foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background)]"
                   >
                     {link.name}
                   </Link>
@@ -55,14 +55,14 @@ export function MarketingFooter() {
             </ul>
           </nav>
 
-          <nav aria-label="Account">
-            <h3 className="text-sm font-semibold uppercase tracking-[0.18em] text-[var(--foreground)]">Account</h3>
+          <nav aria-label="Solutions">
+            <h3 className="text-sm font-semibold uppercase tracking-[0.18em] text-[var(--foreground)]">Solutions</h3>
             <ul className="mt-4 space-y-3" role="list">
-              {footerLinks.account.map((link) => (
+              {footerNavigation.solutions.map((link) => (
                 <li key={link.name}>
                   <Link
                     href={link.href}
-                    className="text-sm text-[var(--muted)] transition-colors hover:text-[var(--foreground)]"
+                    className="text-sm text-[var(--muted)] transition-colors hover:text-[var(--foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background)]"
                   >
                     {link.name}
                   </Link>
@@ -71,28 +71,46 @@ export function MarketingFooter() {
             </ul>
           </nav>
 
-          <div>
+          <nav aria-label="Legal">
             <h3 className="text-sm font-semibold uppercase tracking-[0.18em] text-[var(--foreground)]">Legal</h3>
-            <p className="mt-4 text-sm text-[var(--muted-foreground)]">
-              Legal pages coming soon. For inquiries, contact support.
-            </p>
-          </div>
+            <ul className="mt-4 space-y-3" role="list">
+              {footerNavigation.legal.map((link) => (
+                <li key={link.name}>
+                  <Link
+                    href={link.href}
+                    className="text-sm text-[var(--muted)] transition-colors hover:text-[var(--foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background)]"
+                  >
+                    {link.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
         </div>
 
-        <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-[var(--line)] pt-8 lg:flex-row">
+        <div className="mt-12 flex flex-col items-center justify-between gap-6 border-t border-[var(--line)] pt-8 lg:flex-row">
           <p className="text-sm text-[var(--muted-foreground)]">
             &copy; {currentYear} BusinessFlow AI. All rights reserved.
           </p>
-          <div className="flex items-center gap-4">
-            <span className="text-sm text-[var(--muted-foreground)]">Built with</span>
-            <span className="flex items-center gap-1.5 text-sm font-medium text-[var(--accent)]">
-              <Sparkles size={14} />
-              Next.js
-            </span>
-            <span className="text-[var(--muted-foreground)]">·</span>
-            <span className="text-sm font-medium text-[var(--accent)]">Tailwind CSS</span>
-            <span className="text-[var(--muted-foreground)]">·</span>
-            <span className="text-sm font-medium text-[var(--accent)]">Supabase</span>
+          <div className="flex items-center gap-3">
+            <Link
+              href="/login"
+              className={cn(
+                buttonVariants({ variant: "outline", size: "sm" }),
+                "border-[var(--line)] bg-transparent hover:bg-[var(--surface)]"
+              )}
+            >
+              Sign In
+            </Link>
+            <Link
+              href="/signup"
+              className={cn(
+                buttonVariants({ variant: "primary", size: "sm" }),
+                "bg-[var(--accent)] text-white hover:opacity-80"
+              )}
+            >
+              Get Started
+            </Link>
           </div>
         </div>
       </div>

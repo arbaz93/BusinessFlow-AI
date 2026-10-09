@@ -42,7 +42,7 @@ export function LeadStatusControl({ leadId, initialStatus, readOnly = false }: {
         value={status}
         disabled={pending || readOnly}
         onChange={(event) => handleChange(event.target.value)}
-        className="h-9 max-w-full rounded-md border border-white/10 bg-[#111113] px-2.5 text-xs font-medium text-white/85 outline-none transition-colors hover:border-white/20 focus-visible:ring-2 focus-visible:ring-[#a49bff] disabled:opacity-55"
+        className="h-9 max-w-full rounded-md border border-[var(--line)] bg-[var(--surface)] px-2.5 text-xs font-medium text-[var(--foreground)]/85 outline-none transition-colors hover:border-[var(--line-strong)] focus-visible:ring-2 focus-visible:ring-[#a49bff] disabled:opacity-55"
       >
         {editableStatuses.map((item) => <option key={item} value={item}>{leadStatusLabels[item]}</option>)}
       </select>

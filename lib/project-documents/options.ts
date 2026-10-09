@@ -19,10 +19,10 @@ export const projectDocumentTypeLabels: Record<ProjectDocumentType, string> = {
 };
 
 export const projectDocumentTypeTone: Record<ProjectDocumentType, string> = {
-  PROJECT_BRIEF: "border-[#8b5cf6]/30 bg-[#8b5cf6]/10 text-[#c4b5fd]",
-  CLIENT_ASSET: "border-[#93c5fd]/25 bg-[#93c5fd]/10 text-[#bfdbfe]",
-  REFERENCE: "border-[#34d399]/25 bg-[#34d399]/10 text-[#a7f3d0]",
-  DESIGN: "border-[#f59e0b]/25 bg-[#f59e0b]/10 text-[#fbbf24]",
-  DELIVERABLE: "border-[#f472b6]/25 bg-[#f472b6]/10 text-[#fbcfe8]",
-  OTHER: "border-white/10 bg-white/[0.04] text-white/70",
+  PROJECT_BRIEF: "border-[var(--accent)]/30 bg-[var(--accent)]/10 text-[var(--accent-muted)]",
+  CLIENT_ASSET: "border-[var(--info)]/25 bg-[var(--info-surface)] text-[var(--info-line)]",
+  REFERENCE: "border-[var(--success)]/25 bg-[var(--success-surface)] text-[var(--success-line)]",
+  DESIGN: "border-[var(--warning)]/25 bg-[var(--warning-surface)] text-[var(--warning-line)]",
+  DELIVERABLE: "border-[var(--danger)]/25 bg-[var(--danger-surface)] text-[var(--danger-line)]",
+  OTHER: "border-[var(--line)] bg-[var(--panel)] text-[var(--muted)]",
 };

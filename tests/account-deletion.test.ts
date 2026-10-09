@@ -75,9 +75,9 @@ describe("Account deletion eligibility", () => {
     }
   });
 
-  it("is not blocked for admin-only ownership of a shared workspace", () => {
+  it("is not blocked for member-only ownership of a shared workspace", () => {
     const result = evaluateDeletionEligibility([
-      ownership({ memberCount: 4, role: OrganizationRole.ADMIN }),
+      ownership({ memberCount: 4, role: OrganizationRole.MEMBER }),
     ]);
     assert.equal(result.eligible, true);
     if (result.eligible) {

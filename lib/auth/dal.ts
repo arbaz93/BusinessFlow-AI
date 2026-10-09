@@ -1,10 +1,14 @@
 import "server-only";
 
 import { cache } from "react";
+import { cookies } from "next/headers";
 import type { User as SupabaseUser } from "@supabase/supabase-js";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db/prisma";
 import { createClient } from "@/lib/supabase/server";
+import { resolveApplicationEntryState } from "@/lib/auth/lifecycle";
+
+export const ACTIVE_WORKSPACE_COOKIE = "businessflow_active_workspace";
 
 function metadataString(user: SupabaseUser, key: string) {
   const value = user.user_metadata?.[key];
@@ -38,19 +42,42 @@ export async function syncProfile(authUser: SupabaseUser) {
 
 export async function getOrganizationContext(authUser: SupabaseUser) {
   const profile = await syncProfile(authUser);
-  const membership = await prisma.organizationMember.findFirst({
+  const memberships = await prisma.organizationMember.findMany({
     where: { userId: profile.id },
     include: { organization: true },
     orderBy: { createdAt: "asc" },
   });
+  const activeOrganizationId = (await cookies()).get(ACTIVE_WORKSPACE_COOKIE)?.value;
+  const membership =
+    memberships.find((row) => row.organizationId === activeOrganizationId) ??
+    memberships[0] ??
+    null;
 
-  return { authUser, profile, membership };
+  return { authUser, profile, membership, memberships };
 }
 
-export const requireOrganization = cache(async () => {
+export const requireCurrentOrganization = cache(async () => {
   const authUser = await requireUser();
-  const context = await getOrganizationContext(authUser);
+  const state = await resolveApplicationEntryState(authUser);
 
-  if (!context.membership) redirect("/onboarding");
-  return { ...context, organization: context.membership.organization };
+  if (state.kind === "NO_WORKSPACE") {
+    redirect("/no-workspace");
+  }
+  if (state.kind === "INVITATION_AVAILABLE") {
+    redirect("/onboarding");
+  }
+  if (state.kind !== "READY") {
+    redirect("/login");
+  }
+
+  return {
+    authUser,
+    profile: state.profile,
+    membership: state.membership,
+    memberships: state.memberships,
+    organization: state.organization,
+    organizationId: state.organizationId,
+  };
 });
+
+export const requireOrganization = requireCurrentOrganization;

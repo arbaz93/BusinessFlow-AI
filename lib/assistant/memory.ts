@@ -1,5 +1,6 @@
 import "server-only";
 
+import { requireOrganization } from "@/lib/auth/dal";
 import { prisma } from "@/lib/db/prisma";
 import { env } from "@/lib/env";
 import type { AssistantContextMessage } from "@/lib/assistant/context";
@@ -28,22 +29,38 @@ export interface ConversationMemoryState {
 }
 
 export async function getConversationMemoryState(conversationId: string): Promise<ConversationMemoryState | null> {
+  const { organization, profile } = await requireOrganization();
   const [conversation, totalMessages] = await Promise.all([
-    prisma.aIConversation.findUnique({
-      where: { id: conversationId },
+    prisma.aIConversation.findFirst({
+      where: { id: conversationId, organizationId: organization.id, createdById: profile.id },
       select: {
         memorySummary: true,
         memoryUpdatedAt: true,
       },
     }),
-    prisma.aIConversationMessage.count({ where: { conversationId } }),
+    prisma.aIConversationMessage.count({
+      where: {
+        conversationId,
+        conversation: {
+          organizationId: organization.id,
+          createdById: profile.id,
+        },
+      },
+    }),
   ]);
 
   if (!conversation) return null;
 
   const messagesSinceMemoryUpdate = conversation.memoryUpdatedAt
     ? await prisma.aIConversationMessage.count({
-        where: { conversationId, createdAt: { gt: conversation.memoryUpdatedAt } },
+        where: {
+          conversationId,
+          createdAt: { gt: conversation.memoryUpdatedAt },
+          conversation: {
+            organizationId: organization.id,
+            createdById: profile.id,
+          },
+        },
       })
     : totalMessages;
 
@@ -60,8 +77,15 @@ export async function loadMessagesForMemory(
   recentWindow: number,
   limit: number,
 ): Promise<AssistantContextMessage[]> {
+  const { organization, profile } = await requireOrganization();
   const messages = await prisma.aIConversationMessage.findMany({
-    where: { conversationId },
+    where: {
+      conversationId,
+      conversation: {
+        organizationId: organization.id,
+        createdById: profile.id,
+      },
+    },
     orderBy: { createdAt: "desc" },
     skip: recentWindow,
     take: limit,
@@ -75,9 +99,12 @@ export async function updateAssistantConversationMemory(
   summary: string,
   previousMemoryUpdatedAt: Date | null,
 ): Promise<boolean> {
+  const { organization, profile } = await requireOrganization();
   const result = await prisma.aIConversation.updateMany({
     where: {
       id: conversationId,
+      organizationId: organization.id,
+      createdById: profile.id,
       ...(previousMemoryUpdatedAt
         ? { memoryUpdatedAt: previousMemoryUpdatedAt }
         : { memoryUpdatedAt: null }),

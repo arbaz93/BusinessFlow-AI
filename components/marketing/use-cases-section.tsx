@@ -27,7 +27,7 @@ const useCases = [
 
 export function UseCasesSection() {
   return (
-    <section id="for-agencies" className="py-20 lg:py-28 px-6 lg:px-10">
+    <section id="solutions" className="py-20 lg:py-28 px-6 lg:px-10">
       <div className="mx-auto max-w-7xl">
         <div className="max-w-3xl text-center mx-auto">
           <h2 className="text-4xl md:text-5xl font-semibold leading-[1.1] tracking-[-0.03em] text-[var(--foreground)]">

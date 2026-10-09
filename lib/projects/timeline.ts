@@ -22,7 +22,7 @@ export function isActiveProjectStatus(status: ProjectStatus) {
 }
 
 export function startOfToday(now = new Date()) {
-  return new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
 }
 
 export function endOfToday(now = new Date()) {
@@ -45,14 +45,17 @@ export function getProjectTimelineState(
   if (!startDate && !dueDate) return "no_schedule";
 
   const today = startOfToday(now);
-  const due = dueDate ? new Date(dueDate) : null;
   const start = startDate ? new Date(startDate) : null;
+  const due = dueDate ? new Date(dueDate) : null;
 
-  if (start && today.getTime() < startOfToday(start).getTime()) return "not_started";
+  const startUtc = start ? new Date(Date.UTC(start.getUTCFullYear(), start.getUTCMonth(), start.getUTCDate())) : null;
+  const dueUtc = due ? new Date(Date.UTC(due.getUTCFullYear(), due.getUTCMonth(), due.getUTCDate())) : null;
 
-  if (!due) return "on_track";
+  if (startUtc && today.getTime() < startUtc.getTime()) return "not_started";
 
-  const dueTime = endOfToday(new Date(due.getFullYear(), due.getMonth(), due.getDate())).getTime();
+  if (!dueUtc) return "on_track";
+
+  const dueTime = endOfToday(dueUtc).getTime();
   if (dueTime < today.getTime()) return "overdue";
   if (dueTime <= today.getTime() + DUE_SOON_DAYS * 86_400_000) return "due_soon";
   return "on_track";

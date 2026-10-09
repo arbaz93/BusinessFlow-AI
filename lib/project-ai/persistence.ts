@@ -116,6 +116,21 @@ function toAnalysisSummary(analysis: {
   };
 }
 
+const analysisSelect = {
+  id: true,
+  result: true,
+  sourceDocumentId: true,
+  sourceDocumentName: true,
+  sourceDocumentUpdatedAt: true,
+  model: true,
+  analysisVersion: true,
+  createdAt: true,
+  completedAt: true,
+  suggestionApprovals: {
+    select: { suggestionId: true, taskId: true },
+  },
+} as const;
+
 export async function getProjectAIAnalysisState(projectId: string): Promise<ProjectAIAnalysisState> {
   const { organizationId, project } = await getProjectWorkspace(projectId);
   const primaryBrief = await prisma.projectDocument.findFirst({
@@ -139,20 +154,6 @@ export async function getProjectAIAnalysisState(projectId: string): Promise<Proj
       count: expiredProcessing.count,
     });
   }
-  const analysisSelect = {
-    id: true,
-    result: true,
-    sourceDocumentId: true,
-    sourceDocumentName: true,
-    sourceDocumentUpdatedAt: true,
-    model: true,
-    analysisVersion: true,
-    createdAt: true,
-    completedAt: true,
-    suggestionApprovals: {
-      select: { suggestionId: true, taskId: true },
-    },
-  } as const;
   const [currentSourceCompleted, mostRecentCompleted, processing, latestFailure] = await Promise.all([
     primaryBrief
       ? prisma.projectAIAnalysis.findFirst({
@@ -218,6 +219,39 @@ export async function getProjectAIAnalysisState(projectId: string): Promise<Proj
         select: { id: true, updatedAt: true, isPrimary: true },
       })
     : null;
+  return computeProjectAIAnalysisState({
+    primaryBrief,
+    completed,
+    analysis,
+    sourceDocument,
+    processing: Boolean(processing),
+    latestFailure,
+  });
+}
+
+/**
+ * Pure computation of a project AI analysis state from already-fetched inputs.
+ * Shared by the single-project and batched loaders to keep semantics identical.
+ */
+interface ProjectAIAnalysisComputeInput {
+  primaryBrief: {
+    id: string;
+    name: string;
+    originalName: string;
+    mimeType: string | null;
+    createdAt: Date;
+    updatedAt: Date;
+  } | null;
+  completed: AnalysisWithApprovals | null;
+  analysis: ProjectAIAnalysisSummary | null;
+  sourceDocument: { id: string; updatedAt: Date; isPrimary: boolean } | null;
+  processing: boolean;
+  latestFailure: { errorCode: string | null; createdAt: Date } | null;
+}
+
+function computeProjectAIAnalysisState(input: ProjectAIAnalysisComputeInput): ProjectAIAnalysisState {
+  const { primaryBrief, completed, analysis, sourceDocument, processing, latestFailure } = input;
+
   const sourceAssessment = completed
     ? getProjectAIAnalysisSourceAssessment({
         sourceDocumentId: completed.sourceDocumentId,
@@ -287,6 +321,165 @@ export async function getProjectAIAnalysisState(projectId: string): Promise<Proj
     errorMessage,
     latestFailureMessage,
   };
+}
+
+type AnalysisWithApprovals = {
+  id: string;
+  result: Prisma.JsonValue | null;
+  sourceDocumentId: string | null;
+  sourceDocumentName: string;
+  sourceDocumentUpdatedAt: Date;
+  model: string;
+  analysisVersion: number;
+  createdAt: Date;
+  completedAt: Date | null;
+  suggestionApprovals: Array<{ suggestionId: string; taskId: string | null }>;
+};
+
+export type ProjectAIAnalysisDashboardState = ProjectAIAnalysisState;
+
+/**
+ * Batch-loads project AI analysis state for multiple projects in a single
+ * request. This avoids the per-project N+1 pattern where each project
+ * independently re-queries the workspace, brief, and analyses.
+ *
+ * Semantics are identical to calling `getProjectAIAnalysisState` per project,
+ * but consolidated into bulk reads where possible. The expired-PROCRESSING
+ * -> FAILED write is performed once for the whole batch.
+ */
+export async function getProjectAIAnalysisStatesBatch(
+  projectIds: string[],
+  organizationId: string,
+): Promise<Map<string, ProjectAIAnalysisState>> {
+  const result = new Map<string, ProjectAIAnalysisState>();
+  if (projectIds.length === 0) return result;
+
+  const staleProcessingBefore = new Date(Date.now() - PROCESSING_TIMEOUT_MS);
+
+  const expiredProcessing = await prisma.projectAIAnalysis.updateMany({
+    where: {
+      organizationId,
+      projectId: { in: projectIds },
+      status: "PROCESSING",
+      updatedAt: { lt: staleProcessingBefore },
+    },
+    data: { status: "FAILED", errorCode: "AI_TIMEOUT" },
+  });
+  if (expiredProcessing.count > 0) {
+    console.warn("Expired project AI analysis attempts were marked failed.", {
+      organizationId,
+      count: expiredProcessing.count,
+    });
+  }
+
+  const briefs = await prisma.projectDocument.findMany({
+    where: {
+      organizationId,
+      projectId: { in: projectIds },
+      documentType: "PROJECT_BRIEF",
+      isPrimary: true,
+    },
+    select: { id: true, projectId: true, name: true, originalName: true, mimeType: true, createdAt: true, updatedAt: true },
+  });
+  const briefByProject = new Map(briefs.map((b) => [b.projectId, b]));
+
+  const completedAnalyses = await prisma.projectAIAnalysis.findMany({
+    where: { organizationId, projectId: { in: projectIds }, status: "COMPLETED" },
+    orderBy: currentProjectAIAnalysisOrderBy,
+    select: { ...analysisSelect, projectId: true },
+  });
+
+  const processingAnalyses = await prisma.projectAIAnalysis.findMany({
+    where: {
+      organizationId,
+      projectId: { in: projectIds },
+      status: "PROCESSING",
+      updatedAt: { gte: staleProcessingBefore },
+    },
+    select: { id: true, projectId: true, sourceDocumentId: true, sourceDocumentUpdatedAt: true },
+  });
+
+  const failures = await prisma.projectAIAnalysis.findMany({
+    where: { organizationId, projectId: { in: projectIds }, status: "FAILED" },
+    orderBy: { createdAt: "desc" },
+    select: { id: true, projectId: true, errorCode: true, createdAt: true, sourceDocumentId: true, sourceDocumentUpdatedAt: true },
+  });
+
+  const sourceDocIds = [...new Set(completedAnalyses.map((a) => a.sourceDocumentId).filter((id): id is string => Boolean(id)))];
+  const sourceDocs = sourceDocIds.length
+    ? await prisma.projectDocument.findMany({
+        where: { organizationId, id: { in: sourceDocIds } },
+        select: { id: true, projectId: true, updatedAt: true, isPrimary: true, documentType: true },
+      })
+    : [];
+  const sourceDocById = new Map(sourceDocs.map((d) => [d.id, d]));
+
+  for (const projectId of projectIds) {
+    const primaryBrief = briefByProject.get(projectId) ?? null;
+
+    let currentSourceCompleted: AnalysisWithApprovals | null = null;
+    let mostRecentCompleted: AnalysisWithApprovals | null = null;
+    for (const a of completedAnalyses) {
+      if (a.projectId !== projectId) continue;
+      if (!mostRecentCompleted) mostRecentCompleted = a;
+      if (!currentSourceCompleted && primaryBrief && a.sourceDocumentId === primaryBrief.id && a.sourceDocumentUpdatedAt.getTime() === primaryBrief.updatedAt.getTime()) {
+        currentSourceCompleted = a;
+      }
+    }
+
+    const processing = processingAnalyses.some(
+      (p) =>
+        p.projectId === projectId &&
+        primaryBrief &&
+        p.sourceDocumentId === primaryBrief.id &&
+        p.sourceDocumentUpdatedAt.getTime() === primaryBrief.updatedAt.getTime(),
+    );
+
+    let latestFailure: { errorCode: string | null; createdAt: Date } | null = null;
+    if (primaryBrief) {
+      for (const f of failures) {
+        if (f.projectId !== projectId) continue;
+        if (f.sourceDocumentId === primaryBrief.id && f.sourceDocumentUpdatedAt.getTime() === primaryBrief.updatedAt.getTime()) {
+          latestFailure = f;
+          break;
+        }
+      }
+    } else {
+      for (const f of failures) {
+        if (f.projectId !== projectId) continue;
+        latestFailure = f;
+        break;
+      }
+    }
+
+    const completed = preferCurrentSourceProjectAIAnalysis(currentSourceCompleted, mostRecentCompleted);
+    const analysis = completed ? toAnalysisSummary(completed) : null;
+    if (analysis && completed) {
+      analysis.approvedSuggestions = completed.suggestionApprovals;
+    }
+
+    const sourceDocument = completed?.sourceDocumentId
+      ? (() => {
+          const doc = sourceDocById.get(completed.sourceDocumentId);
+          if (!doc || doc.projectId !== projectId || doc.documentType !== "PROJECT_BRIEF") return null;
+          return { id: doc.id, updatedAt: doc.updatedAt, isPrimary: doc.isPrimary };
+        })()
+      : null;
+
+    result.set(
+      projectId,
+      computeProjectAIAnalysisState({
+        primaryBrief,
+        completed,
+        analysis,
+        sourceDocument,
+        processing,
+        latestFailure,
+      }),
+    );
+  }
+
+  return result;
 }
 
 async function failAnalysis(analysisId: string, organizationId: string, projectId: string, code: string) {

@@ -20,7 +20,7 @@ export function FinalCTASection() {
           <Link
             href="/signup"
             className={cn(
-              buttonVariants({ variant: "default", size: "lg" }),
+              buttonVariants({ variant: "primary", size: "lg" }),
               "group"
             )}
           >

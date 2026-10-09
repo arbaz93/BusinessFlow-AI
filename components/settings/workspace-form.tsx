@@ -8,10 +8,10 @@ import type { BusinessType } from "@/lib/organizations/options";
 import { Save } from "lucide-react";
 
 const inputClass =
-  "h-10 w-full rounded-lg border border-[#27272a] bg-[#111113] px-3.5 text-sm text-white placeholder:text-white/30 focus-visible:border-[#a49bff] focus-visible:ring-[#a49bff]/20 focus-visible:ring-2 disabled:cursor-not-allowed";
+  "h-10 w-full rounded-lg border border-[var(--line)] bg-[var(--surface)] px-3.5 text-sm text-[var(--foreground)] placeholder:text-[var(--muted)] focus-visible:border-[#a49bff] focus-visible:ring-[#a49bff]/20 focus-visible:ring-2 disabled:cursor-not-allowed";
 
 const selectClass =
-  "h-10 w-full appearance-none rounded-lg border border-[#27272a] bg-[#111113] px-3.5 text-sm text-white placeholder:text-white/30 focus-visible:border-[#a49bff] focus-visible:ring-[#a49bff]/20 focus-visible:ring-2 disabled:cursor-not-allowed";
+  "h-10 w-full appearance-none rounded-lg border border-[var(--line)] bg-[var(--surface)] px-3.5 text-sm text-[var(--foreground)] placeholder:text-[var(--muted)] focus-visible:border-[#a49bff] focus-visible:ring-[#a49bff]/20 focus-visible:ring-2 disabled:cursor-not-allowed";
 
 export function WorkspaceForm({
   initialName,
@@ -35,7 +35,7 @@ export function WorkspaceForm({
   return (
     <form action={action} className="space-y-6">
       <div>
-        <label htmlFor="workspace-name" className="block text-sm font-medium text-[#f4f4f5]">
+        <label htmlFor="workspace-name" className="block text-sm font-medium text-[var(--foreground)]">
           Workspace name
         </label>
         {canManage ? (
@@ -69,7 +69,7 @@ export function WorkspaceForm({
       </div>
 
       <div>
-        <label htmlFor="workspace-business-type" className="block text-sm font-medium text-[#f4f4f5]">
+        <label htmlFor="workspace-business-type" className="block text-sm font-medium text-[var(--foreground)]">
           Business type
         </label>
         {canManage ? (
@@ -99,7 +99,7 @@ export function WorkspaceForm({
       </div>
 
       <div>
-        <label htmlFor="workspace-slug" className="block text-sm font-medium text-[#f4f4f5]">
+        <label htmlFor="workspace-slug" className="block text-sm font-medium text-[var(--foreground)]">
           Workspace URL
         </label>
         <Input
@@ -109,11 +109,11 @@ export function WorkspaceForm({
           aria-readonly
           className={inputClass}
         />
-        <p className="mt-1 text-xs text-[#71717a]">Workspace URLs cannot be changed here.</p>
+        <p className="mt-1 text-xs text-[var(--muted-foreground)]">Workspace URLs cannot be changed here.</p>
       </div>
 
       <div>
-        <label htmlFor="workspace-members" className="block text-sm font-medium text-[#f4f4f5]">
+        <label htmlFor="workspace-members" className="block text-sm font-medium text-[var(--foreground)]">
           Members
         </label>
         <Input
@@ -123,13 +123,13 @@ export function WorkspaceForm({
           aria-readonly
           className={inputClass}
         />
-        <p className="mt-1 text-xs text-[#71717a]">
-          You do not manage members from Settings. Invite teammates from the workspace.
+        <p className="mt-1 text-xs text-[var(--muted-foreground)]">
+          View members and manage invitations in Settings → Members.
         </p>
       </div>
 
       {state.message ? (
-        <p className="text-sm text-[#86efac]" role="status">
+        <p className="text-sm text-[var(--success-line)]" role="status">
           {state.message}
         </p>
       ) : null}
@@ -139,14 +139,14 @@ export function WorkspaceForm({
           role="alert"
           className="rounded-lg border border-[#f59e0b]/20 bg-[#f59e0b]/10 px-3.5 py-2.5 text-sm text-[#fbbf24]"
         >
-          Only workspace owners and admins can manage workspace settings.
+          Only workspace owners can manage workspace settings.
         </div>
       ) : (
-        <div className="flex items-center justify-between border-t border-[#27272a] pt-4">
+        <div className="flex items-center justify-between border-t border-[var(--line)] pt-4">
           <button
             type="submit"
             disabled={pending || unchanged}
-            className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-[#7067e8] px-4 text-sm font-semibold text-white transition-colors hover:bg-[#8178f0] disabled:cursor-not-allowed disabled:opacity-55"
+            className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-[var(--accent)] px-4 text-sm font-semibold text-[var(--accent-foreground)] transition-colors hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-55"
           >
             {pending ? (
               <>

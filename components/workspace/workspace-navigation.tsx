@@ -67,7 +67,7 @@ export function WorkspaceNavigation({
       {navigationGroups.map(({ label: groupLabel, items }) => (
         <section key={groupLabel} aria-label={groupLabel}>
           <h2
-            className={`mb-2 px-3 text-[10px] font-semibold uppercase tracking-[0.12em] text-white/40 ${
+            className={`mb-2 px-3 text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--muted-foreground)] ${
               compact ? "sr-only" : ""
             }`}
           >
@@ -89,14 +89,16 @@ export function WorkspaceNavigation({
                     compact ? "justify-center px-0" : "gap-3 px-3"
                   } ${
                     active
-                      ? "bg-[#1f1f23] text-white before:-mr-px before:h-5 before:w-0.5 before:rounded-full before:bg-[#a49bff]"
-                      : "text-white/65 hover:bg-white/6 hover:text-white"
+                      ? `bg-[var(--panel)] text-[var(--foreground)] before:-mr-px before:h-5 before:w-0.5 before:rounded-full${
+                          compact ? "" : " before:bg-[#a49bff]"
+                        }`
+                      : "text-[var(--muted)] hover:bg-[var(--surface)] hover:text-[var(--foreground)]"
                   }`}
                 >
                   <Icon
                     size={17}
                     strokeWidth={1.8}
-                    className={active ? "text-[#a49bff]" : "text-white/55"}
+                    className={active ? "text-[var(--accent-muted)]" : "text-[var(--muted)]"}
                   />
                   {!compact && label}
                 </Link>

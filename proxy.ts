@@ -1,8 +1,10 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { resolveApplicationEntryState } from "@/lib/auth/lifecycle";
+import { getPublicEnv } from "@/lib/env";
 
-const protectedRoutes = ["/dashboard", "/leads", "/clients", "/projects", "/assistant", "/settings", "/onboarding"];
-const authRoutes = ["/login", "/signup"];
+const protectedRoutes = ["/dashboard", "/leads", "/clients", "/projects", "/assistant", "/settings", "/onboarding", "/no-workspace"];
+const authRoutes = ["/login", "/signup", "/forgot-password"];
 
 function matchesRoute(pathname: string, routes: string[]) {
   return routes.some((route) => pathname === route || pathname.startsWith(`${route}/`));
@@ -17,12 +19,14 @@ function copySessionResponse(source: NextResponse, destination: NextResponse) {
 }
 
 export async function proxy(request: NextRequest) {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
-  if (!url || !key) return NextResponse.next({ request });
+  const { NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY } = getPublicEnv();
+
+  if (!NEXT_PUBLIC_SUPABASE_URL || !NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY) {
+    return NextResponse.next({ request });
+  }
 
   let response = NextResponse.next({ request });
-  const supabase = createServerClient(url, key, {
+  const supabase = createServerClient(NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY, {
     cookies: {
       getAll: () => request.cookies.getAll(),
       setAll(cookiesToSet) {
@@ -44,7 +48,18 @@ export async function proxy(request: NextRequest) {
   }
 
   if (matchesRoute(pathname, authRoutes) && isAuthenticated) {
-    const redirectResponse = NextResponse.redirect(new URL("/dashboard", request.url));
+    let destination = "/dashboard";
+    try {
+      const { data: userData } = await supabase.auth.getUser();
+      if (userData.user) {
+        const state = await resolveApplicationEntryState(userData.user);
+        if (state.kind !== "READY") destination = "/onboarding";
+      }
+    } catch {
+      // DB query failed — fall through to default redirect to /dashboard.
+      // The page-level guard (requireOrganization) will still resolve state.
+    }
+    const redirectResponse = NextResponse.redirect(new URL(destination, request.url));
     copySessionResponse(response, redirectResponse);
     return redirectResponse;
   }
@@ -61,8 +76,15 @@ export const config = {
     "/assistant/:path*",
     "/settings/:path*",
     "/onboarding",
+    "/no-workspace",
     "/login",
+    "/login/:path*",
     "/signup",
-    "/auth/callback",
+    "/signup/:path*",
+    "/forgot-password",
+    "/forgot-password/:path*",
+    "/update-password",
+    "/update-password/:path*",
+    "/auth/callback/:path*",
   ],
 };

@@ -20,7 +20,7 @@ export async function updateOrganization(
 
   const { organization, authorized, membership } = await requireWorkspaceManager();
   if (!authorized) {
-    return { error: "Only workspace owners and admins can manage workspace settings." };
+    return { error: "Only workspace owners can manage workspace settings." };
   }
 
   void membership;

@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { Prisma } from "@/app/generated/prisma/client";
 import { requireOrganization } from "@/lib/auth/dal";
 import { prisma } from "@/lib/db/prisma";
-import { env } from "@/lib/env";
+import { getServerEnv } from "@/lib/env";
 import { createAssistantConversationTitle } from "@/lib/assistant/context";
 import { generateAssistantResponse } from "@/lib/assistant/generate-response";
 import { resolveAssistantContext } from "@/lib/assistant/context/resolver";
@@ -23,6 +23,7 @@ import {
 import { taskProposalEditSchema } from "@/lib/tasks/schemas";
 import { createTask, revalidateTaskViews, TaskValidationError, TaskUnavailableError } from "@/lib/tasks/service";
 import type { AssistantConversationMessage, AssistantMessageActionResult, ProposalFormState, TaskProposal, TaskProposalPriority } from "@/lib/assistant/types";
+import { checkRateLimit, getClientIdentifier, AI_RATE_LIMIT_CONFIG } from "@/lib/security/rate-limiter";
 
 export type AssistantActionResult =
   | { success: true; conversationId: string }
@@ -95,6 +96,15 @@ export async function deleteAssistantConversation(
 
 export async function submitAssistantMessage(rawInput: unknown): Promise<AssistantMessageActionResult> {
   const { organization, profile } = await requireOrganization();
+  const clientIp = await getClientIdentifier();
+  const rateLimit = await checkRateLimit(clientIp, AI_RATE_LIMIT_CONFIG);
+  if (!rateLimit.allowed) {
+    return {
+      success: false,
+      error: "Too many AI requests. Please try again later.",
+      requestId: "",
+    };
+  }
   const parsed = createAssistantMessageSchema.safeParse(rawInput);
   if (!parsed.success) {
     return {
@@ -112,7 +122,13 @@ export async function submitAssistantMessage(rawInput: unknown): Promise<Assista
     },
     select: { id: true, contextProjectId: true },
   });
-  if (!conversation) return { success: false, error: "This conversation is unavailable." };
+  if (!conversation) {
+    return {
+      success: false,
+      error: "This conversation is no longer available. Refresh the page and open it again.",
+      requestId,
+    };
+  }
   const activeConversationId = conversation.id;
 
   async function refreshConversationMemory() {
@@ -331,9 +347,10 @@ export async function submitAssistantMessage(rawInput: unknown): Promise<Assista
       contextResult.context.project
     ) {
       const project = contextResult.context.project;
+      const { GEMINI_API_KEY, GEMINI_MODEL } = getServerEnv();
       const draft = await generateTaskProposalDraft(
-        env.GEMINI_API_KEY ?? "",
-        env.GEMINI_MODEL,
+        GEMINI_API_KEY ?? "",
+        GEMINI_MODEL,
         content,
         contextResult.context,
         serverDate,
@@ -744,7 +761,8 @@ export async function getAssistantPendingProposals(conversationId: string): Prom
 }
 
 export async function cancelAssistantTaskProposal(previousState: ProposalFormState | undefined, formData: FormData): Promise<ProposalFormState> {
-  const { organization } = await requireOrganization();  const proposalId = formData.get("proposalId");
+  const { organization } = await requireOrganization();
+  const proposalId = formData.get("proposalId");
   if (typeof proposalId !== "string" || !proposalId.trim()) {
     return { success: false, error: "Missing proposal reference." };
   }

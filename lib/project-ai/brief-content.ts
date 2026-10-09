@@ -5,6 +5,7 @@ import { prisma } from "@/lib/db/prisma";
 import { getProjectWorkspace } from "@/lib/projects/workspace";
 import { extractProjectBriefText, isSupportedProjectBrief } from "@/lib/project-ai/extraction";
 import type { ProjectBriefContentResult } from "@/lib/project-ai/schemas";
+import { getPublicEnv, getServerEnv } from "@/lib/env";
 
 export const MAX_PROJECT_BRIEF_EXTRACTED_CHARS = 200000;
 export const MAX_PROJECT_BRIEF_FILE_BYTES = 20 * 1024 * 1024;
@@ -13,13 +14,14 @@ export const PROJECT_BRIEF_STORAGE_TIMEOUT_MS = 20_000;
 const PROJECT_DOCUMENT_BUCKET = "project-documents";
 
 function getSupabaseStorageClient() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!supabaseUrl || !serviceRoleKey) {
+  const { NEXT_PUBLIC_SUPABASE_URL } = getPublicEnv();
+  const { SUPABASE_SERVICE_ROLE_KEY } = getServerEnv();
+
+  if (!NEXT_PUBLIC_SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
     throw new Error("Project document storage configuration is missing.");
   }
 
-  return createSupabaseClient(supabaseUrl, serviceRoleKey, {
+  return createSupabaseClient(NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
     auth: { persistSession: false, autoRefreshToken: false },
   });
 }

@@ -49,7 +49,7 @@ export function ProjectAIAnalysisFeedbackControl({
           <button
             type="button"
             aria-label={`${savedFeedback ? "Edit" : "Give"} feedback on ${targetLabel}`}
-            className="inline-flex min-h-8 items-center gap-1.5 rounded px-1.5 text-xs font-medium text-white/50 transition-colors hover:bg-white/[0.04] hover:text-[#c4b5fd] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff]"
+            className="inline-flex min-h-8 items-center gap-1.5 rounded px-1.5 text-xs font-medium text-[var(--foreground)]/50 transition-colors hover:bg-[var(--surface)] hover:text-[var(--accent-muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff]"
           >
             {savedFeedback ? <Pencil size={12} aria-hidden="true" /> : <MessageSquareText size={12} aria-hidden="true" />}
             {savedFeedback ? "Edit feedback" : "Give feedback"}
@@ -58,11 +58,11 @@ export function ProjectAIAnalysisFeedbackControl({
         {open && (
           <Dialog.Portal>
             <Dialog.Overlay className="fixed inset-0 z-[60] bg-black/70 backdrop-blur-[2px]" />
-            <Dialog.Content className="fixed left-1/2 top-1/2 z-[60] max-h-[90dvh] w-[calc(100vw-1.5rem)] max-w-[460px] -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-xl border border-white/10 bg-[#18181b] p-4 text-white shadow-2xl outline-none sm:w-[calc(100vw-2rem)] sm:p-5">
+            <Dialog.Content className="fixed left-1/2 top-1/2 z-[60] max-h-[90dvh] w-[calc(100vw-1.5rem)] max-w-[460px] -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-xl border border-[var(--line)] bg-[var(--panel)] p-4 text-[var(--foreground)] shadow-2xl outline-none sm:w-[calc(100vw-2rem)] sm:p-5">
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
-                  <Dialog.Title className="text-base font-semibold text-[#f4f4f5]">Give feedback</Dialog.Title>
-                  <Dialog.Description className="mt-1 break-words text-sm text-white/50">
+                  <Dialog.Title className="text-base font-semibold text-[var(--foreground)]">Give feedback</Dialog.Title>
+                  <Dialog.Description className="mt-1 break-words text-sm text-[var(--foreground)]/50">
                     Feedback applies only to {historical ? "this historical analysis" : "this analysis"}. It is saved separately and does not change this result.
                   </Dialog.Description>
                 </div>
@@ -70,7 +70,7 @@ export function ProjectAIAnalysisFeedbackControl({
                   <button
                     type="button"
                     aria-label="Close feedback dialog"
-                    className="grid size-8 shrink-0 place-items-center rounded-md text-white/55 hover:bg-white/[0.07] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff]"
+                    className="grid size-8 shrink-0 place-items-center rounded-md text-[var(--foreground)]/55 hover:bg-[var(--surface)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff]"
                   >
                     <X size={16} aria-hidden="true" />
                   </button>
@@ -83,8 +83,8 @@ export function ProjectAIAnalysisFeedbackControl({
                 <input type="hidden" name="targetType" value={targetType} />
                 <input type="hidden" name="targetId" value={targetId} />
                 <fieldset className="space-y-2">
-                  <legend className="text-sm font-medium text-white/80">What should we review about “{targetLabel}”?</legend>
-                  <label className="block text-xs text-white/55" htmlFor={`feedback-type-${analysisId}-${targetId}`}>
+                  <legend className="text-sm font-medium text-[var(--foreground)]/80">What should we review about “{targetLabel}”?</legend>
+                  <label className="block text-xs text-[var(--foreground)]/55" htmlFor={`feedback-type-${analysisId}-${targetId}`}>
                     Feedback category
                   </label>
                   <select
@@ -92,7 +92,7 @@ export function ProjectAIAnalysisFeedbackControl({
                     name="feedbackType"
                     defaultValue={savedFeedback?.feedbackType ?? "INCORRECT"}
                     disabled={pending}
-                    className="h-10 w-full rounded-md border border-white/10 bg-[#111113] px-3 text-sm text-white outline-none focus-visible:border-[#a49bff] focus-visible:ring-2 focus-visible:ring-[#a49bff]/30 disabled:opacity-60"
+                    className="h-10 w-full rounded-md border border-[var(--line)] bg-[var(--surface)] px-3 text-sm text-[var(--foreground)] outline-none focus-visible:border-[#a49bff] focus-visible:ring-2 focus-visible:ring-[#a49bff]/30 disabled:opacity-60"
                   >
                     {aiAnalysisFeedbackTypeValues.map((value) => (
                       <option key={value} value={value}>{aiAnalysisFeedbackTypeLabels[value]}</option>
@@ -101,7 +101,7 @@ export function ProjectAIAnalysisFeedbackControl({
                 </fieldset>
 
                 <label className="block space-y-1.5" htmlFor={`feedback-comment-${analysisId}-${targetId}`}>
-                  <span className="text-sm font-medium text-white/80">Optional explanation</span>
+                  <span className="text-sm font-medium text-[var(--foreground)]/80">Optional explanation</span>
                   <textarea
                     id={`feedback-comment-${analysisId}-${targetId}`}
                     name="comment"
@@ -110,9 +110,9 @@ export function ProjectAIAnalysisFeedbackControl({
                     rows={4}
                     disabled={pending}
                     placeholder="Add context if helpful. An explanation is required for Other feedback."
-                    className="w-full resize-y rounded-md border border-white/10 bg-[#111113] px-3 py-2 text-sm leading-6 text-white/80 outline-none placeholder:text-white/30 focus-visible:border-[#a49bff] focus-visible:ring-2 focus-visible:ring-[#a49bff]/30 disabled:opacity-60"
+                    className="w-full resize-y rounded-md border border-[var(--line)] bg-[var(--surface)] px-3 py-2 text-sm leading-6 text-[var(--foreground)]/80 outline-none placeholder:text-[var(--foreground)]/30 focus-visible:border-[#a49bff] focus-visible:ring-2 focus-visible:ring-[#a49bff]/30 disabled:opacity-60"
                   />
-                  <span className="block text-right text-[11px] text-white/40">Up to 1000 characters</span>
+                  <span className="block text-right text-[11px] text-[var(--foreground)]/40">Up to 1000 characters</span>
                 </label>
 
                 {!result?.success && result?.fieldErrors?.comment?.[0] && (
@@ -123,9 +123,9 @@ export function ProjectAIAnalysisFeedbackControl({
                 )}
                 {result?.success && <p role="status" className="text-sm text-emerald-300">{result.message}</p>}
 
-                <div className="flex flex-col-reverse gap-2 border-t border-white/[0.07] pt-4 sm:flex-row sm:justify-end">
+                <div className="flex flex-col-reverse gap-2 border-t border-[var(--line)] pt-4 sm:flex-row sm:justify-end">
                   <Dialog.Close asChild>
-                    <button type="button" className="inline-flex min-h-10 items-center justify-center rounded-md border border-white/10 px-3 text-sm text-white/70 hover:bg-white/[0.05] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff]">
+                    <button type="button" className="inline-flex min-h-10 items-center justify-center rounded-md border border-[var(--line)] px-3 text-sm text-[var(--foreground)]/70 hover:bg-[var(--surface)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff]">
                       Cancel
                     </button>
                   </Dialog.Close>
@@ -146,15 +146,15 @@ export function ProjectAIAnalysisFeedbackControl({
       {statusMessage && !open && <span role="status" className="text-xs text-emerald-300">{statusMessage}</span>}
       {visibleFeedback.length > 0 && (
         <details className="min-w-0">
-          <summary className="min-h-8 cursor-pointer rounded px-1.5 py-1 text-xs text-white/45 hover:text-white/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff]">
+          <summary className="min-h-8 cursor-pointer rounded px-1.5 py-1 text-xs text-[var(--foreground)]/45 hover:text-[var(--foreground)]/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff]">
             {visibleFeedback.length} {visibleFeedback.length === 1 ? "other response" : "other responses"}
           </summary>
-          <ul className="mt-2 w-full space-y-2 rounded-md border border-white/[0.07] bg-[#111113] p-3">
+          <ul className="mt-2 w-full space-y-2 rounded-md border border-[var(--line)] bg-[var(--surface)] p-3">
             {visibleFeedback.map((item) => (
-              <li key={`${item.targetType}-${item.targetId}-${item.authorName}-${item.createdAt}`} className="break-words text-xs text-white/55">
-                <span className="font-medium text-white/75">{item.authorName}</span>
+              <li key={`${item.targetType}-${item.targetId}-${item.authorName}-${item.createdAt}`} className="break-words text-xs text-[var(--foreground)]/55">
+                <span className="font-medium text-[var(--foreground)]/75">{item.authorName}</span>
                 {" · "}{aiAnalysisFeedbackTypeLabels[item.feedbackType]}
-                {item.comment && <p className="mt-1 whitespace-pre-wrap text-white/45">{item.comment}</p>}
+                {item.comment && <p className="mt-1 whitespace-pre-wrap text-[var(--foreground)]/45">{item.comment}</p>}
               </li>
             ))}
           </ul>

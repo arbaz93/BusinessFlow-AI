@@ -55,6 +55,7 @@ type Props = {
   deletionComplete: boolean;
   initialDueFilter: TaskDueFilter;
   initialOpenOnly: boolean;
+  loadError?: boolean;
 };
 
 const allStatuses = "ALL" as const;
@@ -84,6 +85,7 @@ export function TasksWorkspace({
   deletionComplete,
   initialDueFilter,
   initialOpenOnly,
+  loadError,
 }: Props) {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<StatusFilter>(initialOpenOnly ? "OPEN" : allStatuses);
@@ -157,21 +159,27 @@ export function TasksWorkspace({
     <div className="space-y-6 pb-10">
       <section className="flex flex-col gap-5 pt-2 sm:flex-row sm:items-end sm:justify-between sm:pt-5">
         <div className="min-w-0">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#93c5fd]">Delivery workflow</p>
-          <h1 className="mt-2 text-[30px] font-semibold tracking-[-0.04em] text-[#f4f4f5] sm:text-[32px]">Tasks</h1>
-          <p className="mt-2 text-sm text-white/55">Track work across your projects, manage priorities, and stay on top of deadlines.</p>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--info-line)]">Delivery workflow</p>
+          <h1 className="mt-2 text-[30px] font-semibold tracking-[-0.04em] text-[var(--foreground)] sm:text-[32px]">Tasks</h1>
+          <p className="mt-2 text-sm text-[var(--muted)]">Track work across your projects, manage priorities, and stay on top of deadlines.</p>
         </div>
         <TaskFormDialog projects={projects} teamMembers={teamMembers} triggerLabel="New Task" />
       </section>
 
       {showDeletionNotice && (
-        <div role="status" className="flex items-center justify-between gap-3 rounded-lg border border-[#22c55e]/20 bg-[#22c55e]/[0.08] px-3.5 py-2.5 text-sm text-[#86efac]">
+        <div role="status" className="flex items-center justify-between gap-3 rounded-lg border border-[var(--success-border)]/20 bg-[var(--success-surface)] px-3.5 py-2.5 text-sm text-[var(--success-line)]">
           <span>Task deleted successfully.</span>
-          <button type="button" onClick={() => setShowDeletionNotice(false)} aria-label="Dismiss deletion notification" className="grid size-7 shrink-0 place-items-center rounded-md text-[#86efac]/70 transition-colors hover:bg-white/[0.06] hover:text-[#86efac] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#86efac]">
+          <button type="button" onClick={() => setShowDeletionNotice(false)} aria-label="Dismiss deletion notification" className="grid size-7 shrink-0 place-items-center rounded-md text-[var(--success-line)]/70 transition-colors hover:bg-[var(--surface)] hover:text-[var(--success-line)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#86efac]">
             <X size={15} />
           </button>
         </div>
       )}
+
+      {loadError ? (
+        <div role="alert" className="rounded-lg border border-[var(--danger-border)]/25 bg-[var(--danger-surface)] px-4 py-3 text-sm text-[var(--danger)]">
+          We couldn&apos;t load your tasks. Refresh the page or try again in a moment.
+        </div>
+      ) : null}
 
       <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4" aria-label="Task summary">
         <SummaryMetric label="Total open tasks" value={totalOpen} note="To do, in progress, or blocked" />
@@ -180,11 +188,11 @@ export function TasksWorkspace({
         <SummaryMetric label="Completed" value={completed} note="Closed tasks" />
       </section>
 
-      <section className="rounded-[10px] border border-white/10 bg-[#18181b] p-3 sm:p-4" aria-label="Task search and filters">
+      <section className="rounded-[10px] border border-[var(--line)] bg-[var(--panel)] p-3 sm:p-4" aria-label="Task search and filters">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
           <div className="relative w-full lg:max-w-sm">
-            <Search size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-white/35" />
-            <Input type="search" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search tasks or projects…" aria-label="Search tasks" className="h-10 border-white/10 bg-[#111113] pl-9 text-sm text-white placeholder:text-white/35 focus-visible:border-[#a49bff] focus-visible:ring-[#a49bff]/20 dark:bg-[#111113]" />
+            <Search size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[var(--muted)]" />
+            <Input type="search" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search tasks or projects…" aria-label="Search tasks" className="h-10 border-[var(--line)] bg-[var(--surface)] pl-9 text-sm text-[var(--foreground)] placeholder:text-[var(--muted)] focus-visible:border-[#a49bff] focus-visible:ring-[#a49bff]/20 dark:bg-[var(--surface)]" />
           </div>
           <div className="flex flex-wrap items-center gap-2">
             <FilterSelect label="Project" value={projectFilter} onChange={setProjectFilter} id="task-project-filter">
@@ -211,13 +219,13 @@ export function TasksWorkspace({
                 <option key={filter} value={filter}>{taskDueFilterLabels[filter]}</option>
               ))}
             </FilterSelect>
-            <select value={sort} onChange={(event) => setSort(event.target.value as TaskSort)} aria-label="Sort tasks" className="h-10 rounded-md border border-white/10 bg-[#111113] px-2.5 text-sm text-white outline-none focus-visible:border-[#a49bff] focus-visible:ring-[3px] focus-visible:ring-[#a49bff]/20">
+            <select value={sort} onChange={(event) => setSort(event.target.value as TaskSort)} aria-label="Sort tasks" className="h-10 rounded-md border border-[var(--line)] bg-[var(--surface)] px-2.5 text-sm text-[var(--foreground)] outline-none focus-visible:border-[#a49bff] focus-visible:ring-[3px] focus-visible:ring-[#a49bff]/20">
               {taskSortValues.map((value) => (
                 <option key={value} value={value}>{taskSortLabels[value]}</option>
               ))}
             </select>
             {hasActiveFilters && (
-              <button type="button" onClick={resetFilters} className="inline-flex h-10 items-center gap-2 rounded-md border border-white/10 bg-white/[0.02] px-2.5 text-sm text-white/70 hover:bg-white/[0.05] hover:text-white" aria-label="Reset task filters">
+              <button type="button" onClick={resetFilters} className="inline-flex h-10 items-center gap-2 rounded-md border border-[var(--line)] bg-[var(--surface)] px-2.5 text-sm text-[var(--muted)] hover:bg-[var(--surface)] hover:text-[var(--foreground)]" aria-label="Reset task filters">
                 <SlidersHorizontal size={14} /> Reset
               </button>
             )}
@@ -231,29 +239,29 @@ export function TasksWorkspace({
             {visibleTasks.map((task) => {
               const timeline = getTaskTimelineState(task.status, task.dueDate);
               return (
-                <article key={task.id} className="flex flex-col gap-3 rounded-[10px] border border-white/10 bg-[#151518] p-3.5 transition-colors hover:border-white/15 sm:flex-row sm:items-center sm:gap-4 sm:px-4">
+                <article key={task.id} className="flex flex-col gap-3 rounded-[10px] border border-[var(--line)] bg-[var(--surface)] p-3.5 transition-colors hover:border-[var(--line)] sm:flex-row sm:items-center sm:gap-4 sm:px-4">
                   <div className="grid min-w-0 flex-1 grid-cols-[2.5rem_minmax(0,1fr)] items-center gap-x-3">
                     <Link href={`/tasks/${task.id}`} className="col-span-2 flex min-w-0 items-center gap-3 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff]">
-                      <span className="grid size-10 shrink-0 place-items-center rounded-lg border border-[#8b5cf6]/20 bg-[#8b5cf6]/10 text-xs font-semibold text-[#c4b5fd]">
+                      <span className="grid size-10 shrink-0 place-items-center rounded-lg border border-[var(--accent)]/20 bg-[var(--accent)]/10 text-xs font-semibold text-[var(--accent-muted)]">
                         <CheckCircle2 size={16} />
                       </span>
                       <span className="min-w-0 flex-1">
                         <span className="flex flex-wrap items-center gap-2">
-                          <span className="max-w-full truncate text-sm font-semibold text-[#f4f4f5]">{task.title}</span>
+                          <span className="max-w-full truncate text-sm font-semibold text-[var(--foreground)]">{task.title}</span>
                           <span className={`inline-flex h-5 items-center rounded-full border px-2 text-[10px] font-medium ${taskStatusTone[task.status]}`}>{taskStatusLabels[task.status]}</span>
                           <span className={`inline-flex h-5 items-center rounded-full border px-2 text-[10px] font-medium ${taskPriorityTone[task.priority]}`}>{taskPriorityLabels[task.priority]}</span>
                         </span>
                       </span>
                     </Link>
-                    <Link href={`/projects/${task.projectId}/tasks`} className="col-start-2 mt-1 block w-fit max-w-full truncate rounded-sm text-xs text-white/50 hover:text-[#c4b5fd] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff]">
+                    <Link href={`/projects/${task.projectId}/tasks`} className="col-start-2 mt-1 block w-fit max-w-full truncate rounded-sm text-xs text-[var(--muted)] hover:text-[var(--accent-muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff]">
                       {task.projectName}{task.projectClientName ? ` · ${task.projectClientName}` : ""}
                     </Link>
                   </div>
 
-                  <div className="flex flex-wrap items-center justify-between gap-3 border-t border-white/[0.06] pt-3 sm:justify-end sm:border-0 sm:pt-0">
-                    <div className="min-w-0 text-xs text-white/40 sm:w-52 sm:text-right">
+                  <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[var(--line)] pt-3 sm:justify-end sm:border-0 sm:pt-0">
+                    <div className="min-w-0 text-xs text-[var(--muted)] sm:w-52 sm:text-right">
                       <span className="block">{task.assigneeName || "Unassigned"}</span>
-                      <span className="mt-1 block font-medium text-white/65">{timeline === "overdue" ? "Overdue" : timeline === "due_soon" ? "Due soon" : timeline === "no_due_date" ? "No due date" : "On track"}</span>
+                      <span className="mt-1 block font-medium text-[var(--muted)]">{timeline === "overdue" ? "Overdue" : timeline === "due_soon" ? "Due soon" : timeline === "no_due_date" ? "No due date" : "On track"}</span>
                       <span className="mt-1 block">{formatDate(task.dueDate)}</span>
                     </div>
                     <TaskStatusControl taskId={task.id} initialStatus={task.status} />
@@ -263,7 +271,7 @@ export function TasksWorkspace({
             })}
           </div>
         ) : (
-          <div className="rounded-[10px] border border-dashed border-white/12 bg-[#111113] px-4 py-10 text-center text-sm text-white/45">
+          <div className="rounded-[10px] border border-dashed border-[var(--line)] bg-[var(--surface)] px-4 py-10 text-center text-sm text-[var(--muted)]">
             No tasks match the current filters.
           </div>
         )}
@@ -274,23 +282,23 @@ export function TasksWorkspace({
 
 function SummaryMetric({ label, value, note }: { label: string; value: number; note: string }) {
   return (
-    <div className="rounded-[10px] border border-white/10 bg-[#18181b] px-4 py-3 text-white">
-      <p className="text-[11px] font-medium tracking-[0.01em] text-white/55">{label}</p>
-      <p className="mt-3 text-[26px] font-semibold leading-none tracking-[-0.05em] text-[#f4f4f5]">{value}</p>
-      <p className="mt-2 text-[11px] leading-relaxed text-white/45">{note}</p>
+    <div className="rounded-[10px] border border-[var(--line)] bg-[var(--panel)] px-4 py-3 text-[var(--foreground)]">
+      <p className="text-[11px] font-medium tracking-[0.01em] text-[var(--muted)]">{label}</p>
+      <p className="mt-3 text-[26px] font-semibold leading-none tracking-[-0.05em] text-[var(--foreground)]">{value}</p>
+      <p className="mt-2 text-[11px] leading-relaxed text-[var(--muted)]">{note}</p>
     </div>
   );
 }
 
 function FilterSelect<T extends string>({ label, value, onChange, id, children }: { label: string; value: T; onChange: (value: T) => void; id: string; children: React.ReactNode }) {
   return (
-    <label htmlFor={id} className="flex items-center gap-2 rounded-md border border-white/10 bg-[#111113] px-2.5 text-xs text-white/70">
+    <label htmlFor={id} className="flex items-center gap-2 rounded-md border border-[var(--line)] bg-[var(--surface)] px-2.5 text-xs text-[var(--muted)]">
       <span className="sr-only">{label}</span>
       <select
         id={id}
         value={value}
         onChange={(event) => onChange(event.target.value as T)}
-        className="h-10 border-0 bg-transparent pr-2 text-sm text-white outline-none"
+        className="h-10 border-0 bg-transparent pr-2 text-sm text-[var(--foreground)] outline-none"
       >
         {children}
       </select>
