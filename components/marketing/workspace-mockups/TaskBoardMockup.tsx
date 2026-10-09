@@ -87,7 +87,6 @@ export function TaskBoardMockup({ className }: TaskBoardMockupProps) {
               <option>Marcus Webb</option>
               <option>Priya Patel</option>
             </select>
-         
           </div>
         </section>
 

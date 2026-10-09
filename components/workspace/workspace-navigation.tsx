@@ -85,12 +85,12 @@ export function WorkspaceNavigation({
                   aria-current={active ? "page" : undefined}
                   aria-label={compact ? label : undefined}
                   title={compact ? label : undefined}
-                  className={`flex h-10 items-center rounded-lg text-sm font-medium transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8b83f5] ${
+                  className={`flex h-10 items-center rounded-lg text-sm font-medium transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] ${
                     compact ? "justify-center px-0" : "gap-3 px-3"
                   } ${
                     active
                       ? `bg-[var(--panel)] text-[var(--foreground)] before:-mr-px before:h-5 before:w-0.5 before:rounded-full${
-                          compact ? "" : " before:bg-[#a49bff]"
+                          compact ? "" : " before:bg-[var(--accent)]"
                         }`
                       : "text-[var(--muted)] hover:bg-[var(--surface)] hover:text-[var(--foreground)]"
                   }`}

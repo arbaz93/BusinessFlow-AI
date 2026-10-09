@@ -65,7 +65,7 @@ export default async function LeadDetailPage({ params }: PageProps<"/leads/[lead
   return (
     <div className="space-y-6 pb-10">
       <div className="pt-2 sm:pt-5">
-        <Link href="/leads" className="inline-flex h-8 items-center gap-1.5 rounded-md pr-2 text-xs font-medium text-[var(--muted)] transition-colors hover:text-[var(--foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff]">
+        <Link href="/leads" className="inline-flex h-8 items-center gap-1.5 rounded-md pr-2 text-xs font-medium text-[var(--muted)] transition-colors hover:text-[var(--foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]">
           <ArrowLeft size={14} /> Leads
         </Link>
         <div className="mt-3 flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">

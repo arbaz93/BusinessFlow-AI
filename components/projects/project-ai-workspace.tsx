@@ -2,25 +2,23 @@
 
 import { useActionState, useState } from "react";
 import Link from "next/link";
-import { AlertTriangle, ArrowUpRight, FileText, LoaderCircle, Sparkles } from "lucide-react";
+import { AlertTriangle, ArrowUpRight, FileText, LoaderCircle } from "lucide-react";
 import { approveProjectSuggestedTasksAction } from "@/app/actions/project-ai-approvals";
 import { getProjectDocumentAccessUrl } from "@/app/actions/project-documents";
 import { ProjectAIAnalysisFeedbackControl } from "@/components/projects/project-ai-feedback-control";
+import { AIProjectBriefDocument } from "@/components/projects/project-ai-brief-document";
 import { useProjectAIAnalysisRequest } from "@/components/projects/use-project-ai-analysis-request";
 import { formatProjectAIAnalysisDate } from "@/lib/project-ai/history-format";
 import {
   identifyProjectAIAnalysisFeedbackTargets,
 } from "@/lib/project-ai/feedback-identities";
-import {
-  ANALYSIS_FEEDBACK_TARGET_ID,
-  type AIAnalysisFeedbackTargetType,
-} from "@/lib/project-ai/feedback-types";
 import type { ProjectAIAnalysisFeedbackView } from "@/lib/project-ai/feedback";
 import type { ApproveSuggestedTasksResult } from "@/lib/project-ai/approval-schemas";
 import type { ProjectAIAnalysisState } from "@/lib/project-ai/persistence";
 import type { IdentifiedProjectIntelligence } from "@/lib/project-ai/suggestion-identity";
 import { taskPriorityValues, type TaskPriority } from "@/lib/tasks/options";
 import { taskPrioritySchema } from "@/lib/tasks/schemas";
+import type { AIAnalysisFeedbackTargetType } from "@/lib/project-ai/feedback-types";
 
 const badgeTones = {
   LOW: "border-[var(--line)] bg-[var(--surface)] text-[var(--foreground)]/65",
@@ -45,7 +43,7 @@ function EmptyState({ children }: { children: React.ReactNode }) {
   return <p className="rounded-md border border-dashed border-[var(--line)] bg-[var(--surface)] px-3 py-4 text-sm text-[var(--foreground)]/50">{children}</p>;
 }
 
-import { AIProjectBriefDocument } from "@/components/projects/project-ai-brief-document";
+type SuggestionDraft = {
   suggestionId: string;
   title: string;
   description: string;
@@ -672,74 +670,12 @@ export function ProjectAiWorkspace({
       )}
 
       {analysis && (
-        <section className={`space-y-5 rounded-lg border p-4 sm:p-6 ${isStale ? "border-[var(--line)] bg-[var(--surface)]" : "border-[var(--line)] bg-[var(--panel)]"}`} aria-labelledby="saved-analysis">
-          <div className="flex flex-col gap-3 border-b border-[var(--line)] pb-4 sm:flex-row sm:items-start sm:justify-between">
-            <div className="min-w-0">
-              <div className="flex flex-wrap items-center gap-2">
-                <h3 id="saved-analysis" className="text-base font-semibold text-[var(--foreground)]">
-                  {isStale || isProcessing ? "Previous analysis" : state.status === "FAILED" ? "Previous successful analysis" : "Project Summary"}
-                </h3>
-                <Badge tone={isStale || isProcessing ? badgeTones.MEDIUM : "border-[var(--success-border)]/25 bg-[var(--success-surface)]/30 text-[var(--success)]"}>
-                  {isStale ? "Historical analysis" : isProcessing ? "Previous saved result" : state.status === "FAILED" ? "Last successful result" : "Current analysis"}
-                </Badge>
-              </div>
-              <p className="mt-1 break-words text-xs text-[var(--foreground)]/50">Analyzed {formatProjectAIAnalysisDate(analysis.completedAt ?? analysis.createdAt)}</p>
-              <p className="mt-1 break-words text-xs text-[var(--foreground)]/50">
-                Analysis source: {analysis.sourceDocumentName}
-              </p>
-              <p className="mt-1 break-words text-xs text-[var(--foreground)]/40">Brief updated {formatProjectAIAnalysisDate(analysis.sourceDocumentUpdatedAt)}</p>
-              {analysis.sourceDocumentId && !state.analysisSourceMissing && (
-                <button
-                  type="button"
-                  onClick={() => void openProjectBrief(analysis.sourceDocumentId!)}
-                  disabled={openingDocumentId !== null}
-                  className="mt-2 inline-flex min-h-8 items-center gap-1.5 text-xs font-medium text-[var(--accent-muted)] underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-muted)] disabled:opacity-50"
-                >
-                  {openingDocumentId === analysis.sourceDocumentId
-                    ? <LoaderCircle size={12} className="animate-spin" aria-hidden="true" />
-                    : <FileText size={12} aria-hidden="true" />}
-                  Open analyzed Project Brief <ArrowUpRight size={12} aria-hidden="true" />
-                </button>
-              )}
-              {documentAccessError && <p role="status" className="mt-2 text-xs text-[var(--danger)]">{documentAccessError}</p>}
-            </div>
-            <p className="inline-flex shrink-0 items-center gap-1.5 text-xs text-[var(--foreground)]/45">
-              <Sparkles size={13} aria-hidden="true" /> AI-generated
-            </p>
-          </div>
-
-          <ProjectAIAnalysisFeedbackControl
-            projectId={projectId}
-            analysisId={analysis.id}
-            targetType="ANALYSIS"
-            targetId={ANALYSIS_FEEDBACK_TARGET_ID}
-            targetLabel="this full analysis"
-            feedback={initialFeedback.filter((item) => item.targetType === "ANALYSIS" && item.targetId === ANALYSIS_FEEDBACK_TARGET_ID)}
-          />
-
-          {state.status === "FAILED" && state.errorMessage && (
-            <div role="status" className="rounded-md border border-[var(--warning-border)]/25 bg-[var(--warning-surface)]/20 px-3 py-2 text-sm text-[var(--warning)]">
-              {state.errorMessage} {analysis ? "Showing the last successful analysis." : ""}
-            </div>
-          )}
-          {isProcessing && analysis && (
-            <p role="status" className="text-sm text-[var(--accent-muted)]">A new analysis is running. This is the previous saved result.</p>
-          )}
-          <p className="text-xs leading-5 text-[var(--foreground)]/45">Generated from the analysis source shown above. Review insights before using them for project decisions; suggested Tasks require your approval.</p>
-          {analysis.sourceMetadata?.truncated && (
-            <p role="note" className="rounded-md border border-[var(--warning-border)]/15 bg-[var(--warning-surface)]/[0.08] px-3 py-2 text-xs leading-5 text-[var(--foreground)]/55">
-              This analysis used {analysis.sourceMetadata.finalCharacterCount.toLocaleString()} of {analysis.sourceMetadata.originalCharacterCount.toLocaleString()} extracted characters from the source brief. Omitted text may contain additional details.
-            </p>
-          )}
-          <AnalysisSections
-            intelligence={analysis.intelligence}
-            projectId={projectId}
-            analysisId={analysis.id}
-            approvedSuggestions={analysis.approvedSuggestions}
-            canApprove={state.status === "COMPLETED" && state.analysisIsCurrent && !isProcessing}
-            feedback={initialFeedback}
-          />
-        </section>
+        <AIProjectBriefDocument
+          projectId={projectId}
+          state={state}
+          analysis={analysis}
+          feedback={initialFeedback}
+        />
       )}
     </div>
   );

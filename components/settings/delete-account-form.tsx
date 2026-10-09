@@ -10,7 +10,7 @@ import {
 } from "@/lib/organizations/deletion-eligibility";
 
 const inputClass =
-  "h-10 w-full rounded-lg border border-[var(--line)] bg-[var(--surface)] px-3.5 text-sm text-[var(--foreground)] placeholder:text-[var(--foreground)]/30 focus-visible:border-[#a49bff] focus-visible:ring-[#a49bff]/20 focus-visible:ring-2 disabled:cursor-not-allowed";
+  "h-10 w-full rounded-lg border border-[var(--line)] bg-[var(--surface)] px-3.5 text-sm text-[var(--foreground)] placeholder:text-[var(--foreground)]/30 focus-visible:border-[var(--accent)] focus-visible:ring-[var(--accent)]/20 focus-visible:ring-2 disabled:cursor-not-allowed";
 
 export function DeleteAccountForm({ eligibility }: { eligibility: DeletionEligibility }) {
   const [state, action, pending] = useActionState(deleteAccountAction, {});
@@ -60,7 +60,7 @@ export function DeleteAccountForm({ eligibility }: { eligibility: DeletionEligib
         <button
           type="button"
           onClick={() => setDialogOpen(true)}
-          className="mt-4 inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-[var(--line)] bg-[var(--surface)] px-4 text-sm font-medium text-[var(--danger)] transition-colors hover:bg-[var(--danger)]/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff]"
+          className="mt-4 inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-[var(--line)] bg-[var(--surface)] px-4 text-sm font-medium text-[var(--danger)] transition-colors hover:bg-[var(--danger)]/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
         >
           <Trash2 size={15} aria-hidden="true" />
           Delete Account

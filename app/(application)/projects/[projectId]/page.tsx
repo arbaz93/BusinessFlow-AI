@@ -183,7 +183,7 @@ export default async function ProjectOverviewPage({ params }: PageProps<"/projec
                   const dueState = getTaskTimelineState(task.status, task.dueDate);
                   return (
                     <li key={task.id} className="rounded-lg border border-[var(--line)] bg-[var(--panel)] p-3">
-                      <Link href={`/tasks/${task.id}`} className="block rounded-sm text-sm font-medium text-[var(--foreground)] hover:text-[var(--foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff]">{task.title}</Link>
+                      <Link href={`/tasks/${task.id}`} className="block rounded-sm text-sm font-medium text-[var(--foreground)] hover:text-[var(--foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]">{task.title}</Link>
                       <div className="mt-2 flex flex-wrap items-center gap-1.5">
                         <span className={`inline-flex rounded-full border px-2 py-0.5 text-[10px] font-medium ${taskStatusTone[task.status]}`}>{taskStatusLabels[task.status]}</span>
                         <span className={`inline-flex rounded-full border px-2 py-0.5 text-[10px] font-medium ${taskPriorityTone[task.priority]}`}>{taskPriorityLabels[task.priority]}</span>

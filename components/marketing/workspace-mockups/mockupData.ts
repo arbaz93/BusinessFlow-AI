@@ -44,29 +44,35 @@ export const mockBriefSections = [
 
 export const mockAIAnalysis = {
   source: "Brand & Website Refresh — Project Brief",
-  status: "COMPLETED",
   summary: "Refresh Northstar Studio's brand and website with a stronger visual system, improved content hierarchy, and responsive experience before the next campaign launch.",
   requirements: [
-    { priority: "High", text: "Define updated brand direction" },
-    { priority: "High", text: "Ensure responsive mobile experience" },
-    { priority: "Medium", text: "Restructure homepage content hierarchy" },
-    { priority: "Medium", text: "WCAG 2.1 AA compliance" },
-    { priority: "Medium", text: "CMS integration for content management" },
+    { title: "Define updated brand direction", description: "A refreshed brand direction aligned with the studio's positioning.", importance: "HIGH" },
+    { title: "Ensure responsive mobile experience", description: "All pages must work across mobile, tablet, and desktop.", importance: "HIGH" },
+    { title: "Restructure homepage content hierarchy", description: "The current homepage needs clearer information architecture.", importance: "MEDIUM" },
+    { title: "WCAG 2.1 AA compliance", description: "Ensure accessibility standards are met throughout.", importance: "MEDIUM" },
+    { title: "CMS integration for content management", description: "Content team needs to manage pages post-launch.", importance: "MEDIUM" },
+  ],
+  deliverables: [
+    { title: "Brand direction documentation", description: "Color palette, typography, and component specifications." },
+    { title: "Homepage redesign", description: "New homepage layout with improved hierarchy." },
+    { title: "Responsive page layouts", description: "Mobile-first layouts for all key pages." },
+    { title: "Design system documentation", description: "Component library and usage guidelines." },
+    { title: "Developer handoff package", description: "Spec files and assets for implementation." },
   ],
   risks: [
-    "Content requirements may need clarification",
-    "Existing visual system may require broader refinement",
+    { title: "Content requirements may need clarification", description: "Client feedback on copy is still pending.", severity: "MEDIUM" },
+    { title: "Existing visual system needs broader refinement", description: "Current brand assets may not fully support the new direction.", severity: "LOW" },
   ],
   gaps: [
-    "What is the target launch date?",
-    "Which pages are included in the initial release?",
+    { question: "What is the target launch date?", text: "A firm timeline is needed to plan sprint allocation." },
+    { question: "Which pages are included in the initial release?", text: "Knowing scope prevents over-engineering." },
   ],
   suggestedTasks: [
-    { title: "Review brand positioning", priority: "High", req: "Req-1: Define updated brand direction", risk: "Existing visual system may require broader refinement" },
-    { title: "Audit current website", priority: "High", req: "Req-2: Responsive mobile experience", risk: null },
-    { title: "Define homepage structure", priority: "Medium", req: "Req-3: Restructure homepage content", risk: "Content requirements may need clarification" },
-    { title: "Prepare visual direction", priority: "Medium", req: "Req-1: Define updated brand direction", risk: null },
-    { title: "Build responsive page layouts", priority: "Medium", req: "Req-2: Responsive mobile experience", risk: null },
+    { title: "Review brand positioning", priority: "HIGH", req: "Define updated brand direction", risk: "Existing visual system needs broader refinement" },
+    { title: "Audit current website", priority: "HIGH", req: "Ensure responsive mobile experience", risk: null },
+    { title: "Define homepage structure", priority: "MEDIUM", req: "Restructure homepage content hierarchy", risk: "Content requirements may need clarification" },
+    { title: "Prepare visual direction", priority: "MEDIUM", req: "Define updated brand direction", risk: null },
+    { title: "Build responsive page layouts", priority: "MEDIUM", req: "Ensure responsive mobile experience", risk: null },
   ],
 };
 
@@ -151,6 +157,18 @@ export const priorityStyles: Record<string, string> = {
   High: "bg-[var(--danger)]/10 text-[var(--danger)] border-[var(--danger)]/20",
   Medium: "bg-[var(--warning)]/10 text-[var(--warning)] border-[var(--warning)]/20",
   Low: "bg-[var(--info)]/10 text-[var(--info)] border-[var(--info)]/20",
+};
+
+export const importanceStyles: Record<string, string> = {
+  HIGH: "text-[var(--danger)]",
+  MEDIUM: "text-[var(--warning)]",
+  LOW: "text-[var(--muted-foreground)]",
+};
+
+export const severityStyles: Record<string, string> = {
+  HIGH: "text-[var(--danger)]",
+  MEDIUM: "text-[var(--warning)]",
+  LOW: "text-[var(--muted-foreground)]",
 };
 
 export const taskStatusLabels: Record<string, string> = {

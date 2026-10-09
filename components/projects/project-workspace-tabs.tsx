@@ -27,9 +27,9 @@ export function ProjectWorkspaceTabs({ projectId }: { projectId: string }) {
               key={href}
               href={href}
               aria-current={active ? "page" : undefined}
-              className={`inline-flex min-h-11 shrink-0 items-center gap-2 border-b-2 px-3 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#a49bff] ${
+              className={`inline-flex min-h-11 shrink-0 items-center gap-2 border-b-2 px-3 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--accent)] ${
                 active
-                  ? "border-[#a49bff] text-[var(--foreground)]"
+                  ? "border-[var(--accent)] text-[var(--foreground)]"
                   : "border-transparent text-[var(--foreground)]/50 hover:border-[var(--line-strong)] hover:text-[var(--foreground)]/80"
               }`}
             >

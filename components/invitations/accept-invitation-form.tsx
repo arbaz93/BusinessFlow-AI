@@ -18,7 +18,7 @@ export function AcceptInvitationForm({ token }: { token: string }) {
       <button
         type="submit"
         disabled={pending}
-        className="inline-flex h-10 w-full items-center justify-center rounded-lg bg-[#7067e8] px-4 text-sm font-semibold text-[var(--foreground)] transition-colors hover:bg-[#8178f0] disabled:cursor-wait disabled:opacity-55"
+        className="inline-flex h-10 w-full items-center justify-center rounded-lg bg-[var(--accent)] px-4 text-sm font-semibold text-[var(--foreground)] transition-colors hover:opacity-90 disabled:cursor-wait disabled:opacity-55"
       >
         {pending ? "Accepting invitation…" : "Accept invitation"}
       </button>

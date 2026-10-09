@@ -62,9 +62,9 @@ export function SettingsSidebar({ onNavigate }: { onNavigate?: () => void }) {
                   onClick={onNavigate}
                   aria-current={active ? "page" : undefined}
                   className={cn(
-                    "flex h-10 items-center gap-3 rounded-lg text-sm font-medium transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff]",
+                    "flex h-10 items-center gap-3 rounded-lg text-sm font-medium transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]",
                     active
-                      ? "bg-[var(--panel)] text-[var(--foreground)] before:-mr-px before:h-5 before:w-0.5 before:rounded-full before:bg-[#a49bff]"
+                      ? "bg-[var(--panel)] text-[var(--foreground)] before:-mr-px before:h-5 before:w-0.5 before:rounded-full before:bg-[var(--accent)]"
                       : danger
                         ? "text-[var(--danger)] hover:bg-[var(--danger-surface)]"
                         : "text-[var(--muted)] hover:bg-[var(--surface)] hover:text-[var(--foreground)]",

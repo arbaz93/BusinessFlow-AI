@@ -13,6 +13,7 @@ import {
 } from "@/lib/project-ai/feedback-types";
 import type { ProjectAIAnalysisFeedbackView } from "@/lib/project-ai/feedback";
 import type { IdentifiedProjectIntelligence } from "@/lib/project-ai/suggestion-identity";
+import type { ApproveSuggestedTasksResult } from "@/lib/project-ai/approval-schemas";
 import type { ProjectAIAnalysisState, ProjectAIAnalysisSummary } from "@/lib/project-ai/persistence";
 import { taskPriorityValues, type TaskPriority } from "@/lib/tasks/options";
 import { taskPrioritySchema } from "@/lib/tasks/schemas";
@@ -45,14 +46,6 @@ const priorityBg: Record<string, string> = {
   HIGH: "bg-[var(--danger-surface)]/20",
   URGENT: "bg-[var(--danger-surface)]/30",
 };
-
-function getFileTypeLabel(mimeType: string | null, originalName: string) {
-  if (mimeType?.startsWith("application/pdf")) return "PDF";
-  if (mimeType?.includes("wordprocessingml")) return "DOCX";
-  if (mimeType?.startsWith("text/")) return "Text";
-  const extension = originalName.split(".").pop()?.toUpperCase();
-  return extension && extension !== originalName.toUpperCase() ? extension : "Document";
-}
 
 function DocumentBadge({ children, variant = "neutral" }: { children: React.ReactNode; variant?: "neutral" | "success" | "warning" | "info" | "danger" }) {
   const variantClasses = {
@@ -375,6 +368,17 @@ function HistoricalSuggestedTasks({
               </div>
               <p className="mt-2 break-words text-sm leading-6 text-[var(--foreground)]/60">{item.description}</p>
               <p className="mt-3 text-[11px] font-medium text-[var(--foreground)]/35">From this analysis · Historical suggestion</p>
+              <div className="mt-2">
+                <AnalysisFeedbackWrapper
+                  projectId={projectId}
+                  analysisId={analysisId}
+                  targetType="SUGGESTED_TASK"
+                  targetId={item.suggestionId}
+                  targetLabel={item.title}
+                  historical
+                  feedback={feedback.filter((entry) => entry.targetType === "SUGGESTED_TASK" && entry.targetId === item.suggestionId)}
+                />
+              </div>
             </li>
           ))}
         </ul>
@@ -392,13 +396,6 @@ type SuggestionDraft = {
   priority: TaskPriority;
 };
 
-type ApproveSuggestedTasksResult = {
-  success: boolean;
-  error?: string;
-  createdTasks: Array<{ suggestionId: string; taskId: string }>;
-  fieldErrors?: { comment?: string[] };
-};
-
 interface AIProjectBriefDocumentProps {
   projectId: string;
   state: ProjectAIAnalysisState;
@@ -411,7 +408,6 @@ export function AIProjectBriefDocument({ projectId, state, analysis, feedback }:
   const isProcessing = state.status === "PROCESSING";
   const isFailed = state.status === "FAILED";
   const intelligence = analysis.intelligence;
-  const idPrefix = "doc-";
 
   const feedbackTargets = identifyProjectAIAnalysisFeedbackTargets(
     analysis.id,
@@ -446,21 +442,17 @@ export function AIProjectBriefDocument({ projectId, state, analysis, feedback }:
 
   return (
     <section
-      className="mx-auto w-full max-w-4xl"
+      className="ai-project-brief-document mx-auto w-full max-w-4xl"
       aria-labelledby="ai-brief-document-heading"
-      style={{
-        backgroundColor: "var(--ai-doc-bg, #f6f5f4)",
-        color: "var(--ai-doc-text, #18181b)",
-      }}
     >
-      <div style={{ backgroundColor: "var(--ai-doc-bg, #f6f5f4)" }} className="min-h-screen">
+      <div>
         <div className="mx-auto max-w-3xl px-6 py-5">
           <div className="mb-2 flex items-center gap-2 text-[var(--accent-muted)]">
             <Sparkles size={16} aria-hidden="true" />
             <span className="text-[10px] font-semibold uppercase tracking-[0.16em]">AI Project Intelligence</span>
           </div>
 
-          <h1 id="ai-brief-document-heading" className="text-3xl font-thin tracking-[-0.03em] text-[var(--foreground)] sm:text-4xl">
+          <h1 id="ai-brief-document-heading" className="text-3xl font-thin tracking-[-0.03em] sm:text-4xl">
             AI-Generated Project Brief
           </h1>
 
@@ -526,16 +518,40 @@ export function AIProjectBriefDocument({ projectId, state, analysis, feedback }:
             Generated from analysis of: {analysis.sourceDocumentName ?? "Unknown source"}
             {" · "}Analysis source updated: {formatProjectAIAnalysisDate(analysis.sourceDocumentUpdatedAt)}
           </div>
+
+          {analysis.sourceDocumentId && !state.analysisSourceMissing && (
+            <button
+              type="button"
+              onClick={() => void openProjectBrief(analysis.sourceDocumentId!)}
+              disabled={openingDocumentId !== null}
+              className="mt-2 inline-flex min-h-8 items-center gap-1.5 text-xs font-medium text-[var(--accent-muted)] underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-muted)] disabled:opacity-50"
+            >
+              {openingDocumentId === analysis.sourceDocumentId
+                ? <LoaderCircle size={12} className="animate-spin" aria-hidden="true" />
+                : <FileText size={12} aria-hidden="true" />}
+              Open analyzed Project Brief <ArrowUpRight size={12} aria-hidden="true" />
+            </button>
+          )}
+          {documentAccessError && <p role="status" className="mt-2 text-xs text-[var(--danger)]">{documentAccessError}</p>}
+
+          <div className="mt-1">
+            <ProjectAIAnalysisFeedbackControl
+              projectId={projectId}
+              analysisId={analysis.id}
+              targetType="ANALYSIS"
+              targetId={ANALYSIS_FEEDBACK_TARGET_ID}
+              targetLabel="this full analysis"
+              feedback={feedback.filter((item) => item.targetType === "ANALYSIS" && item.targetId === ANALYSIS_FEEDBACK_TARGET_ID)}
+            />
+          </div>
+
+          <p className="mt-1 text-xs leading-5 text-[var(--foreground)]/45">
+            Generated from the analysis source shown above. Review insights before using them for project decisions; suggested Tasks require your approval.
+          </p>
         </div>
       </div>
 
-      <div
-        className="mx-auto max-w-3xl px-6 py-8"
-        style={{
-          backgroundColor: "var(--ai-doc-bg, #f6f5f4)",
-          color: "var(--ai-doc-text, #18181b)",
-        }}
-      >
+      <div className="mx-auto max-w-3xl px-6 py-8">
         <div className="mb-8">
           <span className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--muted-foreground)]/60">Executive Summary</span>
           <p className="mt-3 max-w-2xl text-sm leading-7 text-[var(--foreground)]/75">
@@ -693,13 +709,7 @@ export function AIProjectBriefDocument({ projectId, state, analysis, feedback }:
         </div>
       </div>
 
-      <div
-        className="mx-auto max-w-3xl px-6 pb-10"
-        style={{
-          backgroundColor: "var(--ai-doc-bg, #f6f5f4)",
-          color: "var(--ai-doc-text, #18181b)",
-        }}
-      >
+      <div className="mx-auto max-w-3xl px-6 pb-10">
         {state.status === "PROCESSING" ? (
           <HistoricalSuggestedTasks
             suggestions={intelligence.suggestedTasks}

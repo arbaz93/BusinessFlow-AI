@@ -7,7 +7,7 @@ import { updatePassword } from "@/app/actions/profile";
 import { Input } from "@/components/ui/input";
 
 const inputClass =
-  "h-10 w-full rounded-lg border border-[#27272a] bg-[var(--surface)] px-3.5 text-sm text-[var(--foreground)] placeholder:text-[var(--foreground)]/30 focus-visible:border-[#a49bff] focus-visible:ring-[#a49bff]/20 focus-visible:ring-2 disabled:cursor-not-allowed";
+  "h-10 w-full rounded-lg border border-[var(--line)] bg-[var(--surface)] px-3.5 text-sm text-[var(--foreground)] placeholder:text-[var(--foreground)]/30 focus-visible:border-[var(--accent)] focus-visible:ring-[var(--accent)]/20 focus-visible:ring-2 disabled:cursor-not-allowed";
 
 export function SecurityForm() {
   const [passwordState, passwordAction, passwordPending] = useActionState(updatePassword, {});
@@ -103,14 +103,14 @@ export function SecurityForm() {
           <button
             type="submit"
             disabled={passwordDisabled}
-            className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-[#7067e8] px-4 text-sm font-semibold text-[var(--foreground)] transition-colors hover:bg-[#8178f0] disabled:cursor-not-allowed disabled:opacity-55"
+            className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-[var(--accent)] px-4 text-sm font-semibold text-[var(--foreground)] transition-colors hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-55"
           >
             {passwordPending ? "Updating…" : "Update password"}
           </button>
         </form>
       </section>
 
-      <section className="space-y-4 border-t border-[#27272a] pt-6">
+      <section className="space-y-4 border-t border-[var(--line)] pt-6">
         <div className="space-y-1">
           <h3 className="text-sm font-semibold text-[var(--foreground)]">Sign out</h3>
           <p className="text-sm text-[#a1a1ab]">Sign out of this browser session.</p>
@@ -118,7 +118,7 @@ export function SecurityForm() {
         <form action={signOut}>
           <button
             type="submit"
-            className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-[#27272a] px-4 text-sm font-medium text-[var(--foreground)]/75 transition-colors hover:bg-[var(--surface)] hover:text-[var(--foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff]"
+            className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-[var(--line)] px-4 text-sm font-medium text-[var(--foreground)]/75 transition-colors hover:bg-[var(--surface)] hover:text-[var(--foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
           >
             <LogOut size={15} aria-hidden="true" />
             Sign out

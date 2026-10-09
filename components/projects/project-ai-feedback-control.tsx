@@ -49,7 +49,7 @@ export function ProjectAIAnalysisFeedbackControl({
           <button
             type="button"
             aria-label={`${savedFeedback ? "Edit" : "Give"} feedback on ${targetLabel}`}
-            className="inline-flex min-h-8 items-center gap-1.5 rounded px-1.5 text-xs font-medium text-[var(--foreground)]/50 transition-colors hover:bg-[var(--surface)] hover:text-[var(--accent-muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff]"
+            className="inline-flex min-h-8 items-center gap-1.5 rounded px-1.5 text-xs font-medium text-[var(--foreground)]/50 transition-colors hover:bg-[var(--surface)] hover:text-[var(--accent-muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
           >
             {savedFeedback ? <Pencil size={12} aria-hidden="true" /> : <MessageSquareText size={12} aria-hidden="true" />}
             {savedFeedback ? "Edit feedback" : "Give feedback"}
@@ -70,7 +70,7 @@ export function ProjectAIAnalysisFeedbackControl({
                   <button
                     type="button"
                     aria-label="Close feedback dialog"
-                    className="grid size-8 shrink-0 place-items-center rounded-md text-[var(--foreground)]/55 hover:bg-[var(--surface)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff]"
+                    className="grid size-8 shrink-0 place-items-center rounded-md text-[var(--foreground)]/55 hover:bg-[var(--surface)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
                   >
                     <X size={16} aria-hidden="true" />
                   </button>
@@ -92,7 +92,7 @@ export function ProjectAIAnalysisFeedbackControl({
                     name="feedbackType"
                     defaultValue={savedFeedback?.feedbackType ?? "INCORRECT"}
                     disabled={pending}
-                    className="h-10 w-full rounded-md border border-[var(--line)] bg-[var(--surface)] px-3 text-sm text-[var(--foreground)] outline-none focus-visible:border-[#a49bff] focus-visible:ring-2 focus-visible:ring-[#a49bff]/30 disabled:opacity-60"
+                    className="h-10 w-full rounded-md border border-[var(--line)] bg-[var(--surface)] px-3 text-sm text-[var(--foreground)] outline-none focus-visible:border-[var(--accent)] focus-visible:ring-2 focus-visible:ring-[var(--accent)]/30 disabled:opacity-60"
                   >
                     {aiAnalysisFeedbackTypeValues.map((value) => (
                       <option key={value} value={value}>{aiAnalysisFeedbackTypeLabels[value]}</option>
@@ -110,7 +110,7 @@ export function ProjectAIAnalysisFeedbackControl({
                     rows={4}
                     disabled={pending}
                     placeholder="Add context if helpful. An explanation is required for Other feedback."
-                    className="w-full resize-y rounded-md border border-[var(--line)] bg-[var(--surface)] px-3 py-2 text-sm leading-6 text-[var(--foreground)]/80 outline-none placeholder:text-[var(--foreground)]/30 focus-visible:border-[#a49bff] focus-visible:ring-2 focus-visible:ring-[#a49bff]/30 disabled:opacity-60"
+                    className="w-full resize-y rounded-md border border-[var(--line)] bg-[var(--surface)] px-3 py-2 text-sm leading-6 text-[var(--foreground)]/80 outline-none placeholder:text-[var(--foreground)]/30 focus-visible:border-[var(--accent)] focus-visible:ring-2 focus-visible:ring-[var(--accent)]/30 disabled:opacity-60"
                   />
                   <span className="block text-right text-[11px] text-[var(--foreground)]/40">Up to 1000 characters</span>
                 </label>
@@ -125,14 +125,14 @@ export function ProjectAIAnalysisFeedbackControl({
 
                 <div className="flex flex-col-reverse gap-2 border-t border-[var(--line)] pt-4 sm:flex-row sm:justify-end">
                   <Dialog.Close asChild>
-                    <button type="button" className="inline-flex min-h-10 items-center justify-center rounded-md border border-[var(--line)] px-3 text-sm text-[var(--foreground)]/70 hover:bg-[var(--surface)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff]">
+                    <button type="button" className="inline-flex min-h-10 items-center justify-center rounded-md border border-[var(--line)] px-3 text-sm text-[var(--foreground)]/70 hover:bg-[var(--surface)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]">
                       Cancel
                     </button>
                   </Dialog.Close>
                   <button
                     type="submit"
                     disabled={pending}
-                    className="inline-flex min-h-10 items-center justify-center rounded-md bg-[#a49bff] px-4 text-sm font-medium text-[#101018] hover:bg-[#b3a8ff] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff] disabled:cursor-not-allowed disabled:opacity-60"
+                    className="inline-flex min-h-10 items-center justify-center rounded-md bg-[var(--accent)] px-4 text-sm font-medium text-[var(--accent-foreground)] hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     {pending ? "Saving…" : savedFeedback ? "Update feedback" : "Submit feedback"}
                   </button>
@@ -146,7 +146,7 @@ export function ProjectAIAnalysisFeedbackControl({
       {statusMessage && !open && <span role="status" className="text-xs text-emerald-300">{statusMessage}</span>}
       {visibleFeedback.length > 0 && (
         <details className="min-w-0">
-          <summary className="min-h-8 cursor-pointer rounded px-1.5 py-1 text-xs text-[var(--foreground)]/45 hover:text-[var(--foreground)]/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff]">
+          <summary className="min-h-8 cursor-pointer rounded px-1.5 py-1 text-xs text-[var(--foreground)]/45 hover:text-[var(--foreground)]/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]">
             {visibleFeedback.length} {visibleFeedback.length === 1 ? "other response" : "other responses"}
           </summary>
           <ul className="mt-2 w-full space-y-2 rounded-md border border-[var(--line)] bg-[var(--surface)] p-3">

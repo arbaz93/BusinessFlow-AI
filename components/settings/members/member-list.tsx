@@ -42,7 +42,7 @@ export function MemberList({
                 <div className="flex items-center gap-2 text-sm font-medium text-[var(--foreground)]">
                   <span className="truncate">{member.user.name}</span>
                   {member.role === OrganizationRole.OWNER ? (
-                    <span className="inline-flex items-center gap-1 rounded-full border border-[#a49bff]/30 bg-[#a49bff]/10 px-1.5 py-0.5 text-[10px] uppercase tracking-[0.08em] text-[var(--accent-muted)]">
+                    <span className="inline-flex items-center gap-1 rounded-full border border-[var(--accent)]/30 bg-[var(--accent)]/10 px-1.5 py-0.5 text-[10px] uppercase tracking-[0.08em] text-[var(--accent-muted)]">
                       <ShieldCheck size={10} /> owner
                     </span>
                   ) : null}

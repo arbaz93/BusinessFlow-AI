@@ -20,7 +20,7 @@ export function InviteMemberForm() {
           placeholder="colleague@company.com"
           required
           disabled={pending}
-          className="h-10 flex-1 rounded-lg border border-[var(--line)] bg-[var(--surface)] px-3.5 text-sm text-[var(--foreground)] placeholder:text-[var(--foreground)]/30 focus-visible:border-[#a49bff] focus-visible:ring-[#a49bff]/20 focus-visible:ring-2 disabled:cursor-not-allowed"
+          className="h-10 flex-1 rounded-lg border border-[var(--line)] bg-[var(--surface)] px-3.5 text-sm text-[var(--foreground)] placeholder:text-[var(--foreground)]/30 focus-visible:border-[var(--accent)] focus-visible:ring-[var(--accent)]/20 focus-visible:ring-2 disabled:cursor-not-allowed"
           aria-invalid={Boolean(state.error)}
           aria-describedby={state.error ? "invite-email-error" : undefined}
         />

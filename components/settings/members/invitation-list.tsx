@@ -88,13 +88,13 @@ export function InvitationList({
               <div className="flex flex-wrap items-center justify-end gap-2">
                 <form action={linkAction}>
                   <input type="hidden" name="invitationId" value={invitation.id} />
-                  <button type="submit" className="inline-flex items-center gap-1 rounded-lg border border-[var(--line)] bg-[var(--panel)] px-2.5 py-1.5 text-xs font-medium text-[var(--foreground)] hover:border-[#a49bff]/60 hover:text-[var(--foreground)]">
+                  <button type="submit" className="inline-flex items-center gap-1 rounded-lg border border-[var(--line)] bg-[var(--panel)] px-2.5 py-1.5 text-xs font-medium text-[var(--foreground)] hover:border-[var(--accent)]/60 hover:text-[var(--foreground)]">
                     Copy link
                   </button>
                 </form>
                 <form action={resendAction}>
                   <input type="hidden" name="invitationId" value={invitation.id} />
-                  <button type="submit" className="inline-flex items-center gap-1 rounded-lg border border-[var(--line)] bg-[var(--panel)] px-2.5 py-1.5 text-xs font-medium text-[var(--foreground)] hover:border-[#a49bff]/60 hover:text-[var(--foreground)]" aria-label={`Resend invitation to ${invitation.email}`}>
+                  <button type="submit" className="inline-flex items-center gap-1 rounded-lg border border-[var(--line)] bg-[var(--panel)] px-2.5 py-1.5 text-xs font-medium text-[var(--foreground)] hover:border-[var(--accent)]/60 hover:text-[var(--foreground)]" aria-label={`Resend invitation to ${invitation.email}`}>
                     <RefreshCw size={12} /> Resend invitation
                   </button>
                 </form>

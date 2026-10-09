@@ -8,8 +8,9 @@ import {
   type ProjectAIAnalysisDetailResult,
 } from "@/app/actions/project-ai-history";
 import { getProjectDocumentAccessUrl } from "@/app/actions/project-documents";
-import { AnalysisSections } from "@/components/projects/project-ai-workspace";
+import { AIProjectBriefDocument } from "@/components/projects/project-ai-brief-document";
 import type { ProjectAIAnalysisHistoryEntry } from "@/lib/project-ai/history";
+import type { ProjectAIAnalysisSummary } from "@/lib/project-ai/persistence";
 
 function HistoryBadge({ children, tone = "border-[var(--line)] bg-[var(--surface)] text-[var(--foreground)]/65" }: {
   children: React.ReactNode;
@@ -122,7 +123,7 @@ export function ProjectAIAnalysisHistory({
                       onClick={() => void openAnalysis(analysis.id)}
                       disabled={loadingAnalysisId !== null}
                       aria-label={`View analysis from ${analysis.sourceDocumentName ?? "unavailable source"}, ${analysis.analyzedAtLabel}`}
-                      className="inline-flex min-h-9 items-center justify-center gap-1.5 rounded-md border border-[var(--line)] bg-[var(--surface)] px-3 text-xs font-medium text-[var(--foreground)]/75 transition-colors hover:bg-[var(--surface)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff] disabled:cursor-not-allowed disabled:opacity-50"
+                      className="inline-flex min-h-9 items-center justify-center gap-1.5 rounded-md border border-[var(--line)] bg-[var(--surface)] px-3 text-xs font-medium text-[var(--foreground)]/75 transition-colors hover:bg-[var(--surface)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] disabled:cursor-not-allowed disabled:opacity-50"
                     >
                       View analysis
                     </button>
@@ -133,7 +134,7 @@ export function ProjectAIAnalysisHistory({
                       onClick={() => void openSourceBrief(analysis.sourceDocumentId!)}
                       disabled={openingSourceId !== null}
                       aria-label={`View source brief ${analysis.sourceDocumentName ?? ""}`}
-                      className="inline-flex min-h-9 items-center justify-center gap-1.5 rounded-md border border-[var(--line)] bg-[var(--surface)] px-3 text-xs font-medium text-[var(--foreground)]/75 transition-colors hover:bg-[var(--surface)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff] disabled:cursor-not-allowed disabled:opacity-50"
+                      className="inline-flex min-h-9 items-center justify-center gap-1.5 rounded-md border border-[var(--line)] bg-[var(--surface)] px-3 text-xs font-medium text-[var(--foreground)]/75 transition-colors hover:bg-[var(--surface)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] disabled:cursor-not-allowed disabled:opacity-50"
                     >
                       {openingSourceId === analysis.sourceDocumentId
                         ? <LoaderCircle size={13} className="animate-spin" aria-hidden="true" />
@@ -177,7 +178,7 @@ export function ProjectAIAnalysisHistory({
                   <button
                     type="button"
                     aria-label="Close historical analysis"
-                    className="grid size-9 shrink-0 place-items-center rounded-lg text-[var(--foreground)]/55 transition-colors hover:bg-[var(--surface)] hover:text-[var(--foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff]"
+                    className="grid size-9 shrink-0 place-items-center rounded-lg text-[var(--foreground)]/55 transition-colors hover:bg-[var(--surface)] hover:text-[var(--foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
                   >
                     <X size={17} aria-hidden="true" />
                   </button>
@@ -191,56 +192,59 @@ export function ProjectAIAnalysisHistory({
                   <p role="alert" className="rounded-md border border-[var(--line)] bg-[var(--surface)] px-3 py-3 text-sm text-[var(--foreground)]/65">
                     {detailError}
                   </p>
-                ) : selectedAnalysis ? (
+                 ) : selectedAnalysis ? (
                   <>
-                    <div role="note" className="rounded-md border border-[#a49bff]/20 bg-[#a49bff]/[0.05] px-3 py-3">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <HistoryBadge tone="border-[#a49bff]/25 bg-[#a49bff]/10 text-[var(--accent-muted)]">Reference only</HistoryBadge>
-                        {selectedAnalysis.isStale && <HistoryBadge tone="border-[#f59e0b]/25 bg-[#f59e0b]/[0.08] text-[#fbbf24]">Stale</HistoryBadge>}
-                      </div>
-                      <p className="mt-2 break-words text-sm leading-6 text-[var(--foreground)]/75">
-                        {selectedAnalysis.sourceDocumentName
-                          ? <>Based on “{selectedAnalysis.sourceDocumentName}” at the time of analysis on {selectedAnalysis.analyzedAtLabel}.</>
-                          : <>Generated on {selectedAnalysis.analyzedAtLabel}. The source Project Brief name is unavailable.</>}
-                      </p>
-                      {!selectedAnalysis.sourceDocumentAvailable && (
-                        <p className="mt-1 text-xs leading-5 text-[var(--foreground)]/50">The source document is no longer available.</p>
-                      )}
-                      <p className="mt-1 text-xs leading-5 text-[var(--foreground)]/40">
-                        Source document update marker at analysis: {selectedAnalysis.sourceDocumentUpdatedAtLabel}
-                      </p>
-                      <p className="mt-1 text-xs leading-5 text-[var(--foreground)]/50">
-                        {selectedAnalysis.isStale
-                          ? "This analysis is no longer based on the current primary Project Brief. The current file may differ from the version analyzed."
-                          : "This saved result does not change the current project intelligence."}
-                      </p>
-                      <p className="mt-1 text-xs leading-5 text-[var(--foreground)]/40">
-                        Attribution is document-level; reliable page or section locations were not preserved by extraction.
-                      </p>
-                      {selectedAnalysis.sourceDocumentId && selectedAnalysis.sourceDocumentAvailable && (
-                        <button
-                          type="button"
-                          onClick={() => void openSourceBrief(selectedAnalysis.sourceDocumentId!)}
-                          disabled={openingSourceId !== null}
-                          className="mt-3 inline-flex min-h-8 items-center gap-1.5 text-xs font-medium text-[var(--accent-muted)] underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff] disabled:opacity-50"
-                        >
-                          View source Project Brief <ArrowUpRight size={12} aria-hidden="true" />
-                        </button>
-                      )}
-                      {sourceError && <p role="status" className="mt-2 text-xs text-[#fbbf24]">{sourceError}</p>}
-                    </div>
-                    {selectedAnalysis.intelligence.sourceMetadata?.truncated && (
-                      <p role="note" className="rounded-md border border-[#f59e0b]/15 bg-[#f59e0b]/[0.03] px-3 py-2 text-xs leading-5 text-[var(--foreground)]/55">
-                        This analysis used {selectedAnalysis.intelligence.sourceMetadata.finalCharacterCount.toLocaleString()} of {selectedAnalysis.intelligence.sourceMetadata.originalCharacterCount.toLocaleString()} extracted characters. References, if available, would only apply to the supplied portion.
-                      </p>
+                    {selectedAnalysis.sourceDocumentAvailable && selectedAnalysis.sourceDocumentId && (
+                      <button
+                        type="button"
+                        onClick={() => void openSourceBrief(selectedAnalysis.sourceDocumentId!)}
+                        disabled={openingSourceId !== null}
+                        className="mt-3 inline-flex min-h-8 items-center gap-1.5 text-xs font-medium text-[var(--accent-muted)] underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] disabled:opacity-50"
+                      >
+                        {openingSourceId === selectedAnalysis.sourceDocumentId
+                          ? <LoaderCircle size={13} className="animate-spin" aria-hidden="true" />
+                          : <FileText size={13} aria-hidden="true" />}
+                        View source Project Brief <ArrowUpRight size={12} aria-hidden="true" />
+                      </button>
                     )}
-                    <AnalysisSections
-                      intelligence={selectedAnalysis.intelligence}
+                    {sourceError && <p role="status" className="mt-2 text-xs text-[#fbbf24]">{sourceError}</p>}
+                    <AIProjectBriefDocument
                       projectId={projectId}
-                      analysisId={selectedAnalysis.id}
-                      approvedSuggestions={[]}
-                      canApprove={false}
-                      mode="historical"
+                      state={{
+                        status: "COMPLETED",
+                        primaryBrief: null,
+                        analysis: {
+                          id: selectedAnalysis.id,
+                          intelligence: selectedAnalysis.intelligence,
+                          approvedSuggestions: [],
+                          sourceDocumentId: selectedAnalysis.sourceDocumentId,
+                          sourceDocumentUpdatedAt: selectedAnalysis.sourceDocumentUpdatedAt,
+                          sourceDocumentName: selectedAnalysis.sourceDocumentName ?? "Unknown source",
+                          sourceMetadata: selectedAnalysis.intelligence.sourceMetadata ?? null,
+                          model: "AI",
+                          analysisVersion: selectedAnalysis.analysisVersion,
+                          createdAt: selectedAnalysis.createdAt,
+                          completedAt: selectedAnalysis.completedAt,
+                        },
+                        analysisIsCurrent: selectedAnalysis.isCurrent,
+                        analysisSourceMissing: !selectedAnalysis.sourceDocumentAvailable,
+                        analysisStaleReason: selectedAnalysis.isStale ? "SOURCE_UPDATED" : null,
+                        errorMessage: null,
+                        latestFailureMessage: null,
+                      }}
+                      analysis={{
+                        id: selectedAnalysis.id,
+                        intelligence: selectedAnalysis.intelligence,
+                        approvedSuggestions: [],
+                        sourceDocumentId: selectedAnalysis.sourceDocumentId,
+                        sourceDocumentUpdatedAt: selectedAnalysis.sourceDocumentUpdatedAt,
+                        sourceDocumentName: selectedAnalysis.sourceDocumentName ?? "Unknown source",
+                        sourceMetadata: selectedAnalysis.intelligence.sourceMetadata ?? null,
+                        model: "AI",
+                        analysisVersion: selectedAnalysis.analysisVersion,
+                        createdAt: selectedAnalysis.createdAt,
+                        completedAt: selectedAnalysis.completedAt,
+                      } as ProjectAIAnalysisSummary}
                       feedback={selectedAnalysis.feedback}
                     />
                   </>

@@ -106,7 +106,7 @@ export function LeadsWorkspace({
               onChange={(event) => setSearch(event.target.value)}
               placeholder="Search name, company, email…"
               aria-label="Search leads"
-              className="h-10 border-[var(--line)] bg-[var(--surface)] pl-9 text-sm text-[var(--foreground)] placeholder:text-[var(--muted)] focus-visible:border-[#a49bff] focus-visible:ring-[#a49bff]/20 dark:bg-[var(--surface)]"
+              className="h-10 border-[var(--line)] bg-[var(--surface)] pl-9 text-sm text-[var(--foreground)] placeholder:text-[var(--muted)] focus-visible:border-[var(--accent)] focus-visible:ring-[var(--accent)]/20 dark:bg-[var(--surface)]"
             />
           </div>
           <div className="flex max-w-full flex-wrap gap-1 pb-0.5" role="group" aria-label="Filter leads by status">
@@ -119,7 +119,7 @@ export function LeadsWorkspace({
                   type="button"
                   onClick={() => setStatusFilter(filter.value)}
                   aria-pressed={active}
-                  className={`inline-flex h-9 shrink-0 items-center gap-1.5 rounded-md px-2.5 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff] ${active ? "bg-[var(--surface)] text-[var(--foreground)]" : "text-[var(--muted)] hover:bg-[var(--surface)] hover:text-[var(--foreground)]"}`}
+                  className={`inline-flex h-9 shrink-0 items-center gap-1.5 rounded-md px-2.5 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] ${active ? "bg-[var(--surface)] text-[var(--foreground)]" : "text-[var(--muted)] hover:bg-[var(--surface)] hover:text-[var(--foreground)]"}`}
                 >
                   {filter.label}<span className={active ? "text-[var(--muted)]" : "text-[var(--muted)]"}>{count}</span>
                 </button>
@@ -134,7 +134,7 @@ export function LeadsWorkspace({
           <div className="space-y-2.5">
             {visibleLeads.map((lead) => (
               <article key={lead.id} className="flex flex-col gap-3 rounded-[10px] border border-[var(--line)] bg-[var(--surface)] p-3.5 transition-colors hover:border-[var(--line)] sm:flex-row sm:items-center sm:gap-4 sm:px-4">
-                <Link href={`/leads/${lead.id}`} className="flex min-w-0 flex-1 items-center gap-3 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff]">
+                <Link href={`/leads/${lead.id}`} className="flex min-w-0 flex-1 items-center gap-3 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]">
                   <span className="grid size-10 shrink-0 place-items-center rounded-lg border border-[var(--accent)]/20 bg-[var(--accent)]/10 text-xs font-semibold text-[var(--accent-muted)]">
                     {lead.name.trim().split(/\s+/).slice(0, 2).map((part) => part[0]).join("").toUpperCase()}
                   </span>

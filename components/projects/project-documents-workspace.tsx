@@ -167,7 +167,7 @@ export function ProjectDocumentsWorkspace({
         <div className="flex flex-col gap-5">
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-2">
-              <span className="grid size-8 place-items-center rounded-md border border-[#a49bff]/30 bg-[#a49bff]/10 text-[var(--accent-muted)]">
+              <span className="grid size-8 place-items-center rounded-md border border-[var(--accent)]/30 bg-[var(--accent)]/10 text-[var(--accent-muted)]">
                 <UploadCloud size={16} />
               </span>
               <div>
@@ -185,7 +185,7 @@ export function ProjectDocumentsWorkspace({
             </label>
             <label className="space-y-1.5 text-sm text-[var(--foreground)]/70">
               <span>Document type</span>
-              <select name="documentType" defaultValue="PROJECT_BRIEF" className="h-10 w-full rounded-md border border-[var(--line)] bg-[var(--surface)] px-3 text-sm text-[var(--foreground)] outline-none focus:border-[#a49bff] focus:ring-2 focus:ring-[#a49bff]/20">
+              <select name="documentType" defaultValue="PROJECT_BRIEF" className="h-10 w-full rounded-md border border-[var(--line)] bg-[var(--surface)] px-3 text-sm text-[var(--foreground)] outline-none focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)]/20">
                 {projectDocumentTypeValues.map((type) => (
                   <option key={type} value={type}>{projectDocumentTypeLabels[type]}</option>
                 ))}
@@ -198,12 +198,12 @@ export function ProjectDocumentsWorkspace({
             </label>
             <div className="flex items-end">
               <label className="inline-flex items-center gap-2 rounded-md border border-[var(--line)] bg-[var(--surface)] px-3 py-2 text-sm text-[var(--foreground)]/70">
-                <input type="checkbox" name="isPrimary" value="true" className="h-4 w-4 rounded border-[var(--line)] bg-[var(--surface)] text-[var(--accent-muted)] focus:ring-[#a49bff]" />
+                <input type="checkbox" name="isPrimary" value="true" className="h-4 w-4 rounded border-[var(--line)] bg-[var(--surface)] text-[var(--accent-muted)] focus:ring-[var(--accent)]" />
                 Primary brief
               </label>
             </div>
             <div className="lg:col-span-4 flex justify-end">
-              <button type="submit" disabled={uploadPending} className="inline-flex h-10 items-center justify-center rounded-md bg-[#a49bff] px-4 text-sm font-medium text-[#101018] transition-colors hover:bg-[#b3a8ff] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff] disabled:cursor-wait disabled:opacity-60">
+              <button type="submit" disabled={uploadPending} className="inline-flex h-10 items-center justify-center rounded-md bg-[var(--accent)] px-4 text-sm font-medium text-[var(--accent-foreground)] transition-colors hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] disabled:cursor-wait disabled:opacity-60">
                 {uploadPending ? "Uploading…" : "Upload Document"}
               </button>
             </div>
@@ -227,7 +227,7 @@ export function ProjectDocumentsWorkspace({
             <Search size={15} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[var(--foreground)]/35" />
             <Input value={search} onChange={(event) => setSearch(event.currentTarget.value)} aria-label="Search project documents" placeholder="Search files…" className="h-10 border-[var(--line)] bg-[var(--surface)] pl-9 text-sm text-[var(--foreground)] placeholder:text-[var(--foreground)]/35 dark:bg-[var(--surface)]" />
           </div>
-          <select value={documentTypeFilter} onChange={(event) => setDocumentTypeFilter(event.currentTarget.value as ProjectDocumentType | "ALL")} className="h-10 rounded-md border border-[var(--line)] bg-[var(--surface)] px-3 text-sm text-[var(--foreground)] outline-none focus:border-[#a49bff] focus:ring-2 focus:ring-[#a49bff]/20">
+          <select value={documentTypeFilter} onChange={(event) => setDocumentTypeFilter(event.currentTarget.value as ProjectDocumentType | "ALL")} className="h-10 rounded-md border border-[var(--line)] bg-[var(--surface)] px-3 text-sm text-[var(--foreground)] outline-none focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)]/20">
             <option value="ALL">All document types</option>
             {projectDocumentTypeValues.map((type) => (
               <option key={type} value={type}>{projectDocumentTypeLabels[type]}</option>
@@ -244,7 +244,7 @@ export function ProjectDocumentsWorkspace({
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
                     <span className={`inline-flex rounded-full border px-2 py-0.5 text-[10px] font-medium ${projectDocumentTypeTone[document.documentType]}`}>{projectDocumentTypeLabels[document.documentType]}</span>
-                    {document.isPrimary && <span className="inline-flex rounded-full border border-[#a49bff]/25 bg-[#a49bff]/10 px-2 py-0.5 text-[10px] font-medium text-[var(--accent-muted)]">Primary brief</span>}
+                    {document.isPrimary && <span className="inline-flex rounded-full border border-[var(--accent)]/25 bg-[var(--accent)]/10 px-2 py-0.5 text-[10px] font-medium text-[var(--accent-muted)]">Primary brief</span>}
                   </div>
                   <div className="mt-2 flex items-center gap-2">
                     <span className="grid size-8 place-items-center rounded-md border border-[var(--line)] bg-[var(--surface)] text-[var(--foreground)]/60">
@@ -296,7 +296,7 @@ export function ProjectDocumentsWorkspace({
                       <button
                         type="submit"
                         disabled={pendingActionId === document.id}
-                        className="inline-flex h-9 items-center rounded-md border border-[#a49bff]/25 bg-[#a49bff]/10 px-3 text-sm text-[var(--accent-muted)] hover:bg-[#a49bff]/15 disabled:cursor-wait disabled:opacity-60"
+                        className="inline-flex h-9 items-center rounded-md border border-[var(--accent)]/25 bg-[var(--accent)]/10 px-3 text-sm text-[var(--accent-muted)] hover:bg-[var(--accent)]/15 disabled:cursor-wait disabled:opacity-60"
                       >
                         {pendingActionId === document.id ? "Updating…" : "Set as primary"}
                       </button>

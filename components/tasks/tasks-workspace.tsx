@@ -192,7 +192,7 @@ export function TasksWorkspace({
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
           <div className="relative w-full lg:max-w-sm">
             <Search size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[var(--muted)]" />
-            <Input type="search" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search tasks or projects…" aria-label="Search tasks" className="h-10 border-[var(--line)] bg-[var(--surface)] pl-9 text-sm text-[var(--foreground)] placeholder:text-[var(--muted)] focus-visible:border-[#a49bff] focus-visible:ring-[#a49bff]/20 dark:bg-[var(--surface)]" />
+            <Input type="search" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search tasks or projects…" aria-label="Search tasks" className="h-10 border-[var(--line)] bg-[var(--surface)] pl-9 text-sm text-[var(--foreground)] placeholder:text-[var(--muted)] focus-visible:border-[var(--accent)] focus-visible:ring-[var(--accent)]/20 dark:bg-[var(--surface)]" />
           </div>
           <div className="flex flex-wrap items-center gap-2">
             <FilterSelect label="Project" value={projectFilter} onChange={setProjectFilter} id="task-project-filter">
@@ -219,7 +219,7 @@ export function TasksWorkspace({
                 <option key={filter} value={filter}>{taskDueFilterLabels[filter]}</option>
               ))}
             </FilterSelect>
-            <select value={sort} onChange={(event) => setSort(event.target.value as TaskSort)} aria-label="Sort tasks" className="h-10 rounded-md border border-[var(--line)] bg-[var(--surface)] px-2.5 text-sm text-[var(--foreground)] outline-none focus-visible:border-[#a49bff] focus-visible:ring-[3px] focus-visible:ring-[#a49bff]/20">
+            <select value={sort} onChange={(event) => setSort(event.target.value as TaskSort)} aria-label="Sort tasks" className="h-10 rounded-md border border-[var(--line)] bg-[var(--surface)] px-2.5 text-sm text-[var(--foreground)] outline-none focus-visible:border-[var(--accent)] focus-visible:ring-[3px] focus-visible:ring-[var(--accent)]/20">
               {taskSortValues.map((value) => (
                 <option key={value} value={value}>{taskSortLabels[value]}</option>
               ))}
@@ -241,7 +241,7 @@ export function TasksWorkspace({
               return (
                 <article key={task.id} className="flex flex-col gap-3 rounded-[10px] border border-[var(--line)] bg-[var(--surface)] p-3.5 transition-colors hover:border-[var(--line)] sm:flex-row sm:items-center sm:gap-4 sm:px-4">
                   <div className="grid min-w-0 flex-1 grid-cols-[2.5rem_minmax(0,1fr)] items-center gap-x-3">
-                    <Link href={`/tasks/${task.id}`} className="col-span-2 flex min-w-0 items-center gap-3 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff]">
+                    <Link href={`/tasks/${task.id}`} className="col-span-2 flex min-w-0 items-center gap-3 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]">
                       <span className="grid size-10 shrink-0 place-items-center rounded-lg border border-[var(--accent)]/20 bg-[var(--accent)]/10 text-xs font-semibold text-[var(--accent-muted)]">
                         <CheckCircle2 size={16} />
                       </span>
@@ -253,7 +253,7 @@ export function TasksWorkspace({
                         </span>
                       </span>
                     </Link>
-                    <Link href={`/projects/${task.projectId}/tasks`} className="col-start-2 mt-1 block w-fit max-w-full truncate rounded-sm text-xs text-[var(--muted)] hover:text-[var(--accent-muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff]">
+                    <Link href={`/projects/${task.projectId}/tasks`} className="col-start-2 mt-1 block w-fit max-w-full truncate rounded-sm text-xs text-[var(--muted)] hover:text-[var(--accent-muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]">
                       {task.projectName}{task.projectClientName ? ` · ${task.projectClientName}` : ""}
                     </Link>
                   </div>

@@ -42,7 +42,7 @@ export function ClientActionsMenu({
     <>
       <DropdownMenu.Root>
         <DropdownMenu.Trigger asChild>
-          <button type="button" aria-label="More client actions" className="grid size-10 place-items-center rounded-lg border border-[var(--line)] bg-[var(--panel)] text-[var(--muted)] transition-colors hover:bg-[var(--surface)] hover:text-[var(--foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff]">
+          <button type="button" aria-label="More client actions" className="grid size-10 place-items-center rounded-lg border border-[var(--line)] bg-[var(--panel)] text-[var(--muted)] transition-colors hover:bg-[var(--surface)] hover:text-[var(--foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]">
             <MoreHorizontal size={18} />
           </button>
         </DropdownMenu.Trigger>
@@ -149,7 +149,7 @@ function ClientDeleteDialog({
               <Dialog.Description className="mt-2 text-sm leading-6 text-[var(--muted)]">This will permanently delete this client if no business history depends on it. This action cannot be undone.</Dialog.Description>
             </div>
             <Dialog.Close asChild>
-              <button type="button" disabled={pending} aria-label="Close dialog" className="grid size-9 shrink-0 place-items-center rounded-lg text-[var(--muted)] transition-colors hover:bg-[var(--surface)] hover:text-[var(--foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff] disabled:opacity-50">
+              <button type="button" disabled={pending} aria-label="Close dialog" className="grid size-9 shrink-0 place-items-center rounded-lg text-[var(--muted)] transition-colors hover:bg-[var(--surface)] hover:text-[var(--foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] disabled:opacity-50">
                 <X size={17} />
               </button>
             </Dialog.Close>
@@ -165,7 +165,7 @@ function ClientDeleteDialog({
             <div role="alert" className="mt-4 rounded-lg border border-[var(--danger-border)]/20 bg-[var(--danger)]/[0.08] px-3 py-2 text-sm text-[#fca5a5]">
               <p>{error}</p>
               {dependencyCount !== null && status === "ACTIVE" && (
-                <button type="button" onClick={handleDeactivate} disabled={pending} className="mt-3 h-9 rounded-md bg-[#7067e8] px-3 text-xs font-medium text-[var(--foreground)] transition-colors hover:bg-[#8178f0] disabled:cursor-not-allowed disabled:opacity-55">
+                <button type="button" onClick={handleDeactivate} disabled={pending} className="mt-3 h-9 rounded-md bg-[var(--accent)] px-3 text-xs font-medium text-[var(--foreground)] transition-colors hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-55">
                   {pending ? "Deactivating…" : "Deactivate Client"}
                 </button>
               )}
