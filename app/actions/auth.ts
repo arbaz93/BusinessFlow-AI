@@ -6,7 +6,6 @@ import { getAuthCallbackUrl, getPasswordRecoveryUrl } from "@/lib/auth/callback-
 import { resolveApplicationEntryState } from "@/lib/auth/lifecycle";
 import {
   classifySupabaseError,
-  detectExistingAccount,
   mapAuthErrorToMessage,
   type AuthErrorCategory,
 } from "@/lib/auth/errors";
@@ -17,6 +16,7 @@ import {
 } from "@/lib/members/invitation-tokens";
 import type { FormState } from "@/lib/auth/types";
 import { createClient } from "@/lib/supabase/server";
+import { checkRateLimit, getClientIdentifier, AUTH_RATE_LIMIT_CONFIG } from "@/lib/security/rate-limiter";
 
 function authErrorResponse(
   category: AuthErrorCategory,
@@ -40,6 +40,12 @@ export async function login(_previousState: FormState, formData: FormData): Prom
 
   if (!parsed.success) {
     return { error: parsed.error.issues[0]?.message ?? "Check your details and try again." };
+  }
+
+  const clientIp = await getClientIdentifier();
+  const rateLimit = await checkRateLimit(clientIp, AUTH_RATE_LIMIT_CONFIG);
+  if (!rateLimit.allowed) {
+    return { error: "Too many sign-in attempts. Please try again later." };
   }
 
   let destination: string;
@@ -83,27 +89,18 @@ export async function signup(_previousState: FormState, formData: FormData): Pro
     return { error: parsed.error.issues[0]?.message ?? "Check your details and try again." };
   }
 
+  const clientIp = await getClientIdentifier();
+  const rateLimit = await checkRateLimit(clientIp, AUTH_RATE_LIMIT_CONFIG);
+  if (!rateLimit.allowed) {
+    return { error: "Too many sign-up attempts. Please try again later." };
+  }
+
   const normalizedEmail = parsed.data.email.trim().toLowerCase();
 
   let destination: string | undefined;
   try {
     const supabase = await createClient();
     const requestHeaders = await headers();
-
-    const existing = await detectExistingAccount(normalizedEmail);
-    if (existing.exists) {
-      if (existing.confirmed) {
-        return {
-          error: "An account with this email already exists. Sign in instead.",
-          actionLabel: "Sign in",
-          actionHref: getAuthPathForReturnTo(returnTo, "login"),
-        };
-      }
-      return {
-        error: "An account with this email already exists but hasn't been confirmed yet. Check your email for the confirmation link, or request a new one.",
-        actionLabel: "Resend confirmation",
-      };
-    }
 
     const { data, error } = await supabase.auth.signUp({
       email: normalizedEmail,
@@ -162,6 +159,12 @@ export async function resendConfirmation(_previousState: FormState, formData: Fo
     return { error: "Enter your email address." };
   }
 
+  const clientIp = await getClientIdentifier();
+  const rateLimit = await checkRateLimit(clientIp, AUTH_RATE_LIMIT_CONFIG);
+  if (!rateLimit.allowed) {
+    return { error: "Too many requests. Please try again later." };
+  }
+
   try {
     const supabase = await createClient();
     const { error } = await supabase.auth.resend({
@@ -204,6 +207,12 @@ export async function forgotPassword(_previousState: FormState, formData: FormDa
 
   if (!parsed.success) {
     return { error: parsed.error.issues[0]?.message ?? "Enter a valid email address." };
+  }
+
+  const clientIp = await getClientIdentifier();
+  const rateLimit = await checkRateLimit(clientIp, AUTH_RATE_LIMIT_CONFIG);
+  if (!rateLimit.allowed) {
+    return { error: "Too many reset requests. Please try again later." };
   }
 
   const email = parsed.data.email.trim().toLowerCase();

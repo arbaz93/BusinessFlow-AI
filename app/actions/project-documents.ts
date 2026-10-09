@@ -16,6 +16,7 @@ import {
   projectDocumentIdSchema,
   type ProjectDocumentFormState,
 } from "@/lib/project-documents/schemas";
+import { checkRateLimit, getClientIdentifier, UPLOAD_RATE_LIMIT_CONFIG } from "@/lib/security/rate-limiter";
 
 const PROJECT_DOCUMENT_BUCKET = "project-documents";
 const PROJECT_DOCUMENT_SIGNED_URL_TTL_SECONDS = 600;
@@ -197,6 +198,11 @@ export async function saveProjectDocument(
   formData: FormData,
 ): Promise<ProjectDocumentFormState> {
   const { organization, profile } = await requireOrganization();
+  const clientIp = await getClientIdentifier();
+  const rateLimit = await checkRateLimit(clientIp, UPLOAD_RATE_LIMIT_CONFIG);
+  if (!rateLimit.allowed) {
+    return { error: "Too many upload requests. Please try again later." };
+  }
   const file = formData.get("file");
   const parsed = projectDocumentInputSchema.safeParse({
     projectId: formData.get("projectId"),

@@ -62,7 +62,11 @@ export function getDemoUserCredentials() {
 }
 
 export function createDemoOrganization(prisma: Prisma) {
-  return prisma.organization.create({ data: { name: "Demo Workspace", businessType: "OTHER", slug: "demo-workspace" } });
+  return prisma.organization.upsert({
+    where: { slug: "demo-workspace" },
+    update: { name: "Demo Workspace", businessType: "OTHER" },
+    create: { name: "Demo Workspace", businessType: "OTHER", slug: "demo-workspace" },
+  });
 }
 
 export async function createDemoUsers(
@@ -121,7 +125,7 @@ export function createDemoLeads(prisma: Prisma, ctx: SeedContext) {
         name: "Demo Lead — New Inquiry",
         email: "lead@example.test",
         company: "Demo Acme Corp",
-        source: "Website",
+        source: "WEBSITE",
         notes: "Initial inquiry from the demo website contact form.",
         status: LeadStatus.NEW,
         estimatedValue: 5000.0,
@@ -140,7 +144,7 @@ export function createDemoLeads(prisma: Prisma, ctx: SeedContext) {
         name: "Demo Lead — Contacted Prospect",
         email: "lead@example.test",
         company: "Demo Beta LLC",
-        source: "Referral",
+        source: "REFERRAL",
         notes: "Referred by a current client. Follow-up call scheduled.",
         status: LeadStatus.CONTACTED,
         estimatedValue: 7500.0,
@@ -159,7 +163,7 @@ export function createDemoLeads(prisma: Prisma, ctx: SeedContext) {
         name: "Demo Lead — Qualified",
         email: "lead@example.test",
         company: "Demo Gamma Inc",
-        source: "Linkedin",
+        source: "LINKEDIN",
         notes: "Qualified lead interested in the enterprise plan.",
         status: LeadStatus.QUALIFIED,
         estimatedValue: 12000.0,
@@ -179,7 +183,7 @@ export function createDemoLeads(prisma: Prisma, ctx: SeedContext) {
         name: "Demo Lead — Proposal Sent",
         email: "lead@example.test",
         company: "Demo Delta Co",
-        source: "Webinar",
+        source: "SOCIAL_MEDIA",
         notes: "Proposal sent last week, awaiting feedback.",
         status: LeadStatus.PROPOSAL_SENT,
         estimatedValue: 9000.0,
@@ -198,7 +202,7 @@ export function createDemoLeads(prisma: Prisma, ctx: SeedContext) {
         name: "Demo Lead — Won Deal",
         email: "lead@example.test",
         company: "Demo Client Corp",
-        source: "Cold Outreach",
+        source: "COLD_OUTREACH",
         notes: "Converted to client after successful proposal.",
         status: LeadStatus.WON,
         estimatedValue: 10000.0,
@@ -218,7 +222,7 @@ export function createDemoLeads(prisma: Prisma, ctx: SeedContext) {
         name: "Demo Lead — Lost Deal",
         email: "lead@example.test",
         company: "Demo Epsilon Ltd",
-        source: "Organic",
+        source: "OTHER",
         notes: "Lost to a competitor. Price was the deciding factor.",
         status: LeadStatus.LOST,
         estimatedValue: 3000.0,
@@ -753,6 +757,8 @@ export function createDemoAIConversation(prisma: Prisma, ctx: SeedContext, proje
         conversationId: conversation.id,
         role: AIConversationMessageRole.USER,
         content: "Can you help me plan the timeline for the Demo Acme Corp website redesign?",
+        requestId: "demo_req_1",
+        replyToMessageId: null,
         createdAt: ONE_DAY_AGO,
       },
       {
@@ -761,6 +767,8 @@ export function createDemoAIConversation(prisma: Prisma, ctx: SeedContext, proje
         role: AIConversationMessageRole.ASSISTANT,
         content:
           "I'd be happy to help you plan the website redesign. Based on the project brief, I recommend the following timeline:\n\n1. Discovery & Strategy (Week 1-2)\n2. Design & Prototyping (Week 3-5)\n3. Development (Week 6-10)\n4. Testing & Launch (Week 11-12)\n\nWould you like me to create suggested tasks for this timeline?",
+        requestId: null,
+        replyToMessageId: "demo_msg_1",
         createdAt: ONE_DAY_AGO,
       },
       {
@@ -768,6 +776,8 @@ export function createDemoAIConversation(prisma: Prisma, ctx: SeedContext, proje
         conversationId: conversation.id,
         role: AIConversationMessageRole.USER,
         content: "Yes, please create tasks for the design phase.",
+        requestId: "demo_req_2",
+        replyToMessageId: null,
         createdAt: ONE_HOUR_AGO,
       },
       {
@@ -776,6 +786,8 @@ export function createDemoAIConversation(prisma: Prisma, ctx: SeedContext, proje
         role: AIConversationMessageRole.ASSISTANT,
         content:
           "I've created the following suggested tasks for the design phase:\n\n- **Design & Prototyping** (High Priority)\n  - Create low-fidelity wireframes\n  - Conduct user research sessions\n  - Design high-fidelity mockups\n  - Get client feedback on designs\n\nThese can be added to your project directly from the AI suggestions panel.",
+        requestId: null,
+        replyToMessageId: "demo_msg_3",
         createdAt: ONE_HOUR_AGO,
       },
     ];

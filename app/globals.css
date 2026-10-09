@@ -36,6 +36,8 @@
   --info-surface: #1e3a5f;
   --info-border: #3b82f6;
   --info-line: #93c5fd;
+
+  --default-btn: white;
 }
 
 :root[data-theme="light"] {
@@ -74,6 +76,8 @@
   --info-surface: #dbeafe;
   --info-border: #3b82f6;
   --info-line: #93c5fd;
+
+  --default-btn: white;
 }
 
 @theme inline {
@@ -92,7 +96,8 @@
   --color-success: var(--success);
   --color-warning: var(--warning);
   --color-danger: var(--danger);
-  --color-info: var(--info);
+  --color-default-btn: var(--default-btn);
+  --color-background: var(--background);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }

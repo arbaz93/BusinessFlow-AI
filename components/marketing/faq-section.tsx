@@ -29,7 +29,7 @@ const faqs = [
   {
     question: "How does AI Project Intelligence work?",
     answer:
-      "AI Project Intelligence is a planned capability. When available, it will analyze project briefs and documents to surface summaries, extract requirements, identify missing information, flag potential risks, and suggest next steps — all with human review before any action is taken.",
+      "AI Project Intelligence analyzes project briefs and documents to surface summaries, extract requirements, identify missing information, flag potential risks, and suggest next steps — all with human review before any action is taken.",
   },
   {
     question: "Do I need to install anything?",
@@ -54,13 +54,13 @@ function FAQItem({ question, answer }: { question: string; answer: React.ReactNo
   const [open, setOpen] = useState(false);
 
   return (
-    <details className="group rounded-xl border border-[var(--line)] bg-[var(--panel)] overflow-hidden">
+    <details
+      open={open}
+      className="group rounded-xl border border-[var(--line)] bg-[var(--panel)] overflow-hidden"
+      onToggle={() => setOpen(!open)}
+    >
       <summary
         className="flex items-center justify-between gap-4 px-6 py-5 text-left cursor-pointer list-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background)]"
-        onClick={(e) => {
-          e.preventDefault();
-          setOpen(!open);
-        }}
         aria-expanded={open}
       >
         <span className="text-lg font-medium text-[var(--foreground)] pr-8">{question}</span>
@@ -76,7 +76,7 @@ function FAQItem({ question, answer }: { question: string; answer: React.ReactNo
       </summary>
       <div
         className={cn(
-          "px-6 pb-5 text-base leading-7 text-[var(--muted)] transition-all duration-200",
+          "px-6 pb-5 text-base leading-7 text-[var(--muted)] transition-opacity duration-400",
           open ? "opacity-100 max-h-96" : "opacity-0 max-h-0"
         )}
         role="region"

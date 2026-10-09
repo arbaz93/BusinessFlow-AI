@@ -23,6 +23,7 @@ import {
 import { taskProposalEditSchema } from "@/lib/tasks/schemas";
 import { createTask, revalidateTaskViews, TaskValidationError, TaskUnavailableError } from "@/lib/tasks/service";
 import type { AssistantConversationMessage, AssistantMessageActionResult, ProposalFormState, TaskProposal, TaskProposalPriority } from "@/lib/assistant/types";
+import { checkRateLimit, getClientIdentifier, AI_RATE_LIMIT_CONFIG } from "@/lib/security/rate-limiter";
 
 export type AssistantActionResult =
   | { success: true; conversationId: string }
@@ -95,6 +96,15 @@ export async function deleteAssistantConversation(
 
 export async function submitAssistantMessage(rawInput: unknown): Promise<AssistantMessageActionResult> {
   const { organization, profile } = await requireOrganization();
+  const clientIp = await getClientIdentifier();
+  const rateLimit = await checkRateLimit(clientIp, AI_RATE_LIMIT_CONFIG);
+  if (!rateLimit.allowed) {
+    return {
+      success: false,
+      error: "Too many AI requests. Please try again later.",
+      requestId: "",
+    };
+  }
   const parsed = createAssistantMessageSchema.safeParse(rawInput);
   if (!parsed.success) {
     return {

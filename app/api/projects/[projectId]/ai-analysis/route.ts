@@ -2,6 +2,7 @@ import { requireOrganization } from "@/lib/auth/dal";
 import { getProjectAIErrorMessage } from "@/lib/project-ai/errors";
 import { runAndPersistProjectAnalysis } from "@/lib/project-ai/persistence";
 import { projectAiAnalysisInputSchema } from "@/lib/project-ai/schemas";
+import { checkRateLimit, getClientIdentifier, AI_ANALYSIS_RATE_LIMIT_CONFIG } from "@/lib/security/rate-limiter";
 
 export async function POST(
   _request: Request,
@@ -13,6 +14,15 @@ export async function POST(
     return Response.json(
       { errorMessage: "This project is not ready for AI analysis yet." },
       { status: 400 },
+    );
+  }
+
+  const clientIp = await getClientIdentifier();
+  const rateLimit = await checkRateLimit(clientIp, AI_ANALYSIS_RATE_LIMIT_CONFIG);
+  if (!rateLimit.allowed) {
+    return Response.json(
+      { errorMessage: "Too many analysis requests. Please try again later." },
+      { status: 429 },
     );
   }
 

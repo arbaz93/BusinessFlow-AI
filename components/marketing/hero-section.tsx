@@ -79,7 +79,7 @@ function ProjectRow({ name, client, status, priority, due }: typeof projectData[
 
 export function HeroSection() {
   return (
-    <section className="relative flex flex-col  mx-auto max-w-7xl px-6 py-20 lg:py-28 lg:px-10">
+    <section className="relative flex flex-col mx-auto max-w-7xl px-6 py-20 lg:py-28 lg:px-10">
       <div className="w-full text-center lg:text-left lg:max-w-3xl">
         <span className="inline-flex items-center gap-2 rounded-full border border-[var(--accent)]/30 bg-[var(--accent)]/10 px-3 py-1 text-sm font-medium text-[var(--accent)]">
           <Sparkles size={14} />
@@ -105,13 +105,13 @@ export function HeroSection() {
             <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" aria-hidden="true" />
           </Link>
           <Link
-            href="#how-it-works"
+            href="/how-it-works"
             className={cn(
               buttonVariants({ variant: "outline", size: "lg" }),
               "border-[var(--line)] bg-transparent hover:bg-[var(--surface)]"
             )}
           >
-            Explore the Workflow
+            See How It Works
           </Link>
         </div>
         <p className="mt-6 text-sm text-[var(--muted-foreground)]">

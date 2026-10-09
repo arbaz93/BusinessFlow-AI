@@ -7,7 +7,6 @@ import {
   Sparkles,
   Target,
   Users,
-  Workflow,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -16,41 +15,37 @@ const workflowSteps = [
     icon: Target,
     title: "Lead",
     description: "Capture and organize potential client opportunities.",
-    href: "/leads",
+    href: "/features#leads",
   },
   {
     icon: Users,
     title: "Client",
     description: "Keep contact details and relationship context together.",
-    href: "/clients",
+    href: "/features#clients",
   },
   {
     icon: FolderKanban,
     title: "Project",
     description: "Create a clear home for each client engagement.",
-    href: "/projects",
+    href: "/features#projects",
   },
   {
     icon: FileText,
     title: "Brief",
     description: "Keep project objectives and requirements organized.",
-    href: "#",
-    disabled: true,
+    href: "/features#briefs",
   },
   {
     icon: Sparkles,
     title: "AI Intelligence",
     description: "Analyze project info to surface requirements, risks, and suggested tasks.",
-    href: "#",
-    disabled: true,
-    badge: "Planned",
+    href: "/features#ai-intelligence",
   },
   {
     icon: BriefcaseBusiness,
     title: "Delivery",
     description: "Keep project context and progress connected as work moves forward.",
-    href: "#",
-    disabled: true,
+    href: "/features#delivery",
   },
 ];
 
@@ -68,7 +63,7 @@ export function WorkflowSection() {
         </div>
 
         <div className="mt-16 relative">
-          <div className="hidden lg:block absolute top-10 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-[var(--accent)]/30 to-transparent" aria-hidden="true" />
+          <div className="hidden lg:block absolute top-7 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-[var(--accent)]/30 to-transparent" aria-hidden="true" />
 
           <div className="relative flex flex-col items-center gap-10 lg:flex-row lg:items-start lg:gap-0">
             {workflowSteps.map((step, index) => (
@@ -85,18 +80,13 @@ export function WorkflowSection() {
                   </span>
                   <div>
                     <h3 className="text-lg font-semibold text-[var(--foreground)]">{step.title}</h3>
-                    {step.badge && (
-                      <span className="mt-1 inline-flex rounded-full border border-[var(--accent)]/30 bg-[var(--accent)]/10 px-2 py-0.5 text-[10px] font-medium uppercase tracking-[0.12em] text-[var(--accent)]">
-                        {step.badge}
-                      </span>
-                    )}
                   </div>
                   <p className="max-w-xs text-sm leading-6 text-[var(--muted)]">{step.description}</p>
 
                 </div>
 
                 {index < workflowSteps.length - 1 && (
-                  <div className="hidden lg:block absolute top-10 left-full w-1/2 h-0.5 bg-gradient-to-r from-[var(--accent)]/30 to-transparent" aria-hidden="true" />
+                  <div className="hidden lg:block absolute top-7 left-full w-1/2 h-0.5 bg-gradient-to-r from-[var(--accent)]/30 to-transparent" aria-hidden="true" />
                 )}
               </div>
             ))}
@@ -115,11 +105,6 @@ export function WorkflowSection() {
                 </span>
                 <div>
                   <h3 className="font-semibold text-[var(--foreground)]">{step.title}</h3>
-                  {step.badge && (
-                    <span className="mt-1 inline-flex rounded-full border border-[var(--accent)]/30 bg-[var(--accent)]/10 px-2 py-0.5 text-[10px] font-medium uppercase tracking-[0.12em] text-[var(--accent)]">
-                      {step.badge}
-                    </span>
-                  )}
                 </div>
                 <p className="text-sm leading-6 text-[var(--muted)]">{step.description}</p>
               </div>

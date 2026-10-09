@@ -45,7 +45,7 @@ function EmptyState({ children }: { children: React.ReactNode }) {
   return <p className="rounded-md border border-dashed border-[var(--line)] bg-[var(--surface)] px-3 py-4 text-sm text-[var(--foreground)]/50">{children}</p>;
 }
 
-type SuggestionDraft = {
+import { AIProjectBriefDocument } from "@/components/projects/project-ai-brief-document";
   suggestionId: string;
   title: string;
   description: string;

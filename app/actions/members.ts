@@ -25,6 +25,7 @@ import {
   normalizeEmail,
 } from "@/lib/members/invitation-tokens";
 import { prisma } from "@/lib/db/prisma";
+import { checkRateLimit, getClientIdentifier, INVITATION_RATE_LIMIT_CONFIG } from "@/lib/security/rate-limiter";
 
 export type InvitationFormState = FormState & {
   invitationLink?: string;
@@ -93,6 +94,12 @@ export async function inviteMemberAction(
   _previousState: FormState,
   formData: FormData,
 ): Promise<InvitationFormState> {
+  const clientIp = await getClientIdentifier();
+  const rateLimit = await checkRateLimit(clientIp, INVITATION_RATE_LIMIT_CONFIG);
+  if (!rateLimit.allowed) {
+    return { error: "Too many invitation requests. Please try again later." };
+  }
+
   const parsed = inviteMemberSchema.safeParse({ email: formData.get("email") });
   if (!parsed.success) {
     return { error: parsed.error.issues[0]?.message ?? "Enter a valid team member email." };
