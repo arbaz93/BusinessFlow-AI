@@ -1,6 +1,5 @@
 import { MockupFrame } from "./MockupFrame";
 import { mockBriefSections, mockProject } from "./mockupData";
-import { cn } from "@/lib/utils";
 import { FileText } from "lucide-react";
 
 interface BriefEditorMockupProps {

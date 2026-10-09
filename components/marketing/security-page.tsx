@@ -1,7 +1,6 @@
 "use client";
 
 import { Lock, Server, Shield, UserCheck, FileLock2, Database, Key, CheckCheck, X, ChevronRight } from "lucide-react";
-import { cn } from "@/lib/utils";
 import Link from "next/link";
 
 const securitySections = [
@@ -110,7 +109,7 @@ export function SecurityPage() {
       <section className="py-16 lg:py-24 px-6 lg:px-10 bg-[var(--surface)] border-y border-[var(--line)]">
         <div className="mx-auto max-w-7xl">
           <div className="grid gap-8 lg:grid-cols-2">
-            {securitySections.map((section, index) => (
+            {securitySections.map((section) => (
               <article key={section.title} className="rounded-2xl border border-[var(--line)] bg-[var(--panel)] p-6 lg:p-8">
                 <div className="flex items-start gap-4">
                   <span className="mt-0.5 shrink-0 grid size-12 place-items-center rounded-xl border border-[var(--accent)]/20 bg-[var(--accent)]/10 text-[var(--accent)]">
@@ -149,7 +148,7 @@ export function SecurityPage() {
           </div>
 
           <div className="mt-16 grid gap-6 sm:grid-cols-3">
-            {operationalDiscipline.map((item, index) => (
+            {operationalDiscipline.map((item) => (
               <article key={item.title} className="rounded-2xl border border-[var(--line)] bg-[var(--panel)] p-6 transition-colors hover:border-[var(--line-strong)]">
                 <h3 className="text-lg font-semibold text-[var(--foreground)]">{item.title}</h3>
                 <p className="mt-2 text-base leading-7 text-[var(--muted)]">{item.description}</p>

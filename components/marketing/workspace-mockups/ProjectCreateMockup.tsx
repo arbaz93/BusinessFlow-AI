@@ -1,7 +1,6 @@
 import { MockupFrame } from "./MockupFrame";
 import { mockProject, stageStyles, priorityStyles } from "./mockupData";
-import { cn } from "@/lib/utils";
-import { CalendarDays, Building2, Users, FileText, Sparkles, CheckCheck } from "lucide-react";
+import { CalendarDays, Building2, FileText, Sparkles, CheckCheck } from "lucide-react";
 
 interface ProjectCreateMockupProps {
   className?: string;

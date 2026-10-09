@@ -1,7 +1,6 @@
 "use client";
 
 import { Check, Sparkles, UserCheck, X } from "lucide-react";
-import { cn } from "@/lib/utils";
 
 const controlPrinciples = [
   {

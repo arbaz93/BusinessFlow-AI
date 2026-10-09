@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, Check, Lock, Server, Shield, UserCheck } from "lucide-react";
+import { ArrowRight, Lock, Server, Shield, UserCheck } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 

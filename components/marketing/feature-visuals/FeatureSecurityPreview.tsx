@@ -1,7 +1,7 @@
 "use client";
 
 import { FeatureVisual } from "./FeatureVisual";
-import { Shield, Lock, Server, Database, UserCheck } from "lucide-react";
+import { Lock, Server, Database, UserCheck } from "lucide-react";
 
 interface FeaturePreviewProps {
   className?: string;

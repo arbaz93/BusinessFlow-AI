@@ -1,7 +1,7 @@
 "use client";
 
 import { FeatureVisual } from "./FeatureVisual";
-import { FolderKanban, CalendarDays, CheckCheck, TrendingUp } from "lucide-react";
+import { CalendarDays, TrendingUp } from "lucide-react";
 
 interface FeaturePreviewProps {
   className?: string;

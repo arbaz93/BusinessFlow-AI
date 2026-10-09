@@ -1,7 +1,7 @@
 "use client";
 
 import { FeatureVisual } from "./FeatureVisual";
-import { Workflow, Building2, Users, Search, Activity } from "lucide-react";
+import { Building2, Users, Search } from "lucide-react";
 
 interface FeaturePreviewProps {
   className?: string;

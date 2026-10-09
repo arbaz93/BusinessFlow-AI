@@ -12,7 +12,6 @@ import {
   Shield,
   ChevronRight,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
 import {
   FeatureLeadPreview,
   FeatureClientPreview,

@@ -1,6 +1,5 @@
 import { MockupFrame } from "./MockupFrame";
 import { mockLead, mockClient, stageStyles } from "./mockupData";
-import { cn } from "@/lib/utils";
 import { ArrowRight, ArrowDown, Check, Building2, CalendarDays, Mail, Phone, UserRound, CircleDollarSign } from "lucide-react";
 
 interface LeadConvertMockupProps {
