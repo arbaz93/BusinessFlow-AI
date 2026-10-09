@@ -1,7 +1,6 @@
 import { MockupFrame } from "./MockupFrame";
 import { mockTaskBoard, priorityStyles } from "./mockupData";
-import { cn } from "@/lib/utils";
-import { CalendarDays, Search, CheckCheck, Sparkles } from "lucide-react";
+import { CalendarDays, Search, Sparkles } from "lucide-react";
 
 const taskStatusLabels: Record<string, string> = {
   TODO: "To Do",

@@ -1,8 +1,5 @@
 "use client";
 
-import { Lock, Shield, Server, Database, UserCheck, Key, Mail, MessageSquare } from "lucide-react";
-import { cn } from "@/lib/utils";
-
 const lastUpdated = "January 2025";
 
 const sections = [

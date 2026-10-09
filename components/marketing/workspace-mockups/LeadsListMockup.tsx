@@ -1,6 +1,5 @@
 import { MockupFrame } from "./MockupFrame";
 import { mockLead, stageStyles } from "./mockupData";
-import { cn } from "@/lib/utils";
 
 interface LeadsListMockupProps {
   className?: string;

@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRight, Building2, CheckCheck, Sparkles, Users } from "lucide-react";
+import { Building2, CheckCheck, Sparkles, Users } from "lucide-react";
 
 const steps = [
   {

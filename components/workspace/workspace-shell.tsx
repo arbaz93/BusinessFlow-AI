@@ -13,7 +13,6 @@ import {
   LogOut,
   Menu,
   Settings2,
-  SparkleIcon,
   Sparkles,
   X,
 } from "lucide-react";

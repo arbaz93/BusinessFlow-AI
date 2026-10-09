@@ -1,6 +1,5 @@
 import { MockupFrame } from "./MockupFrame";
 import { mockApprovalTasks, priorityStyles } from "./mockupData";
-import { cn } from "@/lib/utils";
 import { AlertTriangle, Sparkles, CheckCheck, X } from "lucide-react";
 
 interface TaskApprovalMockupProps {

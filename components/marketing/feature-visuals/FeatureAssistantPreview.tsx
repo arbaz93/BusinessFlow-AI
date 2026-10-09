@@ -1,7 +1,7 @@
 "use client";
 
 import { FeatureVisual } from "./FeatureVisual";
-import { Sparkles, MessageSquare, User, Bot } from "lucide-react";
+import { Sparkles, User } from "lucide-react";
 
 interface FeaturePreviewProps {
   className?: string;

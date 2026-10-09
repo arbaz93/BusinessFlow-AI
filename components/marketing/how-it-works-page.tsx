@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  BriefcaseBusiness,
   FileText,
   FolderKanban,
   Sparkles,
@@ -11,7 +10,6 @@ import {
   ArrowRight,
   ChevronRight,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
 import Link from "next/link";
 import {
   LeadsListMockup,

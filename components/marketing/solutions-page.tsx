@@ -1,7 +1,6 @@
 "use client";
 
 import { BriefcaseBusiness, Code, Layers, Users, Target, FileText, FolderKanban, Sparkles, ChevronRight } from "lucide-react";
-import { cn } from "@/lib/utils";
 import Link from "next/link";
 
 const solutions = [

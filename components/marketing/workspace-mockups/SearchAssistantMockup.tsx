@@ -1,6 +1,5 @@
 import { MockupFrame } from "./MockupFrame";
 import { mockSearchResults, mockAssistantMessages } from "./mockupData";
-import { cn } from "@/lib/utils";
 import { Sparkles } from "lucide-react";
 
 interface SearchAssistantMockupProps {

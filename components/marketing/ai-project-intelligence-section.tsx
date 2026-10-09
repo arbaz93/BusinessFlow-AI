@@ -1,7 +1,6 @@
 "use client";
 
 import { FileText, Shield, Sparkles, Target } from "lucide-react";
-import { cn } from "@/lib/utils";
 
 const aiCapabilities = [
   {
