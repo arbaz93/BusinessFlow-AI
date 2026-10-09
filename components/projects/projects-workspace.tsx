@@ -173,7 +173,7 @@ export function ProjectsWorkspace({
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
           <div className="relative w-full lg:max-w-sm">
             <Search size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[var(--muted)]" />
-            <Input type="search" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search projects or clients…" aria-label="Search projects" className="h-10 border-[var(--line)] bg-[var(--surface)] pl-9 text-sm text-[var(--foreground)] placeholder:text-[var(--muted)] focus-visible:border-[#a49bff] focus-visible:ring-[#a49bff]/20 dark:bg-[var(--surface)]" />
+            <Input type="search" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search projects or clients…" aria-label="Search projects" className="h-10 border-[var(--line)] bg-[var(--surface)] pl-9 text-sm text-[var(--foreground)] placeholder:text-[var(--muted)] focus-visible:border-[var(--accent)] focus-visible:ring-[var(--accent)]/20 dark:bg-[var(--surface)]" />
           </div>
           <div className="flex flex-wrap items-center gap-2">
             <FilterSelect label="Client" value={clientFilter} onChange={setClientFilter} id="project-client-filter">
@@ -199,7 +199,7 @@ export function ProjectsWorkspace({
               ))}
             </FilterSelect>
             {hasActiveFilters && (
-              <button type="button" onClick={resetFilters} className="inline-flex h-9 items-center gap-1.5 rounded-md px-2.5 text-xs font-medium text-[var(--muted)] transition-colors hover:bg-[var(--surface)] hover:text-[var(--foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff]">
+              <button type="button" onClick={resetFilters} className="inline-flex h-9 items-center gap-1.5 rounded-md px-2.5 text-xs font-medium text-[var(--muted)] transition-colors hover:bg-[var(--surface)] hover:text-[var(--foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]">
                 <X size={13} /> Reset
               </button>
             )}
@@ -211,7 +211,7 @@ export function ProjectsWorkspace({
             const active = statusFilter === status;
             const count = status === allStatuses ? totalCount : statusCounts[status] ?? 0;
             return (
-              <button key={status} type="button" onClick={() => setStatusFilter(status)} aria-pressed={active} className={`inline-flex h-9 items-center gap-1.5 rounded-md px-3 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff] ${active ? "bg-[var(--surface)] text-[var(--foreground)]" : "text-[var(--muted)] hover:bg-[var(--surface)] hover:text-[var(--foreground)]"}`}>
+              <button key={status} type="button" onClick={() => setStatusFilter(status)} aria-pressed={active} className={`inline-flex h-9 items-center gap-1.5 rounded-md px-3 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] ${active ? "bg-[var(--surface)] text-[var(--foreground)]" : "text-[var(--muted)] hover:bg-[var(--surface)] hover:text-[var(--foreground)]"}`}>
                 {status === allStatuses ? "All" : projectStatusLabels[status]}
                 <span className={active ? "text-[var(--muted)]" : "text-[var(--muted)]"}>{count}</span>
               </button>
@@ -235,7 +235,7 @@ export function ProjectsWorkspace({
                 </div>
                 <div className="divide-y divide-[var(--line)] sm:min-w-0">
                   {visibleProjects.map((project) => (
-                    <Link key={project.id} href={`/projects/${project.id}`} className="grid grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-x-3 gap-y-2 px-3.5 py-3.5 transition-colors hover:bg-[var(--surface)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#a49bff] sm:px-4 lg:grid-cols-[minmax(200px,1.5fr)_minmax(140px,1fr)_110px_110px] xl:grid-cols-[minmax(200px,1.5fr)_minmax(150px,0.9fr)_minmax(130px,0.75fr)_110px_110px_110px] xl:gap-4">
+                    <Link key={project.id} href={`/projects/${project.id}`} className="grid grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-x-3 gap-y-2 px-3.5 py-3.5 transition-colors hover:bg-[var(--surface)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--accent)] sm:px-4 lg:grid-cols-[minmax(200px,1.5fr)_minmax(140px,1fr)_110px_110px] xl:grid-cols-[minmax(200px,1.5fr)_minmax(150px,0.9fr)_minmax(130px,0.75fr)_110px_110px_110px] xl:gap-4">
                       <span className="flex min-w-0 items-center gap-3">
                         <span className="grid size-9 shrink-0 place-items-center rounded-lg border border-[var(--accent)]/20 bg-[var(--accent)]/10 text-[11px] font-semibold text-[var(--accent-muted)]"><FolderKanban size={16} /></span>
                         <span className="min-w-0">
@@ -264,7 +264,7 @@ export function ProjectsWorkspace({
         ) : (
           <div className="rounded-[10px] border border-dashed border-[var(--line)] bg-[var(--surface)] px-5 py-10 text-center">
             <p className="text-sm text-[var(--muted)]">No projects match your filters.</p>
-            <button type="button" onClick={resetFilters} className="mt-3 inline-flex h-9 items-center gap-1.5 rounded-md border border-[var(--line)] px-3 text-xs font-medium text-[var(--muted)] transition-colors hover:bg-[var(--surface)] hover:text-[var(--foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff]">
+            <button type="button" onClick={resetFilters} className="mt-3 inline-flex h-9 items-center gap-1.5 rounded-md border border-[var(--line)] px-3 text-xs font-medium text-[var(--muted)] transition-colors hover:bg-[var(--surface)] hover:text-[var(--foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]">
               <SlidersHorizontal size={13} /> Reset filters
             </button>
           </div>
@@ -301,7 +301,7 @@ function FilterSelect<T extends string>({
         id={id}
         value={value}
         onChange={(event) => onChange(event.target.value as T)}
-        className="h-9 max-w-full appearance-none rounded-md border border-[var(--line)] bg-[var(--surface)] py-0 pl-2.5 pr-7 text-xs font-medium text-[var(--foreground)] outline-none transition-colors hover:border-[var(--line-strong)] focus-visible:ring-2 focus-visible:ring-[#a49bff]"
+        className="h-9 max-w-full appearance-none rounded-md border border-[var(--line)] bg-[var(--surface)] py-0 pl-2.5 pr-7 text-xs font-medium text-[var(--foreground)] outline-none transition-colors hover:border-[var(--line-strong)] focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
       >
         {children}
       </select>

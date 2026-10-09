@@ -53,7 +53,7 @@ export function SettingsShell({
             type="button"
             aria-label="Open settings navigation"
             onClick={() => setDrawerOpen(true)}
-            className="grid size-9 shrink-0 place-items-center rounded-lg text-[var(--muted)] transition-colors hover:bg-[var(--surface)] hover:text-[var(--foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff] md:hidden"
+            className="grid size-9 shrink-0 place-items-center rounded-lg text-[var(--muted)] transition-colors hover:bg-[var(--surface)] hover:text-[var(--foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] md:hidden"
           >
             <Menu size={18} />
           </button>
@@ -87,7 +87,7 @@ export function SettingsShell({
                 <button
                   type="button"
                   aria-label="Close navigation"
-                  className="grid size-8 place-items-center rounded-lg text-[var(--muted)] transition-colors hover:bg-[var(--surface)] hover:text-[var(--foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff]"
+                  className="grid size-8 place-items-center rounded-lg text-[var(--muted)] transition-colors hover:bg-[var(--surface)] hover:text-[var(--foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
                   onClick={() => setDrawerOpen(false)}
                 >
                   <X size={17} />

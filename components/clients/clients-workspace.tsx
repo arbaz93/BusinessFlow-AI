@@ -67,14 +67,14 @@ export function ClientsWorkspace({ clients, deletionComplete, loadError }: { cli
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="relative w-full sm:max-w-sm">
             <Search size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[var(--muted)]" />
-            <Input type="search" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search name, company, email…" aria-label="Search clients" className="h-10 border-[var(--line)] bg-[var(--surface)] pl-9 text-sm text-[var(--foreground)] placeholder:text-[var(--muted)] focus-visible:border-[#a49bff] focus-visible:ring-[#a49bff]/20 dark:bg-[var(--surface)]" />
+            <Input type="search" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search name, company, email…" aria-label="Search clients" className="h-10 border-[var(--line)] bg-[var(--surface)] pl-9 text-sm text-[var(--foreground)] placeholder:text-[var(--muted)] focus-visible:border-[var(--accent)] focus-visible:ring-[var(--accent)]/20 dark:bg-[var(--surface)]" />
           </div>
           <div className="flex gap-1" role="group" aria-label="Filter clients by status">
             {statusFilters.map((status) => {
               const count = status === "ALL" ? clients.length : status === "ACTIVE" ? activeCount : inactiveCount;
               const active = statusFilter === status;
               return (
-                <button key={status} type="button" onClick={() => setStatusFilter(status)} aria-pressed={active} className={`inline-flex h-9 items-center gap-1.5 rounded-md px-3 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff] ${active ? "bg-[var(--surface)] text-[var(--foreground)]" : "text-[var(--muted)] hover:bg-[var(--surface)] hover:text-[var(--foreground)]"}`}>
+                <button key={status} type="button" onClick={() => setStatusFilter(status)} aria-pressed={active} className={`inline-flex h-9 items-center gap-1.5 rounded-md px-3 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] ${active ? "bg-[var(--surface)] text-[var(--foreground)]" : "text-[var(--muted)] hover:bg-[var(--surface)] hover:text-[var(--foreground)]"}`}>
                   {status === "ALL" ? "All clients" : status === "ACTIVE" ? "Active" : "Inactive"}<span className={active ? "text-[var(--muted)]" : "text-[var(--muted)]"}>{count}</span>
                 </button>
               );
@@ -93,7 +93,7 @@ export function ClientsWorkspace({ clients, deletionComplete, loadError }: { cli
                 </div>
                 <div className="divide-y divide-[var(--line)]  sm:min-w-0">
                   {visibleClients.map((client) => (
-                    <Link key={client.id} href={`/clients/${client.id}`} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-2 px-3.5 py-3.5 transition-colors hover:bg-[var(--surface)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#a49bff] sm:px-4 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] lg:grid-cols-[minmax(200px,1.4fr)_minmax(160px,1fr)_112px_145px] xl:grid-cols-[minmax(200px,1.35fr)_minmax(150px,1fr)_minmax(160px,1fr)_112px_145px_118px] xl:gap-4">
+                    <Link key={client.id} href={`/clients/${client.id}`} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-2 px-3.5 py-3.5 transition-colors hover:bg-[var(--surface)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--accent)] sm:px-4 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] lg:grid-cols-[minmax(200px,1.4fr)_minmax(160px,1fr)_112px_145px] xl:grid-cols-[minmax(200px,1.35fr)_minmax(150px,1fr)_minmax(160px,1fr)_112px_145px_118px] xl:gap-4">
                       <span className="flex w-min items-center gap-3">
                         <span className="grid size-10 shrink-0 place-items-center rounded-lg border border-[var(--accent)]/20 bg-[var(--accent)]/10 text-xs font-semibold text-[var(--accent-muted)]">{initials(client.name)}</span>
                         <span>

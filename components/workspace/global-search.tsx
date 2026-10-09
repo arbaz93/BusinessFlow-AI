@@ -103,7 +103,7 @@ export function GlobalSearch() {
           type="button"
           onClick={() => setOpen(true)}
           aria-label="Open search"
-          className="hidden items-center gap-2 rounded-lg border border-[var(--line)] bg-[var(--panel)] px-2.5 py-2 text-sm text-[var(--muted)] transition-colors hover:bg-[var(--surface)] hover:text-[var(--foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8b83f5] md:flex"
+          className="hidden items-center gap-2 rounded-lg border border-[var(--line)] bg-[var(--panel)] px-2.5 py-2 text-sm text-[var(--muted)] transition-colors hover:bg-[var(--surface)] hover:text-[var(--foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] md:flex"
         >
           <Search size={15} />
           <span className="font-medium">Search</span>
@@ -116,7 +116,7 @@ export function GlobalSearch() {
           type="button"
           onClick={() => setOpen(true)}
           aria-label="Open search"
-          className="grid size-10 place-items-center rounded-lg text-[var(--muted)] transition-colors hover:bg-[var(--surface)] hover:text-[var(--foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8b83f5] md:hidden"
+          className="grid size-10 place-items-center rounded-lg text-[var(--muted)] transition-colors hover:bg-[var(--surface)] hover:text-[var(--foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] md:hidden"
         >
           <Search size={18} />
         </button>
@@ -145,7 +145,7 @@ export function GlobalSearch() {
                 type="button"
                 onClick={() => handleOpenChange(false)}
                 aria-label="Close search"
-                className="grid size-8 place-items-center rounded-md text-[var(--muted)] transition-colors hover:bg-[var(--panel)] hover:text-[var(--foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8b83f5]"
+                className="grid size-8 place-items-center rounded-md text-[var(--muted)] transition-colors hover:bg-[var(--panel)] hover:text-[var(--foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
               >
                 <X size={16} />
               </button>
@@ -176,7 +176,7 @@ export function GlobalSearch() {
                       key={`${group.label}-${item.id}`}
                       type="button"
                       onClick={() => handleNavigate(item.href)}
-                      className="flex w-full items-center gap-3 rounded-xl border border-transparent bg-[var(--surface)] px-3 py-2.5 text-left transition-colors hover:border-[var(--line)] hover:bg-[var(--panel)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8b83f5]"
+                      className="flex w-full items-center gap-3 rounded-xl border border-transparent bg-[var(--surface)] px-3 py-2.5 text-left transition-colors hover:border-[var(--line)] hover:bg-[var(--panel)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
                     >
                       <div className="grid size-9 place-items-center rounded-lg bg-[var(--panel)] text-[11px] font-semibold text-[var(--accent-muted)]">
                         {group.label.slice(0, 1)}

@@ -103,7 +103,7 @@ function WorkspaceSwitcher({
             type="button"
             aria-label={`Switch workspace, current workspace: ${organizationName}`}
             disabled={workspaces.length < 2}
-            className={`flex h-11 w-full items-center gap-2 rounded-lg border border-border bg-panel px-2 text-left outline-none transition-colors focus-visible:ring-2 focus-visible:ring-[#8b83f5] disabled:cursor-default ${
+            className={`flex h-11 w-full items-center gap-2 rounded-lg border border-border bg-panel px-2 text-left outline-none transition-colors focus-visible:ring-2 focus-visible:ring-[var(--accent)] disabled:cursor-default ${
               compact ? "justify-center" : "hover:bg-elevated"
             }`}
           >
@@ -177,7 +177,7 @@ function AccountMenu({
         <button
           type="button"
           aria-label={`${userName} account menu`}
-          className={`flex min-h-11 w-full items-center gap-3 rounded-lg px-2 py-2 text-left transition-colors hover:bg-[var(--surface)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8b83f5] ${
+          className={`flex min-h-11 w-full items-center gap-3 rounded-lg px-2 py-2 text-left transition-colors hover:bg-[var(--surface)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] ${
             compact ? "justify-center" : ""
           }`}
         >
@@ -260,7 +260,7 @@ function SidebarContents({
           href="/dashboard"
           onClick={onNavigate}
           aria-label="BusinessFlow AI overview"
-          className={`flex min-w-0 items-center gap-3 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8b83f5] ${
+          className={`flex min-w-0 items-center gap-3 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] ${
             compact ? "justify-center" : ""
           }`}
         >
@@ -275,7 +275,7 @@ function SidebarContents({
             <button
               type="button"
               aria-label="Close navigation"
-              className="grid size-10 shrink-0 place-items-center rounded-lg text-[var(--muted)] transition-colors hover:bg-[var(--panel)] hover:text-[var(--foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8b83f5]"
+              className="grid size-10 shrink-0 place-items-center rounded-lg text-[var(--muted)] transition-colors hover:bg-[var(--panel)] hover:text-[var(--foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
             >
               <X size={18} />
             </button>
@@ -396,7 +396,7 @@ export function WorkspaceShell({
                 <button
                   type="button"
                   aria-label="Open navigation"
-                  className="grid size-10 shrink-0 place-items-center rounded-lg text-[var(--muted)] transition-colors hover:bg-[var(--surface)] hover:text-[var(--foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8b83f5] md:hidden"
+                  className="grid size-10 shrink-0 place-items-center rounded-lg text-[var(--muted)] transition-colors hover:bg-[var(--surface)] hover:text-[var(--foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] md:hidden"
                 >
                   <Menu size={19} />
                 </button>
@@ -408,7 +408,7 @@ export function WorkspaceShell({
                 }
                 aria-expanded={tabletExpanded}
                 onClick={() => setTabletExpanded((expanded) => !expanded)}
-                className="hidden size-10 shrink-0 place-items-center rounded-lg text-[var(--muted)] transition-colors hover:bg-[var(--surface)] hover:text-[var(--foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8b83f5] md:grid xl:hidden"
+                className="hidden size-10 shrink-0 place-items-center rounded-lg text-[var(--muted)] transition-colors hover:bg-[var(--surface)] hover:text-[var(--foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] md:grid xl:hidden"
               >
                 {tabletExpanded ? (
                   <ChevronLeft size={18} />

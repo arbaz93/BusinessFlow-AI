@@ -38,6 +38,14 @@
   --info-line: #93c5fd;
 
   --default-btn: white;
+
+  --ai-doc-bg: #f6f5f4;
+  --ai-doc-surface: #ffffff;
+  --ai-doc-panel: #faf8f6;
+  --ai-doc-text: #18181b;
+  --ai-doc-muted: #52525b;
+  --ai-doc-line: #e4e4e7;
+  --ai-doc-line-strong: #d4d4d8;
 }
 
 :root[data-theme="light"] {
@@ -78,6 +86,14 @@
   --info-line: #93c5fd;
 
   --default-btn: white;
+
+  --ai-doc-bg: #f6f5f4;
+  --ai-doc-surface: #ffffff;
+  --ai-doc-panel: #faf8f6;
+  --ai-doc-text: #18181b;
+  --ai-doc-muted: #52525b;
+  --ai-doc-line: #e4e4e7;
+  --ai-doc-line-strong: #d4d4d8;
 }
 
 @theme inline {
@@ -157,4 +173,16 @@ html {
 
 .skip-link:focus {
   top: 1rem;
+}
+
+.ai-project-brief-document {
+  --foreground: var(--ai-doc-text);
+  --muted-foreground: var(--ai-doc-muted);
+  --background: var(--ai-doc-bg);
+  --panel: var(--ai-doc-panel);
+  --surface: var(--ai-doc-surface);
+  --elevated: var(--ai-doc-surface);
+  --line: var(--ai-doc-line);
+  --line-strong: var(--ai-doc-line-strong);
+  --info-line: #3b82f6;
 }

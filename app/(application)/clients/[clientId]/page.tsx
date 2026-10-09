@@ -74,7 +74,7 @@ export default async function ClientDetailPage({ params }: PageProps<"/clients/[
   return (
     <div className="space-y-7 pb-10">
       <div className="pt-2 sm:pt-5">
-        <Link href="/clients" className="inline-flex h-8 items-center gap-1.5 rounded-md pr-2 text-xs font-medium text-[var(--muted)] transition-colors hover:text-[var(--foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff]">
+        <Link href="/clients" className="inline-flex h-8 items-center gap-1.5 rounded-md pr-2 text-xs font-medium text-[var(--muted)] transition-colors hover:text-[var(--foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]">
           <ArrowLeft size={14} /> Clients
         </Link>
         <div className="mt-4 flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between">

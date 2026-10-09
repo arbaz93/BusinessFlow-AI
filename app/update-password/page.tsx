@@ -97,7 +97,7 @@ export default function UpdatePasswordPage() {
         title="Set a new password"
       >
         <div className="flex h-20 items-center justify-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-2 border-[#7067e8] border-t-transparent" />
+          <div className="animate-spin rounded-full h-8 w-8 border-2 border-[var(--accent)] border-t-transparent" />
         </div>
       </AuthShell>
     );
@@ -116,7 +116,7 @@ export default function UpdatePasswordPage() {
           <div className="flex flex-col sm:flex-row gap-4">
             <Link
               className={cn(
-                "inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-[#7067e8] px-4 text-sm font-semibold text-[var(--foreground)] transition-colors hover:bg-[#8178f0]",
+                "inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-[var(--accent)] px-4 text-sm font-semibold text-[var(--foreground)] transition-colors hover:opacity-90",
                 "w-full sm:w-auto"
               )}
               href="/forgot-password"
@@ -125,7 +125,7 @@ export default function UpdatePasswordPage() {
             </Link>
             <Link
               className={cn(
-                "inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-[#27272a] px-4 text-sm font-medium text-[var(--foreground)]/75 transition-colors hover:bg-[var(--surface)] hover:text-[var(--foreground)]",
+                "inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-[var(--line)] px-4 text-sm font-medium text-[var(--foreground)]/75 transition-colors hover:bg-[var(--surface)] hover:text-[var(--foreground)]",
                 "w-full sm:w-auto"
               )}
               href="/login"

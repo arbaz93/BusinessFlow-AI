@@ -78,7 +78,7 @@ export default async function TaskDetailPage({ params }: PageProps<"/tasks/[task
   return (
     <div className="space-y-6 pb-10">
       <div className="pt-2 sm:pt-5">
-        <Link href="/tasks" className="inline-flex h-8 items-center gap-1.5 rounded-md pr-2 text-xs font-medium text-[var(--muted)] transition-colors hover:text-[var(--foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff]">
+        <Link href="/tasks" className="inline-flex h-8 items-center gap-1.5 rounded-md pr-2 text-xs font-medium text-[var(--muted)] transition-colors hover:text-[var(--foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]">
           <ArrowLeft size={14} /> Tasks
         </Link>
         <div className="mt-4 flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between">
@@ -133,7 +133,7 @@ export default async function TaskDetailPage({ params }: PageProps<"/tasks/[task
                 <h2 className="text-[15px] font-semibold text-[var(--foreground)]">Project details</h2>
                 <p className="mt-1 text-xs text-[var(--muted)]">Connected client and delivery context.</p>
               </div>
-              <Link href={`/projects/${task.project.id}/tasks`} className="inline-flex py-2.5 items-center gap-1.5 rounded-md border border-[var(--line)] bg-[var(--panel)] px-2.5 text-xs font-medium text-[var(--muted)] transition-colors hover:bg-[var(--surface)] hover:text-[var(--foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff]">
+              <Link href={`/projects/${task.project.id}/tasks`} className="inline-flex py-2.5 items-center gap-1.5 rounded-md border border-[var(--line)] bg-[var(--panel)] px-2.5 text-xs font-medium text-[var(--muted)] transition-colors hover:bg-[var(--surface)] hover:text-[var(--foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]">
                 Back to Project Tasks
               </Link>
             </div>

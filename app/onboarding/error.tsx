@@ -9,7 +9,7 @@ export default function OnboardingError({ reset }: { error: Error & { digest?: s
       title="We couldn't load your account"
     >
       <button
-        className="h-10 rounded-lg bg-[#7067e8] px-4 text-sm font-semibold text-[var(--foreground)] hover:bg-[#8178f0]"
+        className="h-10 rounded-lg bg-[var(--accent)] px-4 text-sm font-semibold text-[var(--foreground)] hover:opacity-90"
         onClick={() => reset()}
         type="button"
       >

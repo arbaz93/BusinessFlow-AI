@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 
 const inputClass =
-  "h-10 w-full rounded-lg border border-[var(--line)] bg-[var(--surface)] px-3.5 text-sm text-[var(--foreground)] placeholder:text-[var(--foreground)]/30 focus-visible:border-[#a49bff] focus-visible:ring-[#a49bff]/20 focus-visible:ring-2 disabled:cursor-not-allowed";
+  "h-10 w-full rounded-lg border border-[var(--line)] bg-[var(--surface)] px-3.5 text-sm text-[var(--foreground)] placeholder:text-[var(--foreground)]/30 focus-visible:border-[var(--accent)] focus-visible:ring-[var(--accent)]/20 focus-visible:ring-2 disabled:cursor-not-allowed";
 
 export function ProfileForm({ name, email }: { name: string; email: string | null }) {
   const [state, action, pending] = useActionState(updateProfile, {});

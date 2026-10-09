@@ -21,8 +21,8 @@ export function LeadFormDialog({ lead }: { lead?: LeadDraft }) {
         <button
           type="button"
           className={lead
-            ? "inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-[var(--line)] bg-[var(--panel)] px-3 text-sm font-medium text-[var(--foreground)] transition-colors hover:bg-[var(--surface)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff]"
-            : "inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-[#7067e8] px-4 text-sm font-medium text-white transition-colors hover:bg-[#8178f0] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff]"}
+            ? "inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-[var(--line)] bg-[var(--panel)] px-3 text-sm font-medium text-[var(--foreground)] transition-colors hover:bg-[var(--surface)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
+            : "inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-[var(--accent)] px-4 text-sm font-medium text-white transition-colors hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"}
         >
           {lead ? <Pencil size={15} /> : <Plus size={16} />}
           {lead ? "Edit details" : "New lead"}
@@ -70,8 +70,8 @@ function LeadForm({ lead, onClose }: { lead?: LeadDraft; onClose: () => void }) 
     return state.fieldErrors?.[name]?.[0];
   }
 
-  const inputClass = "h-10 border-[var(--line)] bg-[var(--surface)] text-sm text-[var(--foreground)] placeholder:text-[var(--muted)] focus-visible:border-[#a49bff] focus-visible:ring-[#a49bff]/20";
-  const selectClass = "h-10 w-full rounded-md border border-[var(--line)] bg-[var(--surface)] px-3 text-sm text-[var(--foreground)] outline-none focus-visible:border-[#a49bff] focus-visible:ring-[3px] focus-visible:ring-[#a49bff]/20";
+  const inputClass = "h-10 border-[var(--line)] bg-[var(--surface)] text-sm text-[var(--foreground)] placeholder:text-[var(--muted)] focus-visible:border-[var(--accent)] focus-visible:ring-[var(--accent)]/20";
+  const selectClass = "h-10 w-full rounded-md border border-[var(--line)] bg-[var(--surface)] px-3 text-sm text-[var(--foreground)] outline-none focus-visible:border-[var(--accent)] focus-visible:ring-[3px] focus-visible:ring-[var(--accent)]/20";
   const labelClass = "mb-1.5 block text-xs font-medium text-[var(--muted)]";
 
   return (
@@ -88,7 +88,7 @@ function LeadForm({ lead, onClose }: { lead?: LeadDraft; onClose: () => void }) 
             </Dialog.Description>
           </div>
           <Dialog.Close asChild>
-            <button type="button" aria-label="Close dialog" className="grid size-9 shrink-0 place-items-center rounded-lg text-[var(--foreground)]/55 transition-colors hover:bg-[var(--surface)] hover:text-[var(--foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff]">
+            <button type="button" aria-label="Close dialog" className="grid size-9 shrink-0 place-items-center rounded-lg text-[var(--foreground)]/55 transition-colors hover:bg-[var(--surface)] hover:text-[var(--foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]">
               <X size={17} />
             </button>
           </Dialog.Close>
@@ -169,7 +169,7 @@ function LeadForm({ lead, onClose }: { lead?: LeadDraft; onClose: () => void }) 
             </div>
             <div className="sm:col-span-2">
               <label htmlFor="lead-notes" className={labelClass}>Notes</label>
-              <Textarea id="lead-notes" name="notes" rows={3} maxLength={2000} placeholder="Add context for the next conversation…" value={values.notes ?? ""} onChange={(event) => setValues({ ...values, notes: event.currentTarget.value })} aria-invalid={Boolean(fieldError("notes"))} aria-describedby={fieldError("notes") ? "lead-notes-error" : undefined} className="min-h-24 resize-y border-[var(--line)] bg-[var(--surface)] text-sm text-[var(--foreground)] placeholder:text-[var(--foreground)]/30 focus-visible:border-[#a49bff] focus-visible:ring-[#a49bff]/20 dark:bg-[var(--surface)]" />
+              <Textarea id="lead-notes" name="notes" rows={3} maxLength={2000} placeholder="Add context for the next conversation…" value={values.notes ?? ""} onChange={(event) => setValues({ ...values, notes: event.currentTarget.value })} aria-invalid={Boolean(fieldError("notes"))} aria-describedby={fieldError("notes") ? "lead-notes-error" : undefined} className="min-h-24 resize-y border-[var(--line)] bg-[var(--surface)] text-sm text-[var(--foreground)] placeholder:text-[var(--foreground)]/30 focus-visible:border-[var(--accent)] focus-visible:ring-[var(--accent)]/20 dark:bg-[var(--surface)]" />
               {fieldError("notes") && <p id="lead-notes-error" className="mt-1 text-xs text-[#fca5a5]">{fieldError("notes")}</p>}
             </div>
           </div>
@@ -180,7 +180,7 @@ function LeadForm({ lead, onClose }: { lead?: LeadDraft; onClose: () => void }) 
             <Dialog.Close asChild>
               <button type="button" className="h-10 rounded-lg px-4 text-sm font-medium text-[var(--foreground)]/65 transition-colors hover:bg-[var(--surface)] hover:text-[var(--foreground)]">Cancel</button>
             </Dialog.Close>
-            <button type="submit" disabled={pending} className="h-10 rounded-lg bg-[#7067e8] px-4 text-sm font-medium text-[var(--foreground)] transition-colors hover:bg-[#8178f0] disabled:cursor-not-allowed disabled:opacity-55">
+            <button type="submit" disabled={pending} className="h-10 rounded-lg bg-[var(--accent)] px-4 text-sm font-medium text-[var(--foreground)] transition-colors hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-55">
               {pending ? "Saving…" : lead ? "Save Changes" : "Create Lead"}
             </button>
           </div>

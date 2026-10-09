@@ -59,7 +59,7 @@ export default function SettingsPage() {
           <Link
             key={href}
             href={href}
-            className="group flex items-start gap-3.5 rounded-xl border border-[var(--line)] bg-[var(--panel)] p-4 text-left transition-colors hover:border-[var(--line-strong)] hover:bg-[var(--elevated)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff]"
+            className="group flex items-start gap-3.5 rounded-xl border border-[var(--line)] bg-[var(--panel)] p-4 text-left transition-colors hover:border-[var(--line-strong)] hover:bg-[var(--elevated)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
           >
             <span
               className="mt-0.5 grid size-9 shrink-0 place-items-center rounded-lg"

@@ -145,7 +145,7 @@ export function ProjectTasksWorkspace({
             <li key={task.id} className="rounded-[10px] border border-[var(--line)] bg-[var(--panel)] p-4 sm:p-5">
               <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                 <div className="min-w-0">
-                  <Link href={`/tasks/${task.id}`} className="inline-flex max-w-full items-center gap-1 rounded-sm text-sm font-semibold text-[var(--foreground)] hover:text-[var(--foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff]">
+                  <Link href={`/tasks/${task.id}`} className="inline-flex max-w-full items-center gap-1 rounded-sm text-sm font-semibold text-[var(--foreground)] hover:text-[var(--foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]">
                     <span className="truncate">{task.title}</span><ChevronRight size={15} className="shrink-0 text-[var(--foreground)]/35" />
                   </Link>
                   {task.description && <p className="mt-1 line-clamp-2 text-sm text-[var(--foreground)]/50">{task.description}</p>}
@@ -220,7 +220,7 @@ function Filter({
   return (
     <div>
       <label htmlFor={id} className="sr-only">{label}</label>
-      <select id={id} value={value} onChange={(event) => onChange(event.currentTarget.value)} className="h-10 w-full rounded-md border border-[var(--line)] bg-[var(--surface)] px-3 text-sm text-[var(--foreground)]/80 outline-none focus-visible:ring-2 focus-visible:ring-[#a49bff]">
+      <select id={id} value={value} onChange={(event) => onChange(event.currentTarget.value)} className="h-10 w-full rounded-md border border-[var(--line)] bg-[var(--surface)] px-3 text-sm text-[var(--foreground)]/80 outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]">
         {children}
       </select>
     </div>

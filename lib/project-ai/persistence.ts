@@ -24,7 +24,7 @@ const PROCESSING_TIMEOUT_MS = 5 * 60 * 1000;
 
 type ProjectAIAnalysisStateStatus = "NO_BRIEF" | "READY" | "PROCESSING" | "COMPLETED" | "STALE" | "FAILED" | "SOURCE_MISSING";
 
-type ProjectAIAnalysisSummary = {
+export type ProjectAIAnalysisSummary = {
   id: string;
   intelligence: IdentifiedProjectIntelligence;
   approvedSuggestions: Array<{ suggestionId: string; taskId: string | null }>;
