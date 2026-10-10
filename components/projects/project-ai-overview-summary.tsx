@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { AlertTriangle, ArrowUpRight, FileText, LoaderCircle, Sparkles } from "lucide-react";
 import { useProjectAIAnalysisRequest } from "@/components/projects/use-project-ai-analysis-request";
+import { AiAnalysisLoader } from "@/components/ai/ai-analysis-loader";
 import type { ProjectAIAnalysisState } from "@/lib/project-ai/persistence";
 import { getProjectAIOverviewData } from "@/lib/project-ai/overview";
 
@@ -78,10 +79,9 @@ function AnalyzeProjectForm({
   if (isProcessing) {
     return (
       <div className="mt-4 space-y-3">
-        <p role="status" aria-live="polite" className="flex items-center gap-2 text-sm text-[var(--accent-muted)]">
-          <LoaderCircle size={15} className="animate-spin" aria-hidden="true" />
-          Analyzing Project Brief...
-        </p>
+        <div role="status" aria-live="polite">
+          <AiAnalysisLoader compact />
+        </div>
         <p className="text-xs text-[var(--foreground)]/50">Your previous analysis, Tasks, and Documents remain available while analysis runs.</p>
         {requestError && <p role="alert" className="text-xs text-[var(--danger)]">{requestError}</p>}
         <ViewAIIntelligenceLink projectId={projectId}>Open AI Intelligence</ViewAIIntelligenceLink>

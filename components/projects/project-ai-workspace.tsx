@@ -8,6 +8,7 @@ import { getProjectDocumentAccessUrl } from "@/app/actions/project-documents";
 import { ProjectAIAnalysisFeedbackControl } from "@/components/projects/project-ai-feedback-control";
 import { AIProjectBriefDocument } from "@/components/projects/project-ai-brief-document";
 import { useProjectAIAnalysisRequest } from "@/components/projects/use-project-ai-analysis-request";
+import { AiAnalysisLoader } from "@/components/ai/ai-analysis-loader";
 import { formatProjectAIAnalysisDate } from "@/lib/project-ai/history-format";
 import {
   identifyProjectAIAnalysisFeedbackTargets,
@@ -609,13 +610,13 @@ export function ProjectAiWorkspace({
       )}
 
       {isProcessing && (
-        <div role="status" aria-live="polite" className="flex items-center gap-3 rounded-lg border border-[var(--accent-muted)]/20 bg-[var(--accent-muted)]/[0.06] px-4 py-3 text-sm text-[var(--accent-muted)]">
-          <LoaderCircle size={16} className="shrink-0 animate-spin" aria-hidden="true" />
-          <div>
-            <p className="font-medium">Analyzing Project Brief...</p>
-            <p className="mt-0.5 text-xs text-[var(--foreground)]/55">BusinessFlow AI is reviewing the primary project brief.</p>
-          </div>
-        </div>
+        <section
+          role="status"
+          aria-live="polite"
+          className="rounded-lg border border-[var(--accent-muted)]/20 bg-[var(--accent-muted)]/[0.06] px-4 py-4 sm:px-5"
+        >
+          <AiAnalysisLoader />
+        </section>
       )}
       {requestError && <p role="alert" className="text-sm text-[var(--danger)]">{requestError}</p>}
 

@@ -177,7 +177,7 @@ function ClientDeleteDialog({
               <button type="button" disabled={pending} className="h-10 rounded-lg px-4 text-sm font-medium text-[var(--muted)] transition-colors hover:bg-[var(--surface)] hover:text-[var(--foreground)] disabled:opacity-50">Cancel</button>
             </Dialog.Close>
             {dependencyCount === null && (
-              <button type="button" onClick={handleDelete} disabled={pending} className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-[#dc2626] px-4 text-sm font-semibold text-[var(--foreground)] transition-colors hover:bg-[#ef4444] disabled:cursor-not-allowed disabled:opacity-55">
+              <button type="button" onClick={handleDelete} disabled={pending} className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-[#dc2626] px-4 text-sm font-semibold text-white transition-colors hover:bg-[#ef4444] disabled:cursor-not-allowed disabled:opacity-55">
                 <Trash2 size={15} />{pending ? "Deleting…" : "Delete Client"}
               </button>
             )}

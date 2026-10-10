@@ -22,19 +22,19 @@ import { getProjectDocumentAccessUrl } from "@/app/actions/project-documents";
 import { useActionState, useState } from "react";
 
 const importanceTone: Record<string, string> = {
-  LOW: "text-[var(--muted-foreground)]",
+  LOW: "text-[var(--muted-ink)]",
   MEDIUM: "text-[var(--warning)]",
   HIGH: "text-[var(--danger)]",
 };
 
 const severityTone: Record<string, string> = {
-  LOW: "text-[var(--muted-foreground)]",
+  LOW: "text-[var(--muted-ink)]",
   MEDIUM: "text-[var(--warning)]",
   HIGH: "text-[var(--danger)]",
 };
 
 const priorityTone: Record<string, string> = {
-  LOW: "text-[var(--muted-foreground)]",
+  LOW: "text-[var(--muted-ink)]",
   MEDIUM: "text-[var(--warning)]",
   HIGH: "text-[var(--danger)]",
   URGENT: "text-[var(--danger)]",
@@ -49,7 +49,7 @@ const priorityBg: Record<string, string> = {
 
 function DocumentBadge({ children, variant = "neutral" }: { children: React.ReactNode; variant?: "neutral" | "success" | "warning" | "info" | "danger" }) {
   const variantClasses = {
-    neutral: "border-[var(--line)] bg-[var(--elevated)] text-[var(--foreground)]/65",
+    neutral: "border-[var(--line)] bg-[var(--elevated)] text-ink/65",
     success: "border-[var(--success-border)]/30 bg-[var(--success-surface)]/20 text-[var(--success)]",
     warning: "border-[var(--warning-border)]/30 bg-[var(--warning-surface)]/20 text-[var(--warning)]",
     info: "border-[var(--info-border)]/30 bg-[var(--info-surface)]/20 text-[var(--info)]",
@@ -91,8 +91,8 @@ function PriorityLabel({ priority }: { priority: TaskPriority }) {
 
 function DocumentSectionHeading({ children, id }: { children: React.ReactNode; id?: string }) {
   return (
-    <h2 id={id} className="mt-10 mb-5 border-b border-[var(--line-strong)]/40 pb-2 text-[var(--foreground)]">
-      <span className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--muted-foreground)]/60 block mb-1">Section</span>
+    <h2 id={id} className="mt-10 mb-5 border-b border-[var(--line-strong)]/40 pb-2 text-ink">
+      <span className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--muted-ink)]/60 block mb-1">Section</span>
       <span className="text-xl font-semibold tracking-[-0.02em] sm:text-2xl">
         {children}
       </span>
@@ -102,7 +102,7 @@ function DocumentSectionHeading({ children, id }: { children: React.ReactNode; i
 
 function EmptySectionNote({ children }: { children: React.ReactNode }) {
   return (
-    <p className="mt-4 text-sm italic text-[var(--foreground)]/45">
+    <p className="mt-4 text-sm italic text-ink/45">
       {children}
     </p>
   );
@@ -192,15 +192,15 @@ function SuggestedTasksReview({
   return (
     <section className="mt-12" aria-labelledby="ai-suggested-tasks">
       <div className="mb-6 border-b border-[var(--line-strong)]/40 pb-3">
-        <h2 id="ai-suggested-tasks" className="text-xl font-semibold text-[var(--foreground)] sm:text-2xl">Suggested Tasks</h2>
+        <h2 id="ai-suggested-tasks" className="text-xl font-semibold text-ink sm:text-2xl">Suggested Tasks</h2>
       </div>
-      <div className="mb-4 rounded-md border border-[var(--accent-muted)]/15 bg-[var(--accent-muted)]/[0.04] px-4 py-2.5 text-sm text-[var(--foreground)]/70">
+      <div className="mb-4 rounded-md border border-[var(--accent-muted)]/15 bg-[var(--accent-muted)]/[0.04] px-4 py-2.5 text-sm text-ink/70">
         These are AI-generated suggestions only. No Task is created until you review and approve.
       </div>
       {suggestions.length ? (
         <div className="space-y-4">
           {canApprove && eligibleSuggestions.length > 0 && (
-            <label className="flex min-h-8 items-center gap-2 text-xs text-[var(--foreground)]/60 cursor-pointer">
+            <label className="flex min-h-8 items-center gap-2 text-xs text-ink/60 cursor-pointer">
               <input
                 type="checkbox"
                 checked={selectedIds.length === eligibleSuggestions.length && eligibleSuggestions.length > 0}
@@ -227,7 +227,7 @@ function SuggestedTasksReview({
                           disabled={!canApprove || approved}
                           onChange={(event) => updateDraft(item.suggestionId, "title", event.target.value)}
                           maxLength={160}
-                          className="w-full border-none bg-transparent px-0 text-sm font-medium text-[var(--foreground)]/80 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent-muted)]"
+                          className="w-full border-none bg-transparent px-0 text-sm font-medium text-ink/80 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent-muted)]"
                         />
                       </label>
                       <label className="mt-1 block">
@@ -238,7 +238,7 @@ function SuggestedTasksReview({
                           onChange={(event) => updateDraft(item.suggestionId, "description", event.target.value)}
                           maxLength={2000}
                           rows={3}
-                          className="w-full resize-y border-none bg-transparent px-0 text-sm leading-6 text-[var(--foreground)]/60 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent-muted)]"
+                          className="w-full resize-y border-none bg-transparent px-0 text-sm leading-6 text-ink/60 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent-muted)]"
                         />
                       </label>
                     </div>
@@ -253,7 +253,7 @@ function SuggestedTasksReview({
                               if (priority.success) updatePriority(item.suggestionId, priority.data);
                             }}
                             disabled
-                            className="rounded border border-[var(--line)] bg-[var(--panel)] px-2 py-1 text-xs text-[var(--foreground)]/80"
+                            className="rounded border border-[var(--line)] bg-[var(--panel)] px-2 py-1 text-xs text-ink/80"
                           >
                             {taskPriorityValues.map((priority) => <option key={priority} value={priority}>{priority}</option>)}
                           </select>
@@ -262,7 +262,7 @@ function SuggestedTasksReview({
                     </div>
                   </div>
                   {canApprove && !approved && (
-                    <label className="mt-3 flex items-center gap-2 text-xs text-[var(--foreground)]/50 cursor-pointer">
+                    <label className="mt-3 flex items-center gap-2 text-xs text-ink/50 cursor-pointer">
                       <input
                         type="checkbox"
                         aria-label={`Select ${item.title}`}
@@ -287,10 +287,10 @@ function SuggestedTasksReview({
                   {approved && (
                     taskId
                       ? <Link href={`/tasks/${taskId}`} className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-[var(--accent-muted)] hover:underline">Approved · View task <ArrowUpRight size={12} aria-hidden="true" /></Link>
-                      : <p className="mt-2 text-xs text-[var(--foreground)]/50">Previously approved</p>
+                      : <p className="mt-2 text-xs text-ink/50">Previously approved</p>
                   )}
                   {!approved && (
-                    <p className="mt-2 text-[10px] font-medium uppercase tracking-[0.12em] text-[var(--foreground)]/35">AI suggestion · Not yet a Task</p>
+                    <p className="mt-2 text-[10px] font-medium uppercase tracking-[0.12em] text-ink/35">AI suggestion · Not yet a Task</p>
                   )}
                 </li>
               );
@@ -304,8 +304,8 @@ function SuggestedTasksReview({
               {result && !result.success && <p role="alert" className="text-sm text-[var(--danger)]">{result.error}</p>}
               {confirming ? (
                 <div className="rounded-md border border-[var(--accent-muted)]/20 bg-[var(--accent-muted)]/[0.05] p-4" aria-live="polite">
-                  <p className="text-sm font-medium text-[var(--foreground)]/90">Create {selectedTasks.length} reviewed task{selectedTasks.length === 1 ? "" : "s"}?</p>
-                  <ul className="mt-2 list-inside list-disc space-y-1 text-xs text-[var(--foreground)]/65">
+                  <p className="text-sm font-medium text-ink/90">Create {selectedTasks.length} reviewed task{selectedTasks.length === 1 ? "" : "s"}?</p>
+                  <ul className="mt-2 list-inside list-disc space-y-1 text-xs text-ink/65">
                     {selectedTasks.map((task) => <li key={task.suggestionId} className="break-words">{task.title}</li>)}
                   </ul>
                   <div className="mt-4 flex flex-wrap gap-2">
@@ -313,7 +313,7 @@ function SuggestedTasksReview({
                       {isPending && <LoaderCircle size={13} className="animate-spin" aria-hidden="true" />}
                       Confirm and create tasks
                     </button>
-                    <button type="button" disabled={isPending} onClick={() => setConfirming(false)} className="min-h-9 rounded-md border border-[var(--line)] px-4 text-xs text-[var(--foreground)]/70">
+                    <button type="button" disabled={isPending} onClick={() => setConfirming(false)} className="min-h-9 rounded-md border border-[var(--line)] px-4 text-xs text-ink/70">
                       Cancel
                     </button>
                   </div>
@@ -355,7 +355,7 @@ function HistoricalSuggestedTasks({
 }) {
   return (
     <section className="mt-12" aria-labelledby="historical-ai-suggested-tasks">
-      <div className="mb-4 rounded-md border border-[var(--line)] bg-[var(--surface)]/30 px-4 py-2.5 text-sm text-[var(--foreground)]/60">
+      <div className="mb-4 rounded-md border border-[var(--line)] bg-[var(--surface)]/30 px-4 py-2.5 text-sm text-ink/60">
         These suggestions are preserved for reference and are not eligible for approval.
       </div>
       {suggestions.length ? (
@@ -363,11 +363,11 @@ function HistoricalSuggestedTasks({
           {suggestions.map((item) => (
             <li key={item.suggestionId} className="rounded-lg border border-[var(--line)] bg-[var(--surface)]/30 p-4">
               <div className="flex flex-wrap items-start justify-between gap-2">
-                <h3 className="min-w-0 break-words text-sm font-medium text-[var(--foreground)]/85">{item.title}</h3>
+                <h3 className="min-w-0 break-words text-sm font-medium text-ink/85">{item.title}</h3>
                 <PriorityLabel priority={item.priority} />
               </div>
-              <p className="mt-2 break-words text-sm leading-6 text-[var(--foreground)]/60">{item.description}</p>
-              <p className="mt-3 text-[11px] font-medium text-[var(--foreground)]/35">From this analysis · Historical suggestion</p>
+              <p className="mt-2 break-words text-sm leading-6 text-ink/60">{item.description}</p>
+              <p className="mt-3 text-[11px] font-medium text-ink/35">From this analysis · Historical suggestion</p>
               <div className="mt-2">
                 <AnalysisFeedbackWrapper
                   projectId={projectId}
@@ -456,11 +456,11 @@ export function AIProjectBriefDocument({ projectId, state, analysis, feedback }:
             AI-Generated Project Brief
           </h1>
 
-          <p className="mt-2 max-w-2xl text-sm leading-7 text-[var(--foreground)]/55">
+          <p className="mt-2 max-w-2xl text-sm leading-7 text-ink/55">
             A structured analysis of the project brief, requirements, deliverables, risks, and outstanding questions.
           </p>
 
-          <div className="mt-6 flex flex-wrap gap-2 text-xs text-[var(--foreground)]/50">
+          <div className="mt-6 flex flex-wrap gap-2 text-xs text-ink/50">
             <span className="flex items-center gap-1">
               Source: {analysis.sourceDocumentName ?? "Unknown"}
             </span>
@@ -476,7 +476,7 @@ export function AIProjectBriefDocument({ projectId, state, analysis, feedback }:
                 <AlertTriangle size={16} className="mt-0.5 shrink-0 text-[var(--warning)]" aria-hidden="true" />
                 <div>
                   <p className="font-medium text-[var(--warning)]">This analysis is out of date</p>
-                  <p className="mt-1 leading-6 text-[var(--foreground)]/65">
+                  <p className="mt-1 leading-6 text-ink/65">
                     {state.analysisStaleReason === "PRIMARY_BRIEF_CHANGED"
                       ? "The current primary Project Brief is different from the one used for this analysis."
                       : state.analysisStaleReason === "SOURCE_UPDATED"
@@ -505,7 +505,7 @@ export function AIProjectBriefDocument({ projectId, state, analysis, feedback }:
           )}
 
           {analysis.sourceMetadata?.truncated && (
-            <div className="mt-4 rounded-md border border-[var(--warning-border)]/20 bg-[var(--warning-surface)]/[0.08] px-4 py-3 text-xs leading-5 text-[var(--foreground)]/60">
+            <div className="mt-4 rounded-md border border-[var(--warning-border)]/20 bg-[var(--warning-surface)]/[0.08] px-4 py-3 text-xs leading-5 text-ink/60">
               This analysis used {analysis.sourceMetadata.finalCharacterCount.toLocaleString()} of {analysis.sourceMetadata.originalCharacterCount.toLocaleString()} extracted characters from the source brief. Omitted text may contain additional details.
             </div>
           )}
@@ -514,7 +514,7 @@ export function AIProjectBriefDocument({ projectId, state, analysis, feedback }:
             <DocumentBadge variant={statusColor}>{statusBadgeText}</DocumentBadge>
           </div>
 
-          <div className="mt-1 text-xs leading-5 text-[var(--foreground)]/40">
+          <div className="mt-1 text-xs leading-5 text-ink/40">
             Generated from analysis of: {analysis.sourceDocumentName ?? "Unknown source"}
             {" · "}Analysis source updated: {formatProjectAIAnalysisDate(analysis.sourceDocumentUpdatedAt)}
           </div>
@@ -545,7 +545,7 @@ export function AIProjectBriefDocument({ projectId, state, analysis, feedback }:
             />
           </div>
 
-          <p className="mt-1 text-xs leading-5 text-[var(--foreground)]/45">
+          <p className="mt-1 text-xs leading-5 text-ink/45">
             Generated from the analysis source shown above. Review insights before using them for project decisions; suggested Tasks require your approval.
           </p>
         </div>
@@ -553,8 +553,8 @@ export function AIProjectBriefDocument({ projectId, state, analysis, feedback }:
 
       <div className="mx-auto max-w-3xl px-6 py-8">
         <div className="mb-8">
-          <span className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--muted-foreground)]/60">Executive Summary</span>
-          <p className="mt-3 max-w-2xl text-sm leading-7 text-[var(--foreground)]/75">
+          <span className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--muted-ink)]/60">Executive Summary</span>
+          <p className="mt-3 max-w-2xl text-sm leading-7 text-ink/75">
             {intelligence.summary}
           </p>
           <div className="mt-4">
@@ -576,7 +576,7 @@ export function AIProjectBriefDocument({ projectId, state, analysis, feedback }:
               {intelligence.requirements.map((item, index) => (
                 <li key={`${item.title}-${index}`}>
                   <div className="flex items-start justify-between gap-3">
-                    <h3 className="text-lg font-medium text-[var(--foreground)]/90">
+                    <h3 className="text-lg font-medium text-ink/90">
                       <span className="text-[var(--accent-muted)]/60 mr-2" aria-hidden="true">
                         {String(index + 1).padStart(2, "0")}
                       </span>
@@ -584,7 +584,7 @@ export function AIProjectBriefDocument({ projectId, state, analysis, feedback }:
                     </h3>
                     <ImportanceLabel importance={item.importance} />
                   </div>
-                  <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--foreground)]/65">
+                  <p className="mt-2 max-w-2xl text-sm leading-6 text-ink/65">
                     {item.description}
                   </p>
                   <div className="mt-3">
@@ -617,8 +617,8 @@ export function AIProjectBriefDocument({ projectId, state, analysis, feedback }:
                     </svg>
                   </span>
                   <div className="min-w-0 flex-1">
-                    <h3 className="text-sm font-medium text-[var(--foreground)]/85">{item.title}</h3>
-                    <p className="mt-1 text-sm leading-6 text-[var(--foreground)]/60">{item.description}</p>
+                    <h3 className="text-sm font-medium text-ink/85">{item.title}</h3>
+                    <p className="mt-1 text-sm leading-6 text-ink/60">{item.description}</p>
                   </div>
                   <div className="self-start">
                     <AnalysisFeedbackWrapper
@@ -648,10 +648,10 @@ export function AIProjectBriefDocument({ projectId, state, analysis, feedback }:
                   className="border-l-2 border-[var(--line-strong)]/30 pl-4 py-1"
                 >
                   <div className="flex items-start justify-between gap-3">
-                    <h3 className="text-sm font-medium text-[var(--foreground)]/85">{item.title}</h3>
+                    <h3 className="text-sm font-medium text-ink/85">{item.title}</h3>
                     <SeverityLabel severity={item.severity} />
                   </div>
-                  <p className="mt-1 max-w-2xl text-sm leading-6 text-[var(--foreground)]/65">
+                  <p className="mt-1 max-w-2xl text-sm leading-6 text-ink/65">
                     {item.description}
                   </p>
                   <div className="mt-2">
@@ -674,7 +674,7 @@ export function AIProjectBriefDocument({ projectId, state, analysis, feedback }:
 
         <div className="mb-8">
           <DocumentSectionHeading id="ai-missing-information">Open Questions</DocumentSectionHeading>
-          <p className="mt-1 text-sm text-[var(--foreground)]/55">AI-identified gaps that may need clarification before work can proceed.</p>
+          <p className="mt-1 text-sm text-ink/55">AI-identified gaps that may need clarification before work can proceed.</p>
           {intelligence.missingInformation.length ? (
             <ol className="mt-4 space-y-5">
               {intelligence.missingInformation.map((item, index) => (
@@ -684,8 +684,8 @@ export function AIProjectBriefDocument({ projectId, state, analysis, feedback }:
                       {(index + 1).toString().padStart(2, "0")}
                     </span>
                     <div className="min-w-0 flex-1">
-                      <h3 className="text-sm font-medium text-[var(--foreground)]/85">{item.question}</h3>
-                      <p className="mt-1 text-sm leading-6 text-[var(--foreground)]/60">{item.reason}</p>
+                      <h3 className="text-sm font-medium text-ink/85">{item.question}</h3>
+                      <p className="mt-1 text-sm leading-6 text-ink/60">{item.reason}</p>
                       <div className="mt-2">
                         <AnalysisFeedbackWrapper
                           projectId={projectId}
@@ -702,7 +702,7 @@ export function AIProjectBriefDocument({ projectId, state, analysis, feedback }:
               ))}
             </ol>
           ) : (
-            <p className="mt-4 text-sm italic text-[var(--foreground)]/45">
+            <p className="mt-4 text-sm italic text-ink/45">
               No outstanding questions were identified in this analysis.
             </p>
           )}
