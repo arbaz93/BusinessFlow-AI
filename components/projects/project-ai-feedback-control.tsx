@@ -49,7 +49,7 @@ export function ProjectAIAnalysisFeedbackControl({
           <button
             type="button"
             aria-label={`${savedFeedback ? "Edit" : "Give"} feedback on ${targetLabel}`}
-            className="inline-flex min-h-8 items-center gap-1.5 rounded px-1.5 text-xs font-medium text-[var(--foreground)]/50 transition-colors hover:bg-[var(--surface)] hover:text-[var(--accent-muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
+            className="inline-flex min-h-8 items-center gap-1.5 rounded px-1.5 text-xs font-medium text-ink/50 transition-colors hover:bg-[var(--surface)] hover:text-[var(--accent-muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
           >
             {savedFeedback ? <Pencil size={12} aria-hidden="true" /> : <MessageSquareText size={12} aria-hidden="true" />}
             {savedFeedback ? "Edit feedback" : "Give feedback"}

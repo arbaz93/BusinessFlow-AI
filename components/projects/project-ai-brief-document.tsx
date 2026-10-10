@@ -217,7 +217,7 @@ function SuggestedTasksReview({
               const approved = approvedById.has(item.suggestionId);
               const draft = drafts.find((value) => value.suggestionId === item.suggestionId)!;
               return (
-                <li key={item.suggestionId} className="rounded-lg border border-[var(--line)] bg-[var(--surface)]/30 p-4">
+                <li key={item.suggestionId} className="rounded-lg border border-[var(--line)] bg-[var(--surface)]/4 p-4">
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                     <div className="min-w-0 flex-1">
                       <label className="block">
@@ -253,7 +253,7 @@ function SuggestedTasksReview({
                               if (priority.success) updatePriority(item.suggestionId, priority.data);
                             }}
                             disabled
-                            className="rounded border border-[var(--line)] bg-[var(--panel)] px-2 py-1 text-xs text-ink/80"
+                            className="rounded border border-[var(--line)] px-2 py-1 text-xs text-ink/80"
                           >
                             {taskPriorityValues.map((priority) => <option key={priority} value={priority}>{priority}</option>)}
                           </select>
@@ -309,7 +309,7 @@ function SuggestedTasksReview({
                     {selectedTasks.map((task) => <li key={task.suggestionId} className="break-words">{task.title}</li>)}
                   </ul>
                   <div className="mt-4 flex flex-wrap gap-2">
-                    <button type="submit" disabled={isPending} className="inline-flex min-h-9 items-center justify-center gap-2 rounded-md bg-[var(--accent-muted)] px-4 text-xs font-medium text-[var(--background)] disabled:opacity-60">
+                    <button type="submit" disabled={isPending} className="inline-flex min-h-9 items-center justify-center gap-2 rounded-md bg-[#7c3aed] px-4 text-xs font-medium text-[var(--background)] disabled:opacity-60">
                       {isPending && <LoaderCircle size={13} className="animate-spin" aria-hidden="true" />}
                       Confirm and create tasks
                     </button>
@@ -361,7 +361,7 @@ function HistoricalSuggestedTasks({
       {suggestions.length ? (
         <ul className="space-y-3">
           {suggestions.map((item) => (
-            <li key={item.suggestionId} className="rounded-lg border border-[var(--line)] bg-[var(--surface)]/30 p-4">
+            <li key={item.suggestionId} className="rounded-lg border border-[var(--line)] bg-[var(--surface)]/4 p-4">
               <div className="flex flex-wrap items-start justify-between gap-2">
                 <h3 className="min-w-0 break-words text-sm font-medium text-ink/85">{item.title}</h3>
                 <PriorityLabel priority={item.priority} />
