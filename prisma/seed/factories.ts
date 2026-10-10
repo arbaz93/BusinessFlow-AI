@@ -914,9 +914,7 @@ export function createDemoActivity(
       { organizationId: ctx.organizationId, actorId: ctx.memberUserId, projectId: entityIds.projectIds[0], type: ActivityType.DOCUMENT_PRIMARY_SET, description: "Set primary brief for Demo — Website Redesign", createdAt: ONE_DAY_AGO },
     ];
 
-    for (const activity of activities) {
-      await tx.activity.create({ data: activity });
-    }
+    await tx.activity.createMany({ data: activities });
   });
 }
 
@@ -978,14 +976,7 @@ export function createDemoAIConversation(prisma: Prisma, ctx: SeedContext, proje
       },
     ];
 
-    for (const msg of messages) {
-      const existing = await tx.aIConversationMessage.findUnique({
-        where: { id: msg.id },
-      });
-      if (!existing) {
-        await tx.aIConversationMessage.create({ data: msg });
-      }
-    }
+    await tx.aIConversationMessage.createMany({ data: messages });
 
     return conversation;
   });

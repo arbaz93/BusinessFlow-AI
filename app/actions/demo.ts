@@ -8,11 +8,8 @@ import { getSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { prisma } from "@/lib/db/prisma";
 import { isSeedEnvironmentAllowed } from "@/prisma/seed/env-guard";
-import {
-  seedDemoWorkspace,
-  deleteDemoWorkspaceData,
-} from "@/prisma/seed/factories";
-import { isDemoModeEnabled, getDemoOwnerCredentials, DEMO_OWNER_EMAIL } from "@/lib/demo/config";
+import { seedDemoWorkspace, deleteDemoWorkspaceData, DEMO_USER_EMAIL } from "@/prisma/seed/factories";
+import { isDemoModeEnabled, getDemoOwnerCredentials } from "@/lib/demo/config";
 import { isDemoEmail } from "@/lib/demo/guard";
 import {
   checkRateLimit,
@@ -151,9 +148,8 @@ export async function resetDemoWorkspace(): Promise<DemoResetResult> {
   try {
     await deleteDemoWorkspaceData(prisma);
     await seedDemoWorkspace(prisma);
-
     await prisma.user.updateMany({
-      where: { email: DEMO_OWNER_EMAIL },
+      where: { email: DEMO_USER_EMAIL },
       data: { authUserId: data.user.id },
     });
 
@@ -162,6 +158,9 @@ export async function resetDemoWorkspace(): Promise<DemoResetResult> {
   } catch (error) {
     console.error("Demo workspace reset failed.", {
       errorName: error instanceof Error ? error.name : "UnknownError",
+      message: error instanceof Error ? error.message : String(error),
+      code: error instanceof Error ? (error as { code?: string }).code : undefined,
+      meta: error instanceof Error ? (error as { meta?: unknown }).meta : undefined,
     });
     return { success: false, error: "We couldn't reset the demo workspace right now. Please try again." };
   }
