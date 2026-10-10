@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useActionState, useState } from "react";
 import { login, resendConfirmation, signup } from "@/app/actions/auth";
+import { demoSignIn, type DemoSignInResult } from "@/app/actions/demo";
 import { AuthShell } from "@/components/auth/auth-shell";
 import { Alert } from "@/components/ui/alert";
 import { buttonVariants } from "@/components/ui/button";
@@ -15,6 +16,7 @@ type AuthFormProps = {
   mode: "login" | "signup";
   notice?: string;
   returnTo?: string;
+  demoAvailable?: boolean;
 };
 
 type ActionState = {
@@ -30,10 +32,11 @@ const noticeMessages: Record<string, string> = {
   signout: "We couldn't complete sign out. Please try again.",
 };
 
-export function AuthForm({ mode, notice, returnTo }: AuthFormProps) {
+export function AuthForm({ mode, notice, returnTo, demoAvailable = false }: AuthFormProps) {
   const isSignup = mode === "signup";
   const [state, action, pending] = useActionState(isSignup ? signup : login, {} as ActionState);
   const [resendState, resendAction, resendPending] = useActionState(resendConfirmation, {} as ActionState);
+  const [demoState, demoAction, demoPending] = useActionState<DemoSignInResult, FormData>(demoSignIn, { success: false });
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -147,6 +150,22 @@ export function AuthForm({ mode, notice, returnTo }: AuthFormProps) {
               {pending ? "Please wait..." : successMessage ? "Check your email" : isSignup ? "Create account" : "Log in"}
             </button>
           </form>
+
+          {!isSignup && demoAvailable ? (
+            <form action={demoAction} className="mt-4">
+              {demoState.error ? (
+                <Alert aria-live="assertive" role="alert" tone="error">{demoState.error}</Alert>
+              ) : null}
+              <button
+                aria-busy={demoPending}
+                className={cn(buttonVariants({ size: "lg", variant: "outline" }), "w-full")}
+                disabled={demoPending || demoState.success === true}
+                type="submit"
+              >
+                {demoPending ? "Signing in..." : "Try demo workspace"}
+              </button>
+            </form>
+          ) : null}
 
           {state.actionLabel && state.actionHref && !showResendForm ? (
             <div className="mt-4">

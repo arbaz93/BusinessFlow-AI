@@ -56,6 +56,10 @@ const serverEnvSchema = z.object({
     (value) => value === "true",
     z.boolean().default(false),
   ),
+  DEMO_MODE_ENABLED: z.preprocess(
+    (value) => value === "true",
+    z.boolean().default(false),
+  ),
 });
 
 type PublicEnv = {
@@ -73,6 +77,7 @@ type ServerEnv = {
   AI_PROVIDER: "gemini";
   WORKSPACE_INVITATION_EXPIRY_DAYS: number;
   SEED_DATA_ENABLED: boolean;
+  DEMO_MODE_ENABLED: boolean;
 };
 
 const rawPublicEnv: PublicEnv = {
@@ -90,6 +95,7 @@ const rawServerEnv: ServerEnv = {
   AI_PROVIDER: "gemini",
   WORKSPACE_INVITATION_EXPIRY_DAYS: process.env.WORKSPACE_INVITATION_EXPIRY_DAYS ? parseInt(process.env.WORKSPACE_INVITATION_EXPIRY_DAYS, 10) : 7,
   SEED_DATA_ENABLED: process.env.SEED_DATA_ENABLED === "true",
+  DEMO_MODE_ENABLED: process.env.DEMO_MODE_ENABLED === "true",
 };
 
 let validatedPublicEnv: PublicEnv;

@@ -101,3 +101,15 @@ export const AI_ANALYSIS_RATE_LIMIT_CONFIG: RateLimitConfig = {
   windowMs: 60 * 1000,
   keyPrefix: "ai-analysis",
 };
+
+export const DEMO_SIGNIN_RATE_LIMIT_CONFIG: RateLimitConfig = {
+  maxRequests: 5,
+  windowMs: 60 * 1000,
+  keyPrefix: "demo-signin",
+};
+
+export const DEMO_RESET_RATE_LIMIT_CONFIG: RateLimitConfig = {
+  maxRequests: 2,
+  windowMs: 60 * 1000,
+  keyPrefix: "demo-reset",
+};

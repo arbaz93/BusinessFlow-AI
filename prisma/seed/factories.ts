@@ -34,6 +34,10 @@ export interface SeedContext {
   memberAuthUserId: string;
 }
 
+export const DEMO_OWNER_AUTH_USER_ID = "demo_owner_auth_uid";
+export const DEMO_MEMBER_AUTH_USER_ID = "demo_member_auth_uid";
+export const DEMO_ORGANIZATION_SLUG = "demo-workspace";
+
 const DEMO_USER_NAME = "Demo Owner";
 const DEMO_MEMBER_NAME = "Demo Member";
 const DEMO_USER_EMAIL = "demo-owner@example.test";
@@ -42,6 +46,188 @@ const DEMO_USER_PASSWORD = "DemoPass123!";
 
 export { DEMO_USER_EMAIL, DEMO_USER_NAME, DEMO_MEMBER_NAME, DEMO_MEMBER_EMAIL };
 export const DEMO_USER_PASSWORD_VALUE = DEMO_USER_PASSWORD;
+
+export const DEMO_AUTH_USER_IDS = {
+  owner: DEMO_OWNER_AUTH_USER_ID,
+  member: DEMO_MEMBER_AUTH_USER_ID,
+};
+
+export const DEMO_AI_ANALYSIS_RESULT: Prisma.InputJsonValue = {
+  summary:
+    "Demo Mobile App Development is a cross-platform project to build a mobile operations management app. The project is currently in progress with a high-priority focus on offline capability and cross-platform compatibility.",
+  requirements: [
+    {
+      title: "Cross-platform compatibility",
+      description: "The app must run on both iOS and Android.",
+      importance: "HIGH",
+    },
+    {
+      title: "Offline capability",
+      description: "The app should cache data locally for offline use by field workers.",
+      importance: "MEDIUM",
+    },
+  ],
+  deliverables: [
+    {
+      title: "iOS app build",
+      description: "The cross-platform app published to the Apple App Store.",
+    },
+    {
+      title: "Android app build",
+      description: "The cross-platform app published to the Google Play Store.",
+    },
+  ],
+  risks: [
+    {
+      title: "App store approval delays",
+      description: "Apple and Google review processes can take up to 2 weeks.",
+      severity: "MEDIUM",
+    },
+  ],
+  missingInformation: [
+    {
+      question: "Are there specific brand guidelines to follow?",
+      reason: "The brief does not reference a brand style guide.",
+    },
+  ],
+  suggestedTasks: [
+    {
+      suggestionId: "demo_suggested_task_1",
+      title: "Set up cross-platform development environment",
+      description: "Configure React Native or Flutter development environment for iOS and Android.",
+      priority: "HIGH",
+    },
+    {
+      suggestionId: "demo_suggested_task_2",
+      title: "Implement offline data caching",
+      description: "Set up local storage for offline data capability.",
+      priority: "MEDIUM",
+    },
+  ],
+};
+
+export async function seedDemoWorkspace(prisma: Prisma): Promise<{
+  organizationId: string;
+  ownerUserId: string;
+  memberUserId: string;
+}> {
+  const org = await createDemoOrganization(prisma);
+
+  const users = await createDemoUsers(prisma, org.id, DEMO_OWNER_AUTH_USER_ID, DEMO_MEMBER_AUTH_USER_ID);
+
+  const ctx: SeedContext = {
+    organizationId: org.id,
+    ownerUserId: users.owner.id,
+    ownerAuthUserId: DEMO_OWNER_AUTH_USER_ID,
+    memberUserId: users.member.id,
+    memberAuthUserId: DEMO_MEMBER_AUTH_USER_ID,
+  };
+
+  const leads = await createDemoLeads(prisma, ctx);
+  const convertedLeadId = leads.find((l) => l.id === "demo_lead_qualified")!.id;
+  const wonLeadId = leads.find((l) => l.id === "demo_lead_won")!.id;
+
+  const clients = await createDemoClients(prisma, ctx, {
+    convertedId: convertedLeadId,
+    wonId: wonLeadId,
+  });
+  const clientIds = {
+    convertedId: clients.find((c) => c.id === "demo_client_converted")!.id,
+    wonId: clients.find((c) => c.id === "demo_client_won")!.id,
+    inactiveId: clients.find((c) => c.id === "demo_client_inactive")!.id,
+  };
+
+  const projects = await createDemoProjects(prisma, ctx, clientIds);
+
+  const websiteProject = projects.find((p) => p.name.includes("Website"));
+  const mobileProject = projects.find((p) => p.name.includes("Mobile"));
+  const brandProject = projects.find((p) => p.name.includes("Brand"));
+  const ecommerceProject = projects.find((p) => p.name.includes("E-commerce"));
+  const apiProject = projects.find((p) => p.name.includes("API"));
+
+  if (!websiteProject || !mobileProject || !brandProject || !ecommerceProject || !apiProject) {
+    throw new Error("Demo projects were not created with expected names");
+  }
+
+  const projectIds: DemoProjectIds = {
+    website: websiteProject.id,
+    mobile: mobileProject.id,
+    brand: brandProject.id,
+    ecommerce: ecommerceProject.id,
+    api: apiProject.id,
+  };
+
+  const tasks = await createDemoTasks(prisma, ctx, projectIds);
+  const documents = await createDemoDocuments(prisma, ctx, projectIds);
+  const briefDoc = documents.find((d) => d.name === "Demo Mobile App Brief");
+  if (!briefDoc) throw new Error("Demo brief document was not created");
+
+  const aiAnalysis = await createDemoAIAnalysis(
+    prisma, ctx, projectIds.mobile, briefDoc.id, briefDoc.name, briefDoc.updatedAt,
+    DEMO_AI_ANALYSIS_RESULT,
+  );
+
+  await createDemoAIAnalysisFeedback(prisma, ctx, projectIds.mobile, aiAnalysis.id);
+
+  const inProgressTask = tasks.find((t) => t.title === "Demo — Implement login flow");
+  const inProgressTaskId = inProgressTask ? inProgressTask.id : tasks[0]!.id;
+
+  await createDemoActivity(prisma, ctx, {
+    leadIds: leads.map((l) => l.id),
+    clientIds: clients.map((c) => c.id),
+    projectIds: projects.map((p) => p.id),
+    taskId: inProgressTaskId,
+  });
+
+  await createDemoAIConversation(prisma, ctx, projectIds.website);
+
+  return {
+    organizationId: org.id,
+    ownerUserId: users.owner.id,
+    memberUserId: users.member.id,
+  };
+}
+
+export async function deleteDemoWorkspaceData(prisma: Prisma): Promise<string | null> {
+  const org = await prisma.organization.findUnique({
+    where: { slug: DEMO_ORGANIZATION_SLUG },
+    select: { id: true },
+  });
+
+  if (!org) return null;
+
+  const conversationIds = await prisma.aIConversation.findMany({
+    where: { organizationId: org.id },
+    select: { id: true },
+  });
+
+  await prisma.$transaction(async (tx) => {
+    if (conversationIds.length > 0) {
+      await tx.aIConversationMessage.deleteMany({
+        where: { conversationId: { in: conversationIds.map((c) => c.id) } },
+      });
+    }
+    await tx.activity.deleteMany({ where: { organizationId: org.id } });
+    await tx.aIConversation.deleteMany({ where: { organizationId: org.id } });
+    await tx.aIAssistantTaskProposal.deleteMany({ where: { organizationId: org.id } });
+    await tx.aIAnalysisFeedback.deleteMany({ where: { organizationId: org.id } });
+    await tx.aISuggestedTaskApproval.deleteMany({ where: { organizationId: org.id } });
+    await tx.projectAIAnalysis.deleteMany({ where: { organizationId: org.id } });
+    await tx.projectDocument.deleteMany({ where: { organizationId: org.id } });
+    await tx.task.deleteMany({ where: { organizationId: org.id } });
+    await tx.project.deleteMany({ where: { organizationId: org.id } });
+    await tx.client.deleteMany({ where: { organizationId: org.id } });
+    await tx.lead.deleteMany({ where: { organizationId: org.id } });
+    await tx.organizationInvitation.deleteMany({ where: { organizationId: org.id } });
+    await tx.organizationMember.deleteMany({ where: { organizationId: org.id } });
+    await tx.organization.deleteMany({ where: { id: org.id } });
+    await tx.user.deleteMany({
+      where: { email: { in: [DEMO_USER_EMAIL, DEMO_MEMBER_EMAIL] } },
+    });
+  });
+
+  return org.id;
+}
 
 const now = new Date();
 const TWO_DAYS_AGO = new Date(now.getTime() - 2 * 86_240_000);

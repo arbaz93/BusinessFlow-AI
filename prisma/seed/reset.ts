@@ -17,6 +17,7 @@ import { PrismaClient } from "../../app/generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { isSeedEnvironmentAllowed } from "./env-guard";
 import { isLocalDatabase } from "./env-helpers";
+import { seedDemoWorkspace } from "./factories";
 
 dotenv.config({ path: ".env.local" });
 dotenv.config({ path: ".env" });
@@ -69,8 +70,10 @@ async function main() {
 
   console.log("Database reset complete. Re-seeding...\n");
 
-  const seedModule = await import("./main");
-  await seedModule.runSeed(prisma);
+  const { organizationId, ownerUserId, memberUserId } = await seedDemoWorkspace(prisma);
+  console.log(`Demo workspace: ${organizationId}`);
+  console.log(`Owner user: ${ownerUserId}`);
+  console.log(`Member user: ${memberUserId}`);
 }
 
 main()

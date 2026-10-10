@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { Avatar, Dialog, DropdownMenu } from "radix-ui";
 
 import { ThemeToggle } from "@/components/theme-toggle";
+import { DemoBanner } from "@/components/demo/demo-banner";
 import {
   Building2,
   ChevronDown,
@@ -41,6 +42,7 @@ type WorkspaceShellProps = {
   userName: string;
   userEmail: string;
   avatarUrl: string | null;
+  isDemo?: boolean;
 };
 
 function getInitials(name: string) {
@@ -315,6 +317,7 @@ export function WorkspaceShell({
   userName,
   userEmail,
   avatarUrl,
+  isDemo = false,
 }: WorkspaceShellProps) {
   const pathname = usePathname();
   const { section, label } = getNavigationContext(pathname);
@@ -441,6 +444,7 @@ export function WorkspaceShell({
                 : "px-4 py-6 sm:px-6 sm:py-8 xl:px-10"
             }`}
           >
+            {isDemo ? <DemoBanner /> : null}
             {children}
           </main>
         </div>
