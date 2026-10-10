@@ -7,7 +7,6 @@ import { cookies } from "next/headers";
 import { getSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { prisma } from "@/lib/db/prisma";
-import { isSeedEnvironmentAllowed } from "@/prisma/seed/env-guard";
 import { seedDemoWorkspace, deleteDemoWorkspaceData, DEMO_USER_EMAIL } from "@/prisma/seed/factories";
 import { isDemoModeEnabled, getDemoOwnerCredentials } from "@/lib/demo/config";
 import { isDemoEmail } from "@/lib/demo/guard";
@@ -122,10 +121,6 @@ export type DemoResetResult = { success: boolean; error?: string };
 export async function resetDemoWorkspace(): Promise<DemoResetResult> {
   if (!isDemoModeEnabled()) {
     return { success: false, error: "Demo mode is not available." };
-  }
-
-  if (!isSeedEnvironmentAllowed()) {
-    return { success: false, error: "Demo workspace reset is not available in this environment." };
   }
 
   const clientIp = await getClientIdentifier();
