@@ -180,7 +180,7 @@ function LeadForm({ lead, onClose }: { lead?: LeadDraft; onClose: () => void }) 
             <Dialog.Close asChild>
               <button type="button" className="h-10 rounded-lg px-4 text-sm font-medium text-[var(--foreground)]/65 transition-colors hover:bg-[var(--surface)] hover:text-[var(--foreground)]">Cancel</button>
             </Dialog.Close>
-            <button type="submit" disabled={pending} className="h-10 rounded-lg bg-[var(--accent)] px-4 text-sm font-medium text-[var(--foreground)] transition-colors hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-55">
+            <button type="submit" disabled={pending} className="h-10 rounded-lg bg-[var(--accent)] px-4 text-sm font-medium text-white transition-colors hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-55">
               {pending ? "Saving…" : lead ? "Save Changes" : "Create Lead"}
             </button>
           </div>

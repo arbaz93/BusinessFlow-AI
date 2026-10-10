@@ -124,7 +124,7 @@ function ClientForm({ client, onClose }: { client?: ClientDraft; onClose: () => 
 
           <div className="flex flex-col-reverse gap-2 border-t border-[var(--line)] pt-4 sm:flex-row sm:justify-end">
             <Dialog.Close asChild><button type="button" className="h-10 rounded-lg px-4 text-sm font-medium text-[var(--muted)] transition-colors hover:bg-[var(--surface)] hover:text-[var(--foreground)]">Cancel</button></Dialog.Close>
-            <button type="submit" disabled={pending} className="h-10 rounded-lg bg-[var(--accent)] px-4 text-sm font-medium text-[var(--foreground)] transition-colors hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-55">{pending ? "Saving…" : client ? "Save Changes" : "Create Client"}</button>
+            <button type="submit" disabled={pending} className="h-10 rounded-lg bg-[var(--accent)] px-4 text-sm font-medium text-white transition-colors hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-55">{pending ? "Saving…" : client ? "Save Changes" : "Create Client"}</button>
           </div>
         </form>
       </Dialog.Content>

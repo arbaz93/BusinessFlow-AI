@@ -201,7 +201,7 @@ function ProjectForm({
             <Dialog.Close asChild>
               <button type="button" disabled={pending} className="h-10 rounded-lg px-4 text-sm font-medium text-[var(--muted)] transition-colors hover:bg-[var(--surface)] hover:text-[var(--foreground)] disabled:opacity-50">Cancel</button>
             </Dialog.Close>
-            <button type="submit" disabled={pending || !values.name.trim() || !values.clientId} className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-[var(--accent)] px-4 text-sm font-semibold text-[var(--foreground)] transition-colors hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-55">
+            <button type="submit" disabled={pending || !values.name.trim() || !values.clientId} className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-[var(--accent)] px-4 text-sm font-semibold text-white transition-colors hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-55">
               {pending ? (project ? "Saving…" : "Creating…") : project ? "Save Project" : "Create Project"}
             </button>
           </div>

@@ -103,7 +103,7 @@ export function SecurityForm() {
           <button
             type="submit"
             disabled={passwordDisabled}
-            className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-[var(--accent)] px-4 text-sm font-semibold text-[var(--foreground)] transition-colors hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-55"
+            className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-[var(--accent)] px-4 text-sm font-semibold text-white transition-colors hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-55"
           >
             {passwordPending ? "Updating…" : "Update password"}
           </button>
