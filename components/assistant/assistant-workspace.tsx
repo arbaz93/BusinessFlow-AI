@@ -12,6 +12,8 @@ import {
   submitAssistantMessage,
 } from "@/app/actions/ai-assistant";
 import { AssistantMessageContent } from "@/components/assistant/assistant-message-content";
+import { AssistantThinkingIndicator } from "@/components/assistant/assistant-thinking-indicator";
+import { determineAssistantActivityStatus } from "@/lib/assistant/activity-labels";
 import { TaskProposalCard } from "@/components/assistant/task-proposal-card";
 import { Textarea } from "@/components/ui/textarea";
 import type {
@@ -147,6 +149,7 @@ function ConversationPanel({
   );
   const [draft, setDraft] = useState("");
   const [sending, setSending] = useState(false);
+  const [activityStatus, setActivityStatus] = useState("Preparing your response…");
   const [error, setError] = useState<string | null>(null);
   const [retryRequest, setRetryRequest] = useState<RetryRequest | null>(
     () => latestUnansweredRequest(conversation.messages),
@@ -172,6 +175,7 @@ function ConversationPanel({
     if (sendingRef.current) return;
     sendingRef.current = true;
     setSending(true);
+    setActivityStatus(determineAssistantActivityStatus(request.content));
     setError(null);
     setRetryRequest(request);
     const isRetry = messages.some((message) => message.requestId === request.requestId);
@@ -188,6 +192,7 @@ function ConversationPanel({
       }]);
     }
 
+    setActivityStatus("Processing your response…");
     try {
       const result = await submitAssistantMessage({
         conversationId: conversation.id,
@@ -225,6 +230,7 @@ function ConversationPanel({
     } finally {
       sendingRef.current = false;
       setSending(false);
+      setActivityStatus("Preparing your response…");
     }
   }
 
@@ -374,10 +380,7 @@ function ConversationPanel({
               );
             })}
             {sending && (
-              <p role="status" aria-live="polite" className="flex items-center gap-2 text-xs text-[var(--foreground)]/45">
-                <LoaderCircle size={13} className="animate-spin text-[var(--accent-muted)]" aria-hidden="true" />
-                Preparing a response…
-              </p>
+              <AssistantThinkingIndicator status={activityStatus} />
             )}
             <div aria-hidden="true" />
           </div>
